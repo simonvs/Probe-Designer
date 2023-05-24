@@ -60,6 +60,11 @@ def parse_file_to_seqrecord(filepath):
 
 
 def main():
+    """
+    Ejecutar directamente el archivo descarga requiere entregar el parámetro --accessionnumber para ejecutar la función accnum_to_seqrecord.
+
+    :param accesion_number: El accesion number del archivo en GenBank, por ejemplo NG_008617.1
+    """
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-an',
                         '--accessionnumber',
