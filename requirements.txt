@@ -2,3 +2,4 @@ Bio
 argparse
 pathlib
 shutil
+bcbio-gff
