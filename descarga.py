@@ -21,6 +21,7 @@ def accnum_to_seqrecord(accesion_number):
         os.mkdir(folder_path)
 
     filepath = os.path.join(folder_path, accesion_number+".gbk")
+    print(filepath)
     #Verifica si el archivo ya está descargado
     if not os.path.isfile(filepath):
         try:
@@ -38,9 +39,9 @@ def accnum_to_seqrecord(accesion_number):
 
 def parse_file_to_seqrecord(filepath):
     """
-    Función que recibe la ruta de un archivo genético anotado y lo retorna como SeqRecord. Genera una copia del achivo en la carpeta files.
-    Solo se aceptan archivos en formato "GenBank" y "GFF3", o sea '.gbk', '.gb' y '.gff3'.
-    Estos archivos pueden estar comprimidos en formato '.gz'.
+    Función que recibe la ruta de un archivo genético anotado y lo retorna como SeqRecord. Genera una copia
+    del achivo en la carpeta files. Solo se aceptan archivos en formato "GenBank" y "GFF3", o sea '.gbk',
+    '.gb' y '.gff3'. Estos archivos pueden estar comprimidos en formato '.gz'.
 
     :param filepath: La ruta donde se encuentra el archivo que se quiere utilizar
     :return: La secuencia en formato SeqRecord con todas sus anotaciones.
@@ -82,7 +83,8 @@ def parse_file_to_seqrecord(filepath):
 
 def main():
     """
-    Ejecutar directamente el archivo 'descarga' requiere entregar el parámetro --accessionnumber para ejecutar la función accnum_to_seqrecord.
+    Ejecutar directamente el archivo 'descarga' requiere entregar el parámetro --accessionnumber para
+    descargar una secuencia mediante la función accnum_to_seqrecord.
 
     :param --accesionnumber: El accesion number del archivo en GenBank, por ejemplo NG_008617.1
     """
@@ -96,9 +98,8 @@ def main():
     args = parser.parse_args()
     dargs = vars(args)
 
-    if (dargs["database"] == 'nucleotide'):
-        record = accnum_to_seqrecord(accesion_number=dargs["accessionnumber"])
-        print(len(record))
+    record = accnum_to_seqrecord(accesion_number=dargs["accessionnumber"])
+    print(len(record))
 
 if __name__ == "__main__":
     main()

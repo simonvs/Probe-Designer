@@ -1,0 +1,31 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter A
+  \item \spxentry{accnum\_to\_seqrecord()}\spxextra{en el módulo descarga}, \hyperpage{1}
+
+  \indexspace
+  \bigletter D
+  \item \spxentry{descarga}
+    \subitem \spxentry{módulo}, \hyperpage{1}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{main()}\spxextra{en el módulo descarga}, \hyperpage{1}
+  \item \spxentry{módulo}
+    \subitem \spxentry{descarga}, \hyperpage{1}
+    \subitem \spxentry{test}, \hyperpage{2}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{parse\_file\_to\_seqrecord()}\spxextra{en el módulo descarga}, \hyperpage{2}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{test}
+    \subitem \spxentry{módulo}, \hyperpage{2}
+
+\end{sphinxtheindex}
