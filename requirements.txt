@@ -3,4 +3,4 @@ pandas
 argparse
 pathlib
 shutil
-bcbio-gff
+primer3-py
