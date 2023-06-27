@@ -18,7 +18,7 @@ def check_probe(seq, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
     :param record:
     :param minlen: El largo mínimo de la sonda.
     :param maxlen: El largo máximo de la sonda.
-    :return: La secuencia en formato SeqRecord con todas sus anotaciones.
+    :return: 
     """
 
     #Chequear largo
@@ -27,7 +27,9 @@ def check_probe(seq, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
         return False
     
     #Chequear Tm
-    if MeltingTemp.Tm_NN(seq) < tmmin or MeltingTemp.Tm_NN(seq) > tmmax:
+    tm = MeltingTemp.Tm_NN(seq)
+    #tm = primer3.calc_tm(str(seq))
+    if tm < tmmin or tm > tmmax:
         #print('Tm fuera de rango')
         return False
     
@@ -40,7 +42,7 @@ def check_probe(seq, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
     #dg_hairpin = primer3.calcHairpin(str(seq)).dg
     #dg_homodimero = primer3.calcHomodimer(str(seq)).dg
 
-    #Chequear especificidad usando alineamiento
+    #Chequear especificidad
     #aligner = PairwiseAligner()
     #aligner.mode = 'local'
     #aligner.match_score = 1  # Puntaje por coincidencia
@@ -53,27 +55,62 @@ def check_probe(seq, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
     #PENDIENTE: ¿Qué criterio uso para considerarlo específico?
     #if(sorted(alineamiento)[0].score >= float(len(seq)/4)):
     #    return False
+
+
+    # EVITAR ZONAS SNP
+
     return True
 
 
-def get_probe_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
+def get_probe_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, maxdist):
     i = minlen
     b = False
-    while i <= maxlen and not b:
-        if site == -1:
-            probe = record.seq[empalme[0]-i:empalme[0]].reverse_complement()
-            query = record.seq[:empalme[0]-i-1] + record.seq[empalme[0]+1:]
-        elif site == 1:
-            probe = record.seq[empalme[1]:empalme[1]+i].reverse_complement()
-            query = record.seq[:empalme[1]-1] + record.seq[empalme[1]+i+1:]
-        else:
+    # while i <= maxlen and not b:
+    #     if site == -1:
+    #         probe = record.seq[empalme[0]-i:empalme[0]].reverse_complement()
+    #         query = record.seq[:empalme[0]-i-1] + record.seq[empalme[0]+1:]
+    #     elif site == 1:
+    #         probe = record.seq[empalme[1]:empalme[1]+i].reverse_complement()
+    #         query = record.seq[:empalme[1]-1] + record.seq[empalme[1]+i+1:]
+    #     else:
+    #         probe = (record.seq[empalme[0]-i//2:empalme[0]] + record.seq[empalme[1]:empalme[1]+i//2]).reverse_complement()
+    #         query = record.seq
+    #     b = check_probe(probe, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+    #     i += 1
+
+    if site == 0:
+        while i <= maxlen and not b:
             probe = (record.seq[empalme[0]-i//2:empalme[0]] + record.seq[empalme[1]:empalme[1]+i//2]).reverse_complement()
             query = record.seq
-        b = check_probe(probe, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
-        i += 1
+            b = check_probe(probe, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+            i += 1
+        if not b:
+            return (Seq('AAA'), -1)
+        return (probe, -1)
+
+    elif site == -1:
+        dist_to_border = 0
+        while dist_to_border <= maxdist and not b:
+            while i <= maxlen and not b:
+                probe = record.seq[empalme[0]-i-dist_to_border:empalme[0]-dist_to_border].reverse_complement()
+                query = record.seq[:empalme[0]-i-dist_to_border-1] + record.seq[empalme[0]-dist_to_border+1:]
+                b = check_probe(probe, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                i += 1
+            dist_to_border += 1
+
+    else:
+        dist_to_border = 0
+        while dist_to_border <= maxdist and not b:
+            while i <= maxlen and not b:
+                probe = record.seq[empalme[1]+dist_to_border:empalme[1]+i+dist_to_border].reverse_complement()
+                query = record.seq[:empalme[1]+dist_to_border-1] + record.seq[empalme[1]+i+dist_to_border+1:]
+                b = check_probe(probe, query, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                i += 1
+            dist_to_border += 1
+
     if not b:
-        return Seq('AAA')
-    return probe
+        return (Seq('AAA'), -1)
+    return (probe, dist_to_border-1)
 
 
 def get_splicing_pairs(locations):  
@@ -87,7 +124,7 @@ def get_splicing_pairs(locations):
     return empalmes
 
 
-def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=75, gcmin=30, gcmax=70):
+def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, maxdist=50):
 
     locations = []
     dict_cds = {
@@ -115,45 +152,49 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=75, gcmin=30, 
         'lado':[],
         'tm':[],
         'gc':[],
-        'largo':[]
+        'largo':[],
+        'dist':[]
     }
 
     for index, row in df_cds.iterrows():
         for empalme in row['empalmes']:
-            donor = get_probe_from_pos(empalme, record, -1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+            donor = get_probe_from_pos(empalme, record, -1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, maxdist)
             dict_probes['gen'].append(row['gen'])
             dict_probes['transcrito'].append(row['info'])
             dict_probes['empalme'].append(str(empalme))
-            dict_probes['sonda'].append(str(donor))
+            dict_probes['sonda'].append(str(donor[0]))
             dict_probes['lado'].append('donor site')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(donor)))
-            dict_probes['gc'].append(int(GC(donor)))
-            dict_probes['largo'].append(len(donor))
+            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(donor[0])))
+            dict_probes['gc'].append(int(GC(donor[0])))
+            dict_probes['largo'].append(len(donor[0]))
+            dict_probes['dist'].append(donor[1])
 
-            acceptor = get_probe_from_pos(empalme, record, 1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+            acceptor = get_probe_from_pos(empalme, record, 1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, maxdist)
             dict_probes['gen'].append(row['gen'])
             dict_probes['transcrito'].append(row['info'])
             dict_probes['empalme'].append(str(empalme))
-            dict_probes['sonda'].append(str(acceptor))
+            dict_probes['sonda'].append(str(acceptor[0]))
             dict_probes['lado'].append('acceptor site')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(acceptor)))
-            dict_probes['gc'].append(int(GC(acceptor)))
-            dict_probes['largo'].append(len(acceptor))
+            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(acceptor[0])))
+            dict_probes['gc'].append(int(GC(acceptor[0])))
+            dict_probes['largo'].append(len(acceptor[0]))
+            dict_probes['dist'].append(acceptor[1])
 
-            central = get_probe_from_pos(empalme, record, 0, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+            central = get_probe_from_pos(empalme, record, 0, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, maxdist)
             dict_probes['gen'].append(row['gen'])
             dict_probes['transcrito'].append(row['info'])
             dict_probes['empalme'].append(str(empalme))
-            dict_probes['sonda'].append(str(central))
+            dict_probes['sonda'].append(str(central[0]))
             dict_probes['lado'].append('central')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(central)))
-            dict_probes['gc'].append(int(GC(central)))
-            dict_probes['largo'].append(len(central))
+            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(central[0])))
+            dict_probes['gc'].append(int(GC(central[0])))
+            dict_probes['largo'].append(len(central[0]))
+            dict_probes['dist'].append(central[1])
 
     df_probes = pd.DataFrame(dict_probes)
     return df_probes
 
-def generate_xlsx(df, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
+def generate_xlsx(df, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, maxdist=50):
     wb = Workbook()
 
     sheet1 = wb.active
@@ -178,6 +219,12 @@ def generate_xlsx(df, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
 
     sheet1.cell(row=10, column=1).value = '%GC máximo'
     sheet1.cell(row=10, column=2).value = gcmax
+
+    sheet1.cell(row=12, column=1).value = 'Dist maxima al borde del exón'
+    sheet1.cell(row=12, column=2).value = maxdist
+
+    for cell in sheet1['A']:
+        cell.style = 'Pandas'
 
     for column_cells in sheet1.columns:
         max_length = 2
@@ -228,7 +275,7 @@ def main():
     parser.add_argument('-minlen', '--minimumlength',help='Largo mínimo de sonda.' ,type=int,default=60)
     parser.add_argument('-maxlen', '--maximumlength',help='Largo mínimo de sonda.' ,type=int,default=120)
     parser.add_argument('-tmmin', '--mintempmelting',help='Temperatura de melting mínima.' ,type=int,default=65)
-    parser.add_argument('-tmmax', '--maxtempmelting',help='Temperatura de melting máxima.' ,type=int,default=75)
+    parser.add_argument('-tmmax', '--maxtempmelting',help='Temperatura de melting máxima.' ,type=int,default=80)
     parser.add_argument('-gcmin', '--minumumgc',help='Porcentaje de GC mínimo.' ,type=int,default=30)
     parser.add_argument('-gcmax', '--maximumgc',help='Porcentaje de GC máximo.' ,type=int,default=70)
 
