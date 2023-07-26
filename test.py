@@ -31,5 +31,29 @@
 # #    print("Score = %.3f:" % alignment.score)
 # #    print(alignment)
 
-import re
-print([match.group() for match in re.finditer(r"([A-Z]+)\1{1,}", "ACTGTAGGGCTGTACTACTACTATG")])
+#import re
+#print([match.group() for match in re.finditer(r"([A-Z]+)\1{1,}", "ACTGTAGGGCTGTACTACTACTATG")])
+
+from Bio.Seq import Seq
+
+def validar_repeticiones(seq):
+    secuencia_adn = str(seq)
+    n = len(secuencia_adn)
+
+    for i in range(n - 3):
+        subsecuencia = secuencia_adn[i:i+4]
+        
+        if all(subsecuencia == secuencia_adn[j:j+4] for j in range(i+1, i+4)):
+            return True
+
+    return False
+
+# Ejemplo de uso
+secuencia_adn = Seq("ACGTAGTAGTAGTAGTTTACCC")
+print(secuencia_adn)
+resultado = validar_repeticiones(secuencia_adn)
+
+if resultado:
+    print("La secuencia contiene una subsecuencia de 1, 2 o 3 nucleótidos que se repite 4 veces seguidas.")
+else:
+    print("La secuencia no contiene una subsecuencia de 1, 2 o 3 nucleótidos que se repite 4 veces seguidas.")
