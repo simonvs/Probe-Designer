@@ -2,73 +2,118 @@ import descarga
 import argparse
 import pandas as pd
 import primer3
+import subprocess
 from Bio.SeqUtils import GC, MeltingTemp
 from Bio.Seq import Seq
-from Bio.Align import PairwiseAligner
+from Bio import SearchIO
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from datetime import datetime
 
 
-def check_probe(seq, minlen, maxlen, tmmin, tmmax, gcmin, gcmax):
+def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin):
     """
     Función que recibe una sonda (secuencia) y las restricciones para verificar que la
     sonda cumpla los parámetros establecidos.
     Retorna un valor booleano que determina si cumple las restricciones o no.
     :param seq: La secuencia que se quiere verificar.
-    :param record:
     :param minlen: El largo mínimo de la sonda.
     :param maxlen: El largo máximo de la sonda.
-    :return: 
+    :param tmmin: Temperatura de melting mínima.
+    :param tmmax: Temperatura de melting máxima.
+    :param gcmin: Porcentaje de GC mínimo.
+    :param gcmax: Porcentaje de GC máximo.
+    :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
+    :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
+    :return: Booleano que determina su factibilidad
     """
 
     #Chequear largo
     if len(seq) < minlen or len(seq) > maxlen:
-        #print('Largo no valido')
+        print('Largo no valido')
         return False
     
     #Chequear Tm
     tm = MeltingTemp.Tm_NN(seq)
     #tm = primer3.calc_tm(str(seq))
     if tm < tmmin or tm > tmmax:
-        #print('Tm fuera de rango')
+        print('Tm fuera de rango')
         return False
     
     #Chequear %GC
     if GC(seq) < gcmin or GC(seq) > gcmax:
-        #print('GC fuera de rango')
+        print('GC fuera de rango')
         return False
     
     #Chequear hetero - homodimeros - horquilla
     #dg_hairpin = primer3.calcHairpin(str(seq)).dg
+    if primer3.calcHairpin(str(seq)).dg < dgmin_hairpin:
+        print('Hairpin')
+        return False
+
     #dg_homodimero = primer3.calcHomodimer(str(seq)).dg
+    if primer3.calcHomodimer(str(seq)).dg < dgmin_homodim:
+        print('Homodimer')
+        return False
+    
     #dg_heterodimero = primer3.calcHeterodimer(str(seq)).dg
     
-    # Chequear homopolimeros: recibe seq y un int q indique tamaño de homopol (1,2,3)
+    # Chequear homopolimeros de 1 base
+    bases = ['A', 'C', 'G', 'T']
+    for b in bases:
+        if b * 6 in seq:
+            print('Homopolimero de 1 nucleotido')
+            return False
+        
+    # Chequear homopolimeros de 2 bases
+    checked = []
+    for i in range(len(seq)-2):
+        subseq = str(seq[i:i+1])
+        if subseq not in checked:
+            if subseq * 4 in seq:
+                print('Homopolimero de 2 nucleotidos')
+                return False
+            checked.append(subseq)
 
-
+    # Chequear homopolimeros de 3 bases
+    checked = []
+    for i in range(len(seq)-3):
+        subseq = str(seq[i:i+2])
+        if subseq not in checked:
+            if subseq * 4 in seq:
+                print('Homopolimero de 3 nucleotidos')
+                return False
+            checked.append(subseq)
+    
     #Chequear especificidad (BLAST LOCAL)
+    if not verify_specificity(seq, iscentral):
+        print('Especificidad')
+        return False
     
-
-    #aligner = PairwiseAligner()
-    #aligner.mode = 'local'
-    #aligner.match_score = 1  # Puntaje por coincidencia
-    #aligner.mismatch_score = -1  # Puntaje por desajuste
-    #aligner.open_gap_score = -1  # Puntaje por abrir un gap
-    #aligner.extend_gap_score = -0.5  # Puntaje por extender un gap
-    #alineamiento = aligner.align(seq.complement(), str(query))
-
-    #PENDIENTE: ¿Qué criterio uso para considerarlo específico?
-    #if(sorted(alineamiento)[0].score >= float(len(seq)/4)):
-    #    return False
-
-    
-    # EVITAR ZONAS SNP
-
     return True
 
+
 #Generar par de sondas para una ubicación y un site con ciertos parametros
-def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap):
+def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin):
+    """
+    Esta función genera un par de sondas a partir de la secuencia de referencia y dos posiciones que representan el punto de empalme entre dos exones.
+    :param empalme: Tupla con posiciones que representan al punto de empalme o splicing.
+    :param record: Secuencia de referencia.
+    :param site: Entero que representa si las sondas son donor, acceptor o central.
+    :param minlen: El largo mínimo de la sonda.
+    :param maxlen: El largo máximo de la sonda.
+    :param tmmin: Temperatura de melting mínima.
+    :param tmmax: Temperatura de melting máxima.
+    :param gcmin: Porcentaje de GC mínimo.
+    :param gcmin: Porcentaje de GC máximo.
+    :param mindist: Distancia mínima al borde del exón.
+    :param maxdist: Distancia máxima al borde del exón.
+    :param minoverlap: Sobrelape mínimo entre sondas.
+    :param maxoverlap: Sobrelape máximo entre sondas.
+    :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
+    :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
+    :return: Lista con dos sondas, cada sonda es una tupla con la secuencia, la posición de inicio, la posición final y la distancia al borde del exón si aplica.
+    """
     b = False
     if site == 0:
         i = minlen
@@ -76,7 +121,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
             pos_inicio_int = empalme[0]-i//2
             pos_fin_int = empalme[1]+i//2
             probe_int = (record.seq[pos_inicio_int:empalme[0]] + record.seq[empalme[1]:pos_fin_int]).reverse_complement()
-            b = check_probe(probe_int, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+            b = check_probe(probe_int, True, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin)
             i += 1
         if not b:
             return [(Seq('AAA'), -1, -1, -1), (Seq('AAA'), -1, -1, -1)]
@@ -87,7 +132,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
                 pos_inicio_ext = empalme[0]-i//2
                 pos_fin_ext = empalme[1]+i//2
                 probe_ext = (record.seq[pos_inicio_ext:empalme[0]] + record.seq[empalme[1]:pos_fin_ext]).reverse_complement()
-                b = check_probe(probe_ext, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                b = check_probe(probe_ext, True, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin)
                 i += 1
             if b:
                 return [(probe_int, pos_inicio_int, pos_fin_int, -1), (probe_ext, pos_inicio_ext, pos_fin_ext, -1)]
@@ -103,7 +148,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
                 pos_inicio_int = empalme[0]-i-dist_to_border
                 pos_fin_int = empalme[0]-dist_to_border
                 probe_int = record.seq[pos_inicio_int:pos_fin_int].reverse_complement()
-                b = check_probe(probe_int, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                b = check_probe(probe_int, False, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin)
                 i += 1
             dist_to_border += 1
         if not b:
@@ -118,7 +163,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
                     pos_inicio_ext = int(empalme[0]-j-dist_to_border)
                     pos_fin_ext = int(empalme[0]-dist_to_border)
                     probe_ext = record.seq[pos_inicio_ext:pos_fin_ext].reverse_complement()
-                    b = check_probe(probe_ext, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                    b = check_probe(probe_ext, False, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin)
                     j += 1
                 dist_to_border += 1
             if b:
@@ -135,7 +180,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
                 pos_inicio_int = empalme[1]+dist_to_border
                 pos_fin_int = empalme[1]+i+dist_to_border
                 probe_int = record.seq[pos_inicio_int:pos_fin_int].reverse_complement()
-                b = check_probe(probe_int, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                b = check_probe(probe_int, False, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin)
                 i += 1
             dist_to_border += 1
         
@@ -151,7 +196,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
                     pos_inicio_ext = int(empalme[1]+dist_to_border)
                     pos_fin_ext = int(empalme[1]+j+dist_to_border)
                     probe_ext = record.seq[pos_inicio_ext:pos_fin_ext].reverse_complement()
-                    b = check_probe(probe_ext, minlen, maxlen, tmmin, tmmax, gcmin, gcmax)
+                    b = check_probe(probe_ext, False, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin)
                     j += 1
                 dist_to_border += 1
             if b:
@@ -159,9 +204,56 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
             else:
                 return [(probe_int, pos_inicio_int, pos_fin_int, dist_int_probe), (Seq('AAA'), -1, -1, -1)]
 
+def verify_specificity(seq, iscentral):
+    """
+    Función que verifica la especificidad o unicidad de una secuencia usando la herramienta de alineamiento BLAST de manera local.
+    Es necesario tener instalado Blast+ y las bases de datos en la carpeta 'refseq'.
+    :param seq: Secuencia de nuecleótidos que se quiere validar.
+    :param iscentral: Booleano que indica si se trata de una sonda central. Se utilizan diferentes criterios para chequear la especificidad de una sonda central.
+    :return: Bolleano que indica si la secuencia se considera específica.
+    """
+    db1_name = "refseq/db1_genoma"
+    db2_name = "refseq/db2_transcriptoma"
+    query = "refseq/query.txt"
+    outxml = 'refseq/resultados.xml'
+
+    with open(query, "w") as archivo:
+        archivo.write(">1\n")
+        archivo.write(str(seq))
+
+    blastn_cmd = ['blastn',
+                '-task', 'blastn-short',
+                '-query', query,
+                '-db', db1_name,
+                '-out', outxml,
+                '-outfmt', '5',
+                '-word_size', '11',
+                '-dust', 'no']
+
+    subprocess.run(blastn_cmd, shell=True)
+    blast_qresult = SearchIO.read("resultados.xml", "blast-xml")
+
+    if iscentral:
+        if blast_qresult[0].hsps[2].evalue / blast_qresult[0].hsps[1].evalue < 100:
+            return False
+        if blast_qresult[1].hsps[0].evalue / blast_qresult[0].hsps[1].evalue < 100:
+            return False
+        
+    else:
+        if blast_qresult[0].hsps[1].evalue / blast_qresult[0].hsps[0].evalue < 100:
+            return False
+        if blast_qresult[1].hsps[0].evalue / blast_qresult[0].hsps[0].evalue < 100:
+            return False
+    return True
 
 #Obtener zonas de empalme
-def get_splicing_pairs(locations):  
+def get_splicing_pairs(locations):
+    """
+    Función que obtiene las zonas de empalme a partir de una serie de regiones que representan una transcripción.
+    Las zonas de empalme se representan por dos posiciones: el fin de un exón y el inicio del siguiente.
+    :param locations: Subregiones que representan la secuencia codificante o secuencia de exones
+    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    """
     positions = []
     for subloc in locations.parts:
         positions.append((subloc.start, subloc.end))
@@ -171,8 +263,24 @@ def get_splicing_pairs(locations):
         empalmes.append((positions[i][1].position, positions[i+1][0].position))
     return empalmes
 
-def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50):
-
+def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-8000, dgmin_hairpin=-8000):
+    """
+    Función principal diseñadora de sondas. De la secuancia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
+    :param record: Secuencia anotada de referencia para la creación de las sondas.
+    :param minlen: El largo mínimo de la sonda.
+    :param maxlen: El largo máximo de la sonda.
+    :param tmmin: Temperatura de melting mínima.
+    :param tmmax: Temperatura de melting máxima.
+    :param gcmin: Porcentaje de GC mínimo.
+    :param gcmin: Porcentaje de GC máximo.
+    :param mindist: Distancia mínima al borde del exón.
+    :param maxdist: Distancia máxima al borde del exón.
+    :param minoverlap: Sobrelape mínimo entre sondas.
+    :param maxoverlap: Sobrelape máximo entre sondas.
+    :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
+    :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
+    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    """
     locations = []
     dict_cds = {
         'gen':[],
@@ -202,12 +310,14 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
         'tm':[],
         'gc':[],
         'largo':[],
-        'dist':[]
+        'dist':[],
+        'deltag hairpin':[],
+        'deltag homodim':[]
     }
 
     for index, row in df_cds.iterrows():
         for empalme in row['empalmes']:
-            donor_probes = get_probes_from_pos(empalme, record, -1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap)
+            donor_probes = get_probes_from_pos(empalme, record, -1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin)
 
             #Sonda donor interior
             dict_probes['gen'].append(row['gen'])
@@ -221,6 +331,8 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
             dict_probes['gc'].append(int(GC(donor_probes[0][0])))
             dict_probes['largo'].append(len(donor_probes[0][0]))
             dict_probes['dist'].append(int(donor_probes[0][3]))
+            dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(donor_probes[0][0])).dg)
+            dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(donor_probes[0][0])).dg)
 
             #Sonda donor exterior
             dict_probes['gen'].append(row['gen'])
@@ -234,8 +346,10 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
             dict_probes['gc'].append(int(GC(donor_probes[1][0])))
             dict_probes['largo'].append(len(donor_probes[1][0]))
             dict_probes['dist'].append(int(donor_probes[1][3]))
+            dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(donor_probes[1][0])).dg)
+            dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(donor_probes[1][0])).dg)
 
-            acceptor_probes = get_probes_from_pos(empalme, record, 1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap)
+            acceptor_probes = get_probes_from_pos(empalme, record, 1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin)
 
             #Sonda acceptor interior
             dict_probes['gen'].append(row['gen'])
@@ -249,6 +363,8 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
             dict_probes['gc'].append(int(GC(acceptor_probes[0][0])))
             dict_probes['largo'].append(len(acceptor_probes[0][0]))
             dict_probes['dist'].append(int(acceptor_probes[0][3]))
+            dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(acceptor_probes[0][0])).dg)
+            dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(acceptor_probes[0][0])).dg)
 
             #Sonda acceptor exterior
             dict_probes['gen'].append(row['gen'])
@@ -262,8 +378,10 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
             dict_probes['gc'].append(int(GC(acceptor_probes[1][0])))
             dict_probes['largo'].append(len(acceptor_probes[1][0]))
             dict_probes['dist'].append(int(acceptor_probes[1][3]))
+            dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(acceptor_probes[1][0])).dg)
+            dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(acceptor_probes[1][0])).dg)
 
-            central_probes = get_probes_from_pos(empalme, record, 0, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap)
+            central_probes = get_probes_from_pos(empalme, record, 0, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin)
 
             #Sonda central interior
             dict_probes['gen'].append(row['gen'])
@@ -277,6 +395,8 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
             dict_probes['gc'].append(int(GC(central_probes[0][0])))
             dict_probes['largo'].append(len(central_probes[0][0]))
             dict_probes['dist'].append(int(central_probes[0][3]))
+            dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(central_probes[0][0])).dg)
+            dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(central_probes[0][0])).dg)
 
             #Sonda central exterior
             dict_probes['gen'].append(row['gen'])
@@ -290,11 +410,32 @@ def probe_designer(record, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, 
             dict_probes['gc'].append(int(GC(central_probes[1][0])))
             dict_probes['largo'].append(len(central_probes[1][0]))
             dict_probes['dist'].append(int(central_probes[1][3]))
+            dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(central_probes[1][0])).dg)
+            dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(central_probes[1][0])).dg)
 
     df_probes = pd.DataFrame(dict_probes)
     return df_probes
 
-def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50):
+def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-8000, dgmin_hairpin=-8000):
+    """
+    Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales. 
+    :param df: DataFrame de pandas que contiene las sondas y sus parámetros.
+    :param name: Nombre que se le quiere dar al reporte.
+    :param minlen: El largo mínimo de la sonda.
+    :param maxlen: El largo máximo de la sonda.
+    :param tmmin: Temperatura de melting mínima.
+    :param tmmax: Temperatura de melting máxima.
+    :param gcmin: Porcentaje de GC mínimo.
+    :param gcmin: Porcentaje de GC máximo.
+    :param mindist: Distancia mínima al borde del exón.
+    :param maxdist: Distancia máxima al borde del exón.
+    :param minoverlap: Sobrelape mínimo entre sondas.
+    :param maxoverlap: Sobrelape máximo entre sondas.
+    :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
+    :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
+    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    """
+    
     wb = Workbook()
 
     sheet1 = wb.active
@@ -331,6 +472,12 @@ def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30,
 
     sheet1.cell(row=16, column=1).value = 'Sobrelape máximo'
     sheet1.cell(row=16, column=2).value = maxoverlap
+
+    sheet1.cell(row=18, column=1).value = 'Delta G hairpin mínimo permitido'
+    sheet1.cell(row=18, column=2).value = dgmin_hairpin
+
+    sheet1.cell(row=19, column=1).value = 'Delta G homodimero mínimo permitido'
+    sheet1.cell(row=19, column=2).value = dgmin_homodim
 
     for cell in sheet1['A']:
         cell.style = 'Pandas'
@@ -389,20 +536,26 @@ def main():
     parser.add_argument('-gcmax', '--maximumgc',help='Porcentaje de GC máximo.' ,type=int,default=70)
     parser.add_argument('-olmin', '--minimumoverlap',help='Sobrelape mínimo.' ,type=int,default=25)
     parser.add_argument('-olmax', '--maximumoverlap',help='Sobrelape máximo.' ,type=int,default=50)
+    parser.add_argument('-dghairpin', '--deltaghairpin',help='Mínimo Delta G hairpin permitido.' ,type=int,default=-8000)
+    parser.add_argument('-dghomodim', '--deltaghomodimer',help='Mínimo Delta G homodimero permitido.' ,type=int,default=-8000)
 
     args = parser.parse_args()
     dargs = vars(args)
     rec = descarga.parse_file_to_seqrecord('C:/Users/simon/Downloads/tp53.gb')
     #rec = descarga.accnum_to_seqrecord(dargs["accessionnumber"])
-    df = probe_designer(record=rec,
-                        minlen=dargs["minimumlength"],
-                        maxlen=dargs["maximumlength"],
-                        tmmin=dargs["mintempmelting"],
-                        tmmax=dargs["maxtempmelting"],
-                        gcmin=dargs["minumumgc"],
-                        gcmax=dargs["maximumgc"],
-                        minoverlap=dargs["minimumoverlap"],
-                        maxoverlap=dargs["maximumoverlap"])
+    print(rec.annotations.get("accession", None))
+    df = probe_designer(record=rec)
+                        # ,
+                        # minlen=dargs["minimumlength"],
+                        # maxlen=dargs["maximumlength"],
+                        # tmmin=dargs["mintempmelting"],
+                        # tmmax=dargs["maxtempmelting"],
+                        # gcmin=dargs["minumumgc"],
+                        # gcmax=dargs["maximumgc"],
+                        # minoverlap=dargs["minimumoverlap"],
+                        # maxoverlap=dargs["maximumoverlap"],
+                        # maxoverlap=dargs["deltaghairpin"],
+                        # maxoverlap=dargs["deltaghomodimer"])
     
     generate_xlsx(df=df,
                   name='sondas',
