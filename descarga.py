@@ -40,8 +40,8 @@ def accnum_to_seqrecord(accesion_number):
 def parse_file_to_seqrecord(filepath):
     """
     Función que recibe la ruta de un archivo genético anotado y lo retorna como SeqRecord. Genera una copia
-    del achivo en la carpeta files. Solo se aceptan archivos en formato "GenBank" y "GFF3", o sea '.gbk',
-    '.gb' y '.gff3'. Estos archivos pueden estar comprimidos en formato '.gz'.
+    del achivo en la carpeta files. Solo se aceptan archivos en formato "GenBank", o sea '.gbk' y
+    '.gb'. Estos archivos pueden estar comprimidos en formato '.gz'.
 
     :param filepath: La ruta donde se encuentra el archivo que se quiere utilizar
     :return: La secuencia en formato SeqRecord con todas sus anotaciones.
