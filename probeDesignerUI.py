@@ -1,34 +1,13 @@
 import descarga
 import diseno
+import imagen
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import font
 import time
 
-# Función para simular una tarea que toma tiempo
-def tarea_larga():
-    time.sleep(3)
-    return 0
-
-# Función para mostrar la pantalla de carga
-# def pantalla_carga():
-#     carga_window = tk.Toplevel(root)
-#     carga_window.title("Cargando...")
-#     carga_label = tk.Label(carga_window, text='Ejecutando tarea')
-#     carga_label.pack()
-#     resultado = tarea_larga()
-#     carga_window.destroy()
-#     mostrar_resultado(resultado)
-
-# Función para mostrar el resultado
-# def mostrar_resultado(resultado):
-#     resultado_window = tk.Toplevel(root)
-#     resultado_window.title("Resultado")
-#     resultado_label = tk.Label(resultado_window, text=f"La tarea se ejecutó con éxito. Resultado: {resultado}")
-#     resultado_label.pack()
-#     resultado_button = tk.Button(resultado_window, text="Cerrar", command=resultado_window.destroy)
-#     resultado_button.pack()
 
 # Función para seleccionar el archivo GenBank
 def seleccionar_archivo():
@@ -44,7 +23,13 @@ def pantalla_transcripciones(seqrecord):
     transcripciones_window.title("Diseñador de sondas de hibridación para ARN mensajero")
 
     transcripciones_label = tk.Label(transcripciones_window, text=f"Seleccione las transcripciones para el diseño de sondas", font=fuente_titulo)
-    transcripciones_label.pack()
+    transcripciones_label.grid(row=0, column=0, columnspan=2, padx=10, pady=20)
+
+    frame_combobox = tk.Frame(transcripciones_window)
+    frame_combobox.grid(row=1, column=0)
+
+    frame_listbox = tk.Frame(transcripciones_window)
+    frame_listbox.grid(row=1, column=1)
 
     #Obtener lista con transcripciones
     transcripts = []
@@ -54,26 +39,92 @@ def pantalla_transcripciones(seqrecord):
             if str(info) not in transcripts:
                 transcripts.append(str(info))
     
-    checkboxes = []
-    variables = []
+    def maxlen(a):
+        maximo = 0
+        for i in a:
+            length = len(i)
+            if length > maximo:
+                maximo = length
+        return maximo
 
-    for transcripcion in transcripts:
-        var = tk.BooleanVar()
-        checkbox = tk.Checkbutton(transcripciones_window, text=transcripcion, variable=var)
-        checkbox.pack(pady=20)  # Alineación a la izquierda
-        checkboxes.append(checkbox)
-        variables.append(var)
+    # Crear Combobox para seleccionar opciones
+    combobox = ttk.Combobox(frame_combobox, values=transcripts, state="readonly", width=maxlen(transcripts))
+    combobox.pack(pady=20)
 
+    # Función para agregar una opción al Listbox si no se ha seleccionado previamente
+    def agregar_opcion():
+        opcion = combobox.get()
+        if opcion and opcion not in lista_seleccion.get(0, tk.END):
+            lista_seleccion.insert(tk.END, opcion)
+
+    # Función para seleccionar todas las opciones
+    def seleccionar_todas():
+        for opcion in transcripts:
+            if opcion not in lista_seleccion.get(0, tk.END):
+                lista_seleccion.insert(tk.END, opcion)
+
+    # Función para eliminar las opciones seleccionadas
+    def eliminar_seleccionadas():
+        seleccionados = lista_seleccion.curselection()
+        for seleccionado in seleccionados:
+            lista_seleccion.delete(seleccionado)
+
+    
     def obtener_seleccion():
-        opciones_seleccionadas = []
-        for i, var in enumerate(variables):
-            if var.get():
-                opciones_seleccionadas.append(transcripts[i])
+        seleccionados = lista_seleccion.get(0, tk.END)
         transcripciones_window.destroy()
-        pantalla_parametros(seqrecord, opciones_seleccionadas)
+        pantalla_parametros(seqrecord, [seleccionado for seleccionado in seleccionados])
 
-    boton_parametros = tk.Button(transcripciones_window, text="Continuar", command=obtener_seleccion)
-    boton_parametros.pack()
+    def volver_a_seleccion():
+        transcripciones_window.destroy()
+        root.deiconify()
+
+    # Botón para agregar la opción seleccionada al Listbox
+    boton_agregar = tk.Button(frame_combobox, text="Agregar Opción", command=agregar_opcion)
+    boton_agregar.pack()
+
+    # Listbox para mostrar las opciones seleccionadas
+    lista_seleccion = tk.Listbox(frame_listbox, selectmode=tk.MULTIPLE, width=maxlen(transcripts))
+    lista_seleccion.pack(pady=10)
+
+    # Botón para seleccionar todas las opciones
+    boton_seleccionar_todas = tk.Button(frame_listbox, text="Seleccionar Todas", command=seleccionar_todas)
+    boton_seleccionar_todas.pack()
+
+    # Botón para eliminar las opciones seleccionadas
+    boton_eliminar_seleccionadas = tk.Button(frame_listbox, text="Eliminar Seleccionadas", command=eliminar_seleccionadas)
+    boton_eliminar_seleccionadas.pack()
+
+    # Botón para obtener las opciones seleccionadas
+    boton_obtener_seleccionadas = tk.Button(transcripciones_window, text="Volver", command=volver_a_seleccion)
+    boton_obtener_seleccionadas.grid(row=2, column=0, pady=20)
+
+    # Botón para obtener las opciones seleccionadas
+    boton_obtener_seleccionadas = tk.Button(transcripciones_window, text="Continuar", command=obtener_seleccion)
+    boton_obtener_seleccionadas.grid(row=2, column=1, pady=20)
+
+    ###################CHECKBOX FEO###########################
+    # checkboxes = []
+    # variables = []
+
+    # for transcripcion in transcripts:
+    #     var = tk.BooleanVar()
+    #     checkbox = tk.Checkbutton(transcripciones_window, text=transcripcion, variable=var)
+    #     checkbox.pack(pady=20)  # Alineación a la izquierda
+    #     checkboxes.append(checkbox)
+    #     variables.append(var)
+
+    # def obtener_seleccion():
+    #     opciones_seleccionadas = []
+    #     for i, var in enumerate(variables):
+    #         if var.get():
+    #             opciones_seleccionadas.append(transcripts[i])
+    #     transcripciones_window.destroy()
+    #     pantalla_parametros(seqrecord, opciones_seleccionadas)
+
+    # boton_parametros = tk.Button(transcripciones_window, text="Continuar", command=obtener_seleccion)
+    # boton_parametros.pack()
+    ################################################
 
 
 def pantalla_parametros(seqrecord, transcripts):
@@ -195,7 +246,7 @@ def pantalla_parametros(seqrecord, transcripts):
     maxdist_spinbox = tk.Spinbox(parametros_window, from_=0, to=500, increment=1, width=5)
     maxdist_spinbox.grid(row=9, column=3, padx= 5)
     maxdist_spinbox.delete(0, "end")
-    maxdist_spinbox.insert(0, "50")
+    maxdist_spinbox.insert(0, "200")
 
 
     #Sobrelape mínimo
@@ -276,32 +327,72 @@ def pantalla_parametros(seqrecord, transcripts):
         carga_window.title("Cargando...")
         carga_label = tk.Label(carga_window, text='Ejecutando tarea, Por favor espere...', font=fuente_titulo)
         carga_label.pack()
+        dict_params = {}
+        dict_params['minlen'] = int(minlen_spinbox.get())
+        dict_params['maxlen'] = int(maxlen_spinbox.get())
+        dict_params['tmmin'] = int(tmmin_spinbox.get())
+        dict_params['tmmax'] = int(tmmax_spinbox.get())
+        dict_params['gcmin'] = int(gcmin_spinbox.get())
+        dict_params['gcmax'] = int(gcmax_spinbox.get())
+        dict_params['mindist'] = int(mindist_spinbox.get())
+        dict_params['maxdist'] = int(maxdist_spinbox.get())
+        dict_params['minoverlap'] = int(minoverlap_spinbox.get())
+        dict_params['maxoverlap'] = int(maxoverlap_spinbox.get())
+        dict_params['dgmin_homodim'] = int(dgmin_homodim_spinbox.get())
+        dict_params['dgmin_hairpin'] = int(dgmin_hairpin_spinbox.get())
+        dict_params['maxhomopol_simple'] = int(maxhomopol_simple_spinbox.get())
+        dict_params['maxhomopol_double'] = int(maxhomopol_double_spinbox.get())
+        dict_params['maxhomopol_triple'] = int(maxhomopol_triple_spinbox.get())
+        parametros_window.destroy()
+
+
         df = diseno.probe_designer(seqrecord,
-                                   transcripts,
-                                   minlen=int(minlen_spinbox.get()),
-                                   maxlen=int(maxlen_spinbox.get()),
-                                   tmmin=int(tmmin_spinbox.get()),
-                                   tmmax=int(tmmax_spinbox.get()),
-                                   gcmin=int(gcmin_spinbox.get()),
-                                   gcmax=int(gcmax_spinbox.get()),
-                                   mindist=int(mindist_spinbox.get()),
-                                   maxdist=int(maxdist_spinbox.get()),
-                                   minoverlap=int(minoverlap_spinbox.get()),
-                                   maxoverlap=int(maxoverlap_spinbox.get()),
-                                   dgmin_homodim=int(dgmin_homodim_spinbox.get()),
-                                   dgmin_hairpin=int(dgmin_hairpin_spinbox.get()),
-                                   maxhomopol_simple=int(maxhomopol_simple_spinbox.get()),
-                                   maxhomopol_double=int(maxhomopol_double_spinbox.get()),
-                                   maxhomopol_triple=int(maxhomopol_triple_spinbox.get()))
+                                    transcripts,
+                                    minlen=dict_params['minlen'],
+                                    maxlen=dict_params['maxlen'],
+                                    tmmin=dict_params['tmmin'],
+                                    tmmax=dict_params['tmmax'],
+                                    gcmin=dict_params['gcmin'],
+                                    gcmax=dict_params['gcmax'],
+                                    mindist=dict_params['mindist'],
+                                    maxdist=dict_params['maxdist'],
+                                    minoverlap=dict_params['minoverlap'],
+                                    maxoverlap=dict_params['maxoverlap'],
+                                    dgmin_homodim=dict_params['dgmin_homodim'],
+                                    dgmin_hairpin=dict_params['dgmin_hairpin'],
+                                    maxhomopol_simple=dict_params['maxhomopol_simple'],
+                                    maxhomopol_double=dict_params['maxhomopol_double'],
+                                    maxhomopol_triple=dict_params['maxhomopol_triple'])
         #resultado = tarea_larga()
         carga_window.destroy()
-        mostrar_resultado(df)
+        mostrar_resultado(df, dict_params)
 
-    def mostrar_resultado(df):
+    def mostrar_resultado(df, dict_params):
         resultado_window = tk.Toplevel(root)
         resultado_window.title("Resultado")
         resultado_label = tk.Label(resultado_window, text=f"La tarea se ejecutó con éxito. Nro sondas: {df.shape[0]}")
         resultado_label.pack()
+        diseno.generate_xlsx(df=df,
+                            name=seqrecord.id,
+                            minlen=dict_params['minlen'],
+                            maxlen=dict_params['maxlen'],
+                            tmmin=dict_params['tmmin'],
+                            tmmax=dict_params['tmmax'],
+                            gcmin=dict_params['gcmin'],
+                            gcmax=dict_params['gcmax'],
+                            mindist=dict_params['mindist'],
+                            maxdist=dict_params['maxdist'],
+                            minoverlap=dict_params['minoverlap'],
+                            maxoverlap=dict_params['maxoverlap'],
+                            dgmin_homodim=dict_params['dgmin_homodim'],
+                            dgmin_hairpin=dict_params['dgmin_hairpin'],
+                            maxhomopol_simple=dict_params['maxhomopol_simple'],
+                            maxhomopol_double=dict_params['maxhomopol_double'],
+                            maxhomopol_triple=dict_params['maxhomopol_triple'])
+        imagen.plot_isoforms(seqrecord,
+                             transcripts,
+                             imagen.get_splicings(seqrecord, transcripts))
+        
         resultado_button = tk.Button(resultado_window, text="Cerrar", command=resultado_window.destroy)
         resultado_button.pack()
 

@@ -87,9 +87,9 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
             checked.append(subseq)
     
     #Chequear especificidad (BLAST LOCAL)
-    if not verify_specificity(seq, iscentral):
-        print('Especificidad')
-        return False
+    #if not verify_specificity(seq, iscentral):
+    #    print('Especificidad')
+    #    return False
     
     print('Sonda Aceptada: ', str(seq))
     return True
@@ -266,7 +266,19 @@ def get_splicing_pairs(locations):
         empalmes.append((positions[i][1].position, positions[i+1][0].position))
     return empalmes
 
-def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-8000, dgmin_hairpin=-8000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4):
+def get_splicings(seqrecord, transcripts):
+    empalmes_array = []
+    for f in seqrecord.features:
+        if f.type == 'CDS':
+            if f.qualifiers.get('product')[0] in transcripts:
+                loc = f.location
+                pares_empalme = get_splicing_pairs(loc)
+                for par in pares_empalme:
+                    if par not in empalmes_array:
+                        empalmes_array.append(par)
+    return empalmes_array
+
+def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-8000, dgmin_hairpin=-8000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4):
     """
     Función principal diseñadora de sondas. De la secuancia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
     :param record: Secuencia anotada de referencia para la creación de las sondas.
@@ -308,6 +320,7 @@ def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=8
     dict_probes = {
         'gen':[],
         'transcrito':[],
+        'nombre':[],
         'sonda':[],
         'pos inicio':[],
         'pos fin':[],
@@ -321,103 +334,196 @@ def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=8
         #'deltag homodim':[]
     }
 
+    splicing_pairs = get_splicings(record, transcripts)
+    dict_generated_probes = {}
+
     for index, row in df_cds.iterrows():
         for empalme in row['empalmes']:
-            donor_probes = get_probes_from_pos(empalme, record, -1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple)
+            #Verificar si aún no se diseñan las sondas para ese empalme
+            if str(empalme) not in dict_generated_probes:
+                donor_probes = get_probes_from_pos(empalme, record, -1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple)
 
-            #Sonda donor interior
-            dict_probes['gen'].append(row['gen'])
-            dict_probes['transcrito'].append(row['info'])
-            dict_probes['sonda'].append(str(donor_probes[0][0]))
-            dict_probes['pos inicio'].append(donor_probes[0][1])
-            dict_probes['pos fin'].append(donor_probes[0][2])
-            dict_probes['empalme'].append(str(empalme))
-            dict_probes['lado'].append('donor interior')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(donor_probes[0][0])))
-            dict_probes['gc'].append(int(GC(donor_probes[0][0])))
-            dict_probes['largo'].append(len(donor_probes[0][0]))
-            dict_probes['dist'].append(int(donor_probes[0][3]))
-            #dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(donor_probes[0][0])).dg)
-            #dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(donor_probes[0][0])).dg)
+                #Sonda donor interior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('DI'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(donor_probes[0][0]))
+                dict_probes['pos inicio'].append(donor_probes[0][1])
+                dict_probes['pos fin'].append(donor_probes[0][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('donor interior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(donor_probes[0][0])))
+                dict_probes['gc'].append(int(GC(donor_probes[0][0])))
+                dict_probes['largo'].append(len(donor_probes[0][0]))
+                dict_probes['dist'].append(int(donor_probes[0][3]))
 
-            #Sonda donor exterior
-            dict_probes['gen'].append(row['gen'])
-            dict_probes['transcrito'].append(row['info'])
-            dict_probes['sonda'].append(str(donor_probes[1][0]))
-            dict_probes['pos inicio'].append(donor_probes[1][1])
-            dict_probes['pos fin'].append(donor_probes[1][2])
-            dict_probes['empalme'].append(str(empalme))
-            dict_probes['lado'].append('donor exterior')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(donor_probes[1][0])))
-            dict_probes['gc'].append(int(GC(donor_probes[1][0])))
-            dict_probes['largo'].append(len(donor_probes[1][0]))
-            dict_probes['dist'].append(int(donor_probes[1][3]))
-            #dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(donor_probes[1][0])).dg)
-            #dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(donor_probes[1][0])).dg)
+                #Sonda donor exterior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('DE'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(donor_probes[1][0]))
+                dict_probes['pos inicio'].append(donor_probes[1][1])
+                dict_probes['pos fin'].append(donor_probes[1][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('donor exterior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(donor_probes[1][0])))
+                dict_probes['gc'].append(int(GC(donor_probes[1][0])))
+                dict_probes['largo'].append(len(donor_probes[1][0]))
+                dict_probes['dist'].append(int(donor_probes[1][3]))
 
-            acceptor_probes = get_probes_from_pos(empalme, record, 1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple)
+                acceptor_probes = get_probes_from_pos(empalme, record, 1, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple)
 
-            #Sonda acceptor interior
-            dict_probes['gen'].append(row['gen'])
-            dict_probes['transcrito'].append(row['info'])
-            dict_probes['sonda'].append(str(acceptor_probes[0][0]))
-            dict_probes['pos inicio'].append(acceptor_probes[0][1])
-            dict_probes['pos fin'].append(acceptor_probes[0][2])
-            dict_probes['empalme'].append(str(empalme))
-            dict_probes['lado'].append('acceptor interior')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(acceptor_probes[0][0])))
-            dict_probes['gc'].append(int(GC(acceptor_probes[0][0])))
-            dict_probes['largo'].append(len(acceptor_probes[0][0]))
-            dict_probes['dist'].append(int(acceptor_probes[0][3]))
-            #dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(acceptor_probes[0][0])).dg)
-            #dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(acceptor_probes[0][0])).dg)
+                #Sonda acceptor interior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('AI'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(acceptor_probes[0][0]))
+                dict_probes['pos inicio'].append(acceptor_probes[0][1])
+                dict_probes['pos fin'].append(acceptor_probes[0][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('acceptor interior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(acceptor_probes[0][0])))
+                dict_probes['gc'].append(int(GC(acceptor_probes[0][0])))
+                dict_probes['largo'].append(len(acceptor_probes[0][0]))
+                dict_probes['dist'].append(int(acceptor_probes[0][3]))
 
-            #Sonda acceptor exterior
-            dict_probes['gen'].append(row['gen'])
-            dict_probes['transcrito'].append(row['info'])
-            dict_probes['sonda'].append(str(acceptor_probes[1][0]))
-            dict_probes['pos inicio'].append(acceptor_probes[1][1])
-            dict_probes['pos fin'].append(acceptor_probes[1][2])
-            dict_probes['empalme'].append(str(empalme))
-            dict_probes['lado'].append('acceptor exterior')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(acceptor_probes[1][0])))
-            dict_probes['gc'].append(int(GC(acceptor_probes[1][0])))
-            dict_probes['largo'].append(len(acceptor_probes[1][0]))
-            dict_probes['dist'].append(int(acceptor_probes[1][3]))
-            #dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(acceptor_probes[1][0])).dg)
-            #dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(acceptor_probes[1][0])).dg)
 
-            central_probes = get_probes_from_pos(empalme, record, 0, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple)
+                #Sonda acceptor exterior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('AE'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(acceptor_probes[1][0]))
+                dict_probes['pos inicio'].append(acceptor_probes[1][1])
+                dict_probes['pos fin'].append(acceptor_probes[1][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('acceptor exterior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(acceptor_probes[1][0])))
+                dict_probes['gc'].append(int(GC(acceptor_probes[1][0])))
+                dict_probes['largo'].append(len(acceptor_probes[1][0]))
+                dict_probes['dist'].append(int(acceptor_probes[1][3]))
 
-            #Sonda central interior
-            dict_probes['gen'].append(row['gen'])
-            dict_probes['transcrito'].append(row['info'])
-            dict_probes['sonda'].append(str(central_probes[0][0]))
-            dict_probes['pos inicio'].append(central_probes[0][1])
-            dict_probes['pos fin'].append(central_probes[0][2])
-            dict_probes['empalme'].append(str(empalme))
-            dict_probes['lado'].append('central interior')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(central_probes[0][0])))
-            dict_probes['gc'].append(int(GC(central_probes[0][0])))
-            dict_probes['largo'].append(len(central_probes[0][0]))
-            dict_probes['dist'].append(int(central_probes[0][3]))
-            #dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(central_probes[0][0])).dg)
-            #dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(central_probes[0][0])).dg)
+                central_probes = get_probes_from_pos(empalme, record, 0, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple)
 
-            #Sonda central exterior
-            dict_probes['gen'].append(row['gen'])
-            dict_probes['transcrito'].append(row['info'])
-            dict_probes['sonda'].append(str(central_probes[1][0]))
-            dict_probes['pos inicio'].append(central_probes[1][1])
-            dict_probes['pos fin'].append(central_probes[1][2])
-            dict_probes['empalme'].append(str(empalme))
-            dict_probes['lado'].append('central exterior')
-            dict_probes['tm'].append(int(MeltingTemp.Tm_NN(central_probes[1][0])))
-            dict_probes['gc'].append(int(GC(central_probes[1][0])))
-            dict_probes['largo'].append(len(central_probes[1][0]))
-            dict_probes['dist'].append(int(central_probes[1][3]))
-            #dict_probes['deltag hairpin'].append(primer3.calc_hairpin(str(central_probes[1][0])).dg)
-            #dict_probes['deltag homodim'].append(primer3.calc_homodimer(str(central_probes[1][0])).dg)
+                #Sonda central interior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('CI'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(central_probes[0][0]))
+                dict_probes['pos inicio'].append(central_probes[0][1])
+                dict_probes['pos fin'].append(central_probes[0][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('central interior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(central_probes[0][0])))
+                dict_probes['gc'].append(int(GC(central_probes[0][0])))
+                dict_probes['largo'].append(len(central_probes[0][0]))
+                dict_probes['dist'].append(int(central_probes[0][3]))
+
+                #Sonda central exterior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('CE'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(central_probes[1][0]))
+                dict_probes['pos inicio'].append(central_probes[1][1])
+                dict_probes['pos fin'].append(central_probes[1][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('central exterior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(central_probes[1][0])))
+                dict_probes['gc'].append(int(GC(central_probes[1][0])))
+                dict_probes['largo'].append(len(central_probes[1][0]))
+                dict_probes['dist'].append(int(central_probes[1][3]))
+
+                dict_generated_probes[str(empalme)] = [donor_probes, acceptor_probes, central_probes]
+
+
+            #Si el punto de empalme ya fue diseñado se extrae del diccionario
+            else:
+                #Sonda donor interior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('DI'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(dict_generated_probes[str(empalme)][0][0][0]))
+                dict_probes['pos inicio'].append(dict_generated_probes[str(empalme)][0][0][1])
+                dict_probes['pos fin'].append(dict_generated_probes[str(empalme)][0][0][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('donor interior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(dict_generated_probes[str(empalme)][0][0][0])))
+                dict_probes['gc'].append(int(GC(dict_generated_probes[str(empalme)][0][0][0])))
+                dict_probes['largo'].append(len(dict_generated_probes[str(empalme)][0][0][0]))
+                dict_probes['dist'].append(int(dict_generated_probes[str(empalme)][0][0][3]))
+
+                #Sonda donor exterior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('DE'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(dict_generated_probes[str(empalme)][0][1][0]))
+                dict_probes['pos inicio'].append(dict_generated_probes[str(empalme)][0][1][1])
+                dict_probes['pos fin'].append(dict_generated_probes[str(empalme)][0][1][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('donor exterior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(dict_generated_probes[str(empalme)][0][1][0])))
+                dict_probes['gc'].append(int(GC(dict_generated_probes[str(empalme)][0][1][0])))
+                dict_probes['largo'].append(len(dict_generated_probes[str(empalme)][0][1][0]))
+                dict_probes['dist'].append(int(dict_generated_probes[str(empalme)][0][1][3]))
+
+
+                #Sonda acceptor interior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('AI'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(dict_generated_probes[str(empalme)][1][0][0]))
+                dict_probes['pos inicio'].append(dict_generated_probes[str(empalme)][1][0][1])
+                dict_probes['pos fin'].append(dict_generated_probes[str(empalme)][1][0][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('acceptor interior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(dict_generated_probes[str(empalme)][1][0][0])))
+                dict_probes['gc'].append(int(GC(dict_generated_probes[str(empalme)][1][0][0])))
+                dict_probes['largo'].append(len(dict_generated_probes[str(empalme)][1][0][0]))
+                dict_probes['dist'].append(int(dict_generated_probes[str(empalme)][1][0][3]))
+
+                #Sonda acceptor exterior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('AE'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(dict_generated_probes[str(empalme)][1][1][0]))
+                dict_probes['pos inicio'].append(dict_generated_probes[str(empalme)][1][1][1])
+                dict_probes['pos fin'].append(dict_generated_probes[str(empalme)][1][1][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('acceptor exterior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(dict_generated_probes[str(empalme)][1][1][0])))
+                dict_probes['gc'].append(int(GC(dict_generated_probes[str(empalme)][1][1][0])))
+                dict_probes['largo'].append(len(dict_generated_probes[str(empalme)][1][1][0]))
+                dict_probes['dist'].append(int(dict_generated_probes[str(empalme)][1][1][3]))
+
+
+                #Sonda central interior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('CI'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(dict_generated_probes[str(empalme)][2][0][0]))
+                dict_probes['pos inicio'].append(dict_generated_probes[str(empalme)][2][0][1])
+                dict_probes['pos fin'].append(dict_generated_probes[str(empalme)][2][0][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('central interior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(dict_generated_probes[str(empalme)][2][0][0])))
+                dict_probes['gc'].append(int(GC(dict_generated_probes[str(empalme)][2][0][0])))
+                dict_probes['largo'].append(len(dict_generated_probes[str(empalme)][2][0][0]))
+                dict_probes['dist'].append(int(dict_generated_probes[str(empalme)][2][0][3]))
+
+
+                #Sonda central exterior
+                dict_probes['gen'].append(row['gen'])
+                dict_probes['transcrito'].append(row['info'])
+                dict_probes['nombre'].append('CE'+str(splicing_pairs.index(empalme)))
+                dict_probes['sonda'].append(str(dict_generated_probes[str(empalme)][2][1][0]))
+                dict_probes['pos inicio'].append(dict_generated_probes[str(empalme)][2][1][1])
+                dict_probes['pos fin'].append(dict_generated_probes[str(empalme)][2][1][2])
+                dict_probes['empalme'].append(str(empalme))
+                dict_probes['lado'].append('central exterior')
+                dict_probes['tm'].append(int(MeltingTemp.Tm_NN(dict_generated_probes[str(empalme)][2][1][0])))
+                dict_probes['gc'].append(int(GC(dict_generated_probes[str(empalme)][2][1][0])))
+                dict_probes['largo'].append(len(dict_generated_probes[str(empalme)][2][1][0]))
+                dict_probes['dist'].append(int(dict_generated_probes[str(empalme)][2][1][3]))
+
 
     df_probes = pd.DataFrame(dict_probes)
     return df_probes
@@ -534,7 +640,7 @@ def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30,
 
     
     now = datetime.now()
-    wb.save(name+'_'+now.strftime("%Y%m%d_%H%M%S")+'.xlsx') # nombre: datetime?
+    wb.save(name+'_'+now.strftime("%Y%m%d_%H%M%S")+'.xlsx')
     return 0
 
 def get_all_transcripts(seqrecord):

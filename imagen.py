@@ -4,7 +4,28 @@ import pandas as pd
 # Ejemplo de datos de secuencia en formato SeqRecord de Biopython
 # Aquí debes cargar tu propio archivo o crear tus propios registros SeqRecord
 
-sequence_data = descarga.parse_file_to_seqrecord('C:\Users\simon\Documents\GitHub\Probe-Designer\files\NM_000186.4.gbk')
+#sequence_data = descarga.parse_file_to_seqrecord('C:/Users/simon/Documents/GitHub/Probe-Designer/files/tp53.gb')
+
+def get_all_transcripts(seqrecord):
+    transcripts = []
+    for f in seqrecord.features:
+        if f.type == 'CDS':
+            info = f.qualifiers.get('product')[0]
+            if str(info) not in transcripts:
+                transcripts.append(str(info))
+    return transcripts
+
+def get_splicings(seqrecord, transcripts):
+    empalmes_array = []
+    for f in seqrecord.features:
+        if f.type == 'CDS':
+            if f.qualifiers.get('product')[0] in transcripts:
+                loc = f.location
+                pares_empalme = get_splicing_pairs(loc)
+                for par in pares_empalme:
+                    if par not in empalmes_array:
+                        empalmes_array.append(par)
+    return empalmes_array
 
 def get_exon_positions(locations):
    
@@ -14,28 +35,44 @@ def get_exon_positions(locations):
 
     return positions
 
-def plot_isoforms(record, name):
+def get_splicing_pairs(locations):
+    positions = []
+    for subloc in locations.parts:
+        positions.append((subloc.start, subloc.end))
+
+    empalmes = []
+    for i in range(len(positions)-1):
+        empalmes.append((positions[i][1].position, positions[i+1][0].position))
+
+    return empalmes
+
+def plot_isoforms(record, transcripts, empalmes_array):
 
     locations = []
     dict_cds = {
         'info':[],
-        'exones':[]
+        'exones':[],
+        'empalmes':[]
     }
 
     for f in record.features:
         if f.type == 'CDS':
             loc = f.location
-            if str(loc) not in locations:
+            info = f.qualifiers.get('product')[0]
+            if str(loc) not in locations and info in transcripts:
                 locations.append(str(loc))
-                dict_cds['info'].append(f.qualifiers.get('product', ['Transctipto no identificado'])[0])
+                dict_cds['info'].append(info)
                 dict_cds['exones'].append(get_exon_positions(loc))
+                dict_cds['empalmes'].append(get_splicing_pairs(loc))
+                
 
     df_cds = pd.DataFrame(dict_cds)
 
-    fig, ax = plt.subplots(figsize=(10, len(dict_cds) * 1.5))
+    fig, ax = plt.subplots(figsize=(10, len(dict_cds) * 2))
 
     yticks = []
     yticklabels = []
+
 
     xmin = float('inf')
     xmax = float('-inf')
@@ -44,25 +81,33 @@ def plot_isoforms(record, name):
         yticks.append(idx)
         yticklabels.append(row['info'])
 
-        exons = row['exones']
-        for start, end in exons:
-            ax.add_patch(plt.Rectangle((start, idx), end - start, 0.3, color='gray'))
+        exones = row['exones']
+        empalmes = row['empalmes']
+        for start, end in exones:
+            ax.add_patch(plt.Rectangle((start, idx-0.15), end - start, 0.3, color='gray'))
             xmin = min(xmin, start)
             xmax = max(xmax, end)
+
+        for line_start, line_end in empalmes:
+            id_empalme = str(empalmes_array.index((line_start, line_end)) + 1)
+            mitad = (line_end+line_start)/2
+            ax.plot([line_start, mitad], [idx, idx+0.1], color='red')
+            ax.plot([mitad, line_end], [idx+0.1, idx], color='red')
+            ax.text(mitad, idx + 0.15, id_empalme, ha='center', va='bottom', color='red')
         
-    
+        
 
     ax.set_xlim(xmin-500, xmax+500)
-    ax.set_ylim(-0.5, len(dict_cds) - 0.5)
+    ax.set_ylim(-0.7, len(dict_cds)+8.5)
     ax.set_yticks(yticks)
     ax.set_yticklabels(yticklabels)
     ax.set_xlabel('Posición')
-    ax.set_title('Transcripciones de '+name)
+    ax.set_title('Transcripciones de '+record.id)
 
     plt.show()
 
 # Llama a la función con tus datos de secuencia
-plot_isoforms(sequence_data, str(sequence_data.id))
+#plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)))
 
 #########
 # from dna_features_viewer import BiopythonTranslator
