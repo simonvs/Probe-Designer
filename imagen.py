@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 import descarga
 import pandas as pd
-# Ejemplo de datos de secuencia en formato SeqRecord de Biopython
-# Aquí debes cargar tu propio archivo o crear tus propios registros SeqRecord
-
-#sequence_data = descarga.parse_file_to_seqrecord('C:/Users/simon/Documents/GitHub/Probe-Designer/files/tp53.gb')
+import os
 
 def get_all_transcripts(seqrecord):
     transcripts = []
@@ -46,7 +43,7 @@ def get_splicing_pairs(locations):
 
     return empalmes
 
-def plot_isoforms(record, transcripts, empalmes_array):
+def plot_isoforms(record, transcripts, empalmes_array, foldername):
 
     locations = []
     dict_cds = {
@@ -68,7 +65,7 @@ def plot_isoforms(record, transcripts, empalmes_array):
 
     df_cds = pd.DataFrame(dict_cds)
 
-    fig, ax = plt.subplots(figsize=(10, len(dict_cds) * 2))
+    fig, ax = plt.subplots(figsize=(10, len(transcripts) * 5))
 
     yticks = []
     yticklabels = []
@@ -93,7 +90,7 @@ def plot_isoforms(record, transcripts, empalmes_array):
             mitad = (line_end+line_start)/2
             ax.plot([line_start, mitad], [idx, idx+0.1], color='red')
             ax.plot([mitad, line_end], [idx+0.1, idx], color='red')
-            ax.text(mitad, idx + 0.15, id_empalme, ha='center', va='bottom', color='red')
+            ax.text(mitad, idx + 0.15, id_empalme, fontsize=8 ,ha='center', va='bottom', color='red')
         
         
 
@@ -104,10 +101,14 @@ def plot_isoforms(record, transcripts, empalmes_array):
     ax.set_xlabel('Posición')
     ax.set_title('Transcripciones de '+record.id)
 
-    plt.show()
+    plt.savefig(os.path.join('sondas',foldername,record.id+'.png'))
+    #plt.show()
 
-# Llama a la función con tus datos de secuencia
-#plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)))
+# if __name__ == "__main__":
+#     sequence_data = descarga.parse_file_to_seqrecord('C:/Users/simon/Documents/GitHub/Probe-Designer/files/tp53.gb')
+#     plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)))
+
+
 
 #########
 # from dna_features_viewer import BiopythonTranslator

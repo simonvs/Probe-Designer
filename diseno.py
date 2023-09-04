@@ -1,4 +1,6 @@
 import descarga
+import multiplex_probes
+import os
 import argparse
 import pandas as pd
 import primer3
@@ -278,7 +280,7 @@ def get_splicings(seqrecord, transcripts):
                         empalmes_array.append(par)
     return empalmes_array
 
-def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-8000, dgmin_hairpin=-8000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4):
+def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, mindg=-13627, maxdt=5):
     """
     Función principal diseñadora de sondas. De la secuancia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
     :param record: Secuencia anotada de referencia para la creación de las sondas.
@@ -526,9 +528,24 @@ def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=8
 
 
     df_probes = pd.DataFrame(dict_probes)
+
+    probes_array = []
+    for index, row in df_probes.iterrows():
+        if row['sonda'] != 'AAA':
+            probes_array.append(df_probes.at[index, 'sonda'])
+    print(probes_array)
+
+    if len(probes_array) < 70:
+        dict_multiplex = multiplex_probes.multiplex_sequences(probes_array, mindg, maxdt)
+        for index, row in df_probes.iterrows():
+            if row['sonda'] == 'AAA':
+                df_probes.at[index, 'grupo'] = -1
+            else:
+                df_probes.at[index, 'grupo'] = dict_multiplex[row['sonda']]
+
     return df_probes
 
-def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-8000, dgmin_hairpin=-8000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4):
+def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4):
     """
     Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales. 
     :param df: DataFrame de pandas que contiene las sondas y sus parámetros.
@@ -610,7 +627,7 @@ def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30,
         for cell in column_cells:
             try:
                 if len(str(cell.value)) > max_length:
-                    max_length = len(cell.value)
+                    max_length = len(str(cell.value))
             except:
                 pass
         adjusted_width = (max_length + 2) * 1.2
@@ -640,8 +657,15 @@ def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30,
 
     
     now = datetime.now()
-    wb.save(name+'_'+now.strftime("%Y%m%d_%H%M%S")+'.xlsx')
-    return 0
+    filename = name+'_'+now.strftime("%Y%m%d_%H%M%S")
+    filepath = os.path.join(os.getcwd(),'sondas', filename, filename+'.xlsx')
+
+    folder_path = os.path.join(os.getcwd(), "sondas", filename)
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+
+    wb.save(filepath)
+    return filename
 
 def get_all_transcripts(seqrecord):
     transcripts = []

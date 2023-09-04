@@ -1,7 +1,8 @@
 files/
 __pycache__/
 .ipynb_checkpoints/
-sondas*
+sondas/
+databases/
 Pruebas.ipynb
 db*
-resultados.xml
+multiplexador.py
