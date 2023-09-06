@@ -2,5 +2,6 @@ Bio
 pandas
 argparse
 pathlib
-shutil
 primer3-py
+tkinter
+bcbio-gff

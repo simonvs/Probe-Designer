@@ -65,7 +65,7 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
 
     df_cds = pd.DataFrame(dict_cds)
 
-    fig, ax = plt.subplots(figsize=(20, len(transcripts) * 5))
+    fig, ax = plt.subplots(figsize=(10, len(transcripts) * 0.5))
 
     yticks = []
     yticklabels = []
@@ -102,10 +102,11 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
     ax.set_title('Transcripciones de '+record.id)
 
     plt.savefig(os.path.join('sondas',foldername,record.id+'.png'))
-    #plt.show()
+    #plt.savefig(os.path.join('sondas',record.id+'.png'))
+    plt.show()
 
 if __name__ == "__main__":
-    sequence_data = descarga.parse_file_to_seqrecord('C:/Users/simon/Documents/GitHub/Probe-Designer/files/tp53.gb')
+    sequence_data = descarga.parse_file_to_seqrecord('files/fktn.gb')
     plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)),"PKD1")
 
 
