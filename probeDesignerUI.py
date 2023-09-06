@@ -219,7 +219,7 @@ class PantallaParametros(PantallaInicial):
         tmmax_spinbox.delete(0, "end")
         tmmax_spinbox.insert(0, "80")
 
-        texto_tm = "La temperatura melting (Tm) o temperatura de fusión de\nuna secuencia se refiere a la temperatura en la cual\nse desnaturalizaría la doble hebra. Más en concreto\nes la temperatura en la cual 50 % de las copias de esa secuencia\npresentes en una reacción se encuentra en forma monocatenaria y\n50 % en forma bicatenaria, que interactúan con su secuencia complementaria."
+        texto_tm = "La temperatura melting (Tm) o temperatura de fusión de\nuna secuencia se refiere a la temperatura en la cual\nse desnaturalizaría la doble hebra. Más en concreto\nes la temperatura en la cual 50 % de las copias de esa secuencia\npresentes en una reacción se encuentra en forma monocatenaria\ny 50 % en forma bicatenaria, que interactúan con su secuencia\ncomplementaria."
         tooltip_tmmin = ToolTip(tmmin_label, texto_tm)
         tooltip_tmmax = ToolTip(tmmax_label, texto_tm)
 
@@ -242,9 +242,9 @@ class PantallaParametros(PantallaInicial):
         gcmax_spinbox.delete(0, "end")
         gcmax_spinbox.insert(0, "70")
 
-        texto_gc = "Porcentaje de GC: Se refiere a la fracción de bases nitrogenadas que son citosinas o guaninas dentro de la secuancia de nucleótidos."
-        tooltip_gcmin = ToolTip(gcmin_label, texto_largo, os.path.join("images","distancia.png"))
-        tooltip_gcmax = ToolTip(gcmax_label, texto_largo, os.path.join("images","distancia.png"))
+        texto_gc = "Porcentaje de GC: Se refiere a la fracción de bases\nnitrogenadas que son citosinas o guaninas dentro de\nla secuancia de nucleótidos."
+        tooltip_gcmin = ToolTip(gcmin_label, texto_gc)
+        tooltip_gcmax = ToolTip(gcmax_label, texto_gc)
 
         #Distancia mínima al borde del exón
         mindist_label = tk.Label(self.frame, text="Distancia mínima al borde del exón (nt)")
@@ -264,6 +264,10 @@ class PantallaParametros(PantallaInicial):
         maxdist_spinbox.grid(row=9, column=3, padx= 5)
         maxdist_spinbox.delete(0, "end")
         maxdist_spinbox.insert(0, "100")
+
+        texto_dist = "Se refiere a la cantidad de nucleótidos que hay entre\nel punto de empalme y las sondas internas donor y acceptor.\n(No aplica para sondas centrales)"
+        tooltip_mindist = ToolTip(mindist_label, texto_dist, os.path.join("images","distancia.png"))
+        tooltip_maxdist = ToolTip(maxdist_label, texto_dist, os.path.join("images","distancia.png"))
 
 
         #Sobrelape mínimo
@@ -285,6 +289,9 @@ class PantallaParametros(PantallaInicial):
         maxoverlap_spinbox.delete(0, "end")
         maxoverlap_spinbox.insert(0, "50")
 
+        texto_overlap = "El sobrelape u overlap es el porcentaje de la\nsonda interior que es compartido con las sondas\nexteriores, solo aplica para donor y acceptor."
+        tooltip_minoverlap = ToolTip(minoverlap_label, texto_overlap, os.path.join("images","sobrelape.png"))
+        tooltip_maxoverlap = ToolTip(maxoverlap_label, texto_overlap, os.path.join("images","sobrelape.png"))
 
         #Delta G mínimo homodimerización
         dgmin_homodim_label = tk.Label(self.frame, text="Delta G mínimo homodimerización")
@@ -305,6 +312,10 @@ class PantallaParametros(PantallaInicial):
         dgmin_hairpin_spinbox.delete(0, "end")
         dgmin_hairpin_spinbox.insert(0, "-10000")
 
+        texto_dgmin_homodim = "Se refiere a la evaluación de la capacidad\nde la secuencia para formar estructuras de dímeros\nhomólogos. Los dímeros homólogos son la unión de\ndos secuencias de ADN idénticas o muy similares\nentre sí. Básicamente que la sonda no se complemente\ncon sí misma. Esto se verifica con la librería\nprimer3, que calcula la energía máxima entre las\ndos secuencias iguales."
+        tooltip_dgmin_homodim = ToolTip(dgmin_homodim_label, texto_dgmin_homodim)
+        texto_hairpin_label = "Capacidad de una secuencia para formar estructuras\nde horquilla (hairpin) en sí misma. Una estructura\nde hairpin es una conformación en la que una región\nde la secuencia se pliega hacia atrás y se empareja\ncon su complementaria, formando una estructura en forma de\nhorquilla."
+        tooltip_hairpin_label = ToolTip(dgmin_hairpin_label, texto_hairpin_label)
 
         #Máximo homopolímeros simples
         maxhomopol_simple_label = tk.Label(self.frame, text="Máximo homopolímeros simples")
@@ -333,6 +344,13 @@ class PantallaParametros(PantallaInicial):
         maxhomopol_triple_spinbox.grid(row=16, column=1, padx= 5)
         maxhomopol_triple_spinbox.delete(0, "end")
         maxhomopol_triple_spinbox.insert(0, "4")
+
+        texto_maxhomopol_simple = "Homopolímeros"
+        tooltip_maxhomopol_simple = ToolTip(maxhomopol_simple_label, texto_maxhomopol_simple)
+        texto_maxhomopol_double = "Homopolímeros"
+        tooltip_maxhomopol_double = ToolTip(maxhomopol_double_label, texto_maxhomopol_double)
+        texto_maxhomopol_triple = "Homopolímeros"
+        tooltip_maxhomopol_triple = ToolTip(maxhomopol_triple_label, texto_maxhomopol_triple)
 
         def ejecutar():
             dict_params = {}
@@ -592,6 +610,7 @@ class ControladorApp:
         print(len(df))
         self.carga.destroy()  # Cierra la pantalla de carga
         self.mostrar_pantalla(nombre="final", seqrecord=seqrecord, transcripciones=transcripciones, df=df, dict_params=dict_params)  # Muestra la pantalla de configuración
+
 
 class ToolTip:
     def __init__(self, widget, text, image_path=None):
