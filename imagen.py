@@ -65,7 +65,7 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
 
     df_cds = pd.DataFrame(dict_cds)
 
-    fig, ax = plt.subplots(figsize=(10, len(transcripts) * 0.5))
+    fig, ax = plt.subplots(figsize=(10, len(transcripts) * 0.5+2))
 
     yticks = []
     yticklabels = []
@@ -90,7 +90,7 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
             mitad = (line_end+line_start)/2
             ax.plot([line_start, mitad], [idx, idx+0.1], color='red')
             ax.plot([mitad, line_end], [idx+0.1, idx], color='red')
-            ax.text(mitad, idx + 0.15, id_empalme, fontsize=9 ,ha='center', va='bottom', color='red')
+            ax.text(mitad, idx + 0.15, id_empalme, fontsize=7 ,ha='center', va='bottom', color='red')
         
         
 
@@ -103,6 +103,9 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
 
     plt.savefig(os.path.join('sondas',foldername,record.id+'.png'))
     #plt.savefig(os.path.join('sondas',record.id+'.png'))
+    #plt.show()
+
+def plot_show():
     plt.show()
 
 if __name__ == "__main__":

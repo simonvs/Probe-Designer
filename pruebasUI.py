@@ -1,47 +1,65 @@
 import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
 
-class ToolTip:
-    def __init__(self, widget, text, image_path=None):
-        self.widget = widget
-        self.text = text
-        self.image_path = image_path
-        self.tooltip = None
-        self.widget.bind("<Enter>", self.mostrar_tooltip)
-        self.widget.bind("<Leave>", self.ocultar_tooltip)
 
-    def mostrar_tooltip(self, event):
-        x, y, _, _ = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 25
+class SeleccionarOpciones(root):
+    def __init__(self, root):
+        super().__init__(root)
+        self.root = root
+        self.root.title("Seleccionar Opciones")
 
-        self.tooltip = tk.Toplevel(self.widget)
-        self.tooltip.wm_overrideredirect(True)
-        self.tooltip.wm_geometry(f"+{x}+{y}")
+        self.opciones_disponibles = ["Opción 1", "Opción 2", "Opción 3", "Opción 4", "Opción 5"]
+        self.opciones_seleccionadas = []
 
-        if self.image_path:
-            imagen = Image.open(self.image_path)
-            imagen = ImageTk.PhotoImage(imagen)
-            label_imagen = tk.Label(self.tooltip, image=imagen)
-            label_imagen.image = imagen
-            label_imagen.pack()
+        self.lista_disponibles = tk.Listbox(self, selectmode=tk.SINGLE)
+        self.lista_disponibles.pack(side=tk.LEFT, padx=10, pady=10)
 
-        label_texto = tk.Label(self.tooltip, text=self.text, background="lightyellow", relief="solid")
-        label_texto.pack()
+        for opcion in self.opciones_disponibles:
+            self.lista_disponibles.insert(tk.END, opcion)
 
-    def ocultar_tooltip(self, event):
-        if self.tooltip:
-            self.tooltip.destroy()
-            self.tooltip = None
+        self.lista_seleccionadas = tk.Listbox(self, selectmode=tk.SINGLE)
+        self.lista_seleccionadas.pack(side=tk.RIGHT, padx=10, pady=10)
 
-root = tk.Tk()
-root.title("Tooltip con Imagen")
+        self.boton_seleccionar = tk.Button(self, text="Seleccionar", command=self.seleccionar)
+        self.boton_seleccionar.pack()
+        
+        self.boton_eliminar = tk.Button(self, text="Eliminar", command=self.eliminar)
+        self.boton_eliminar.pack()
 
-label = tk.Label(root, text="Pasa el cursor por encima de mí", cursor="hand2")
-label.pack(padx=20, pady=20)
+        self.boton_seleccionar_todo = tk.Button(self, text="Seleccionar Todo", command=self.seleccionar_todo)
+        self.boton_seleccionar_todo.pack()
 
-imagen_path = "images/largo.png"  # Reemplaza con la ruta de tu imagen
-tooltip = ToolTip(label, "Texto de tooltip aquí", imagen_path)
+        self.boton_eliminar_todo = tk.Button(self, text="Eliminar Todo", command=self.eliminar_todo)
+        self.boton_eliminar_todo.pack()
 
-root.mainloop()
+    def seleccionar(self):
+        seleccion = self.lista_disponibles.get(tk.ACTIVE)
+        if seleccion not in self.opciones_seleccionadas:
+            self.opciones_seleccionadas.append(seleccion)
+            self.lista_seleccionadas.insert(tk.END, seleccion)
+            self.lista_disponibles.delete(tk.ACTIVE)
+
+    def eliminar(self):
+        seleccion = self.lista_seleccionadas.get(tk.ACTIVE)
+        if seleccion in self.opciones_seleccionadas:
+            self.opciones_seleccionadas.remove(seleccion)
+            self.lista_disponibles.insert(tk.END, seleccion)
+            self.lista_seleccionadas.delete(tk.ACTIVE)
+
+    def seleccionar_todo(self):
+        for opcion in self.opciones_disponibles:
+            if opcion not in self.opciones_seleccionadas:
+                self.opciones_seleccionadas.append(opcion)
+                self.lista_seleccionadas.insert(tk.END, opcion)
+        self.lista_disponibles.delete(0, tk.END)
+
+    def eliminar_todo(self):
+        for opcion in self.opciones_seleccionadas:
+            self.opciones_seleccionadas.remove(opcion)
+            self.lista_disponibles.insert(tk.END, opcion)
+        self.lista_seleccionadas.delete(0, tk.END)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = SeleccionarOpciones(root)
+    app.pack()
+    root.mainloop()

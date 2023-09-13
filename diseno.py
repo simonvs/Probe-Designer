@@ -280,7 +280,7 @@ def get_splicings(seqrecord, transcripts):
                         empalmes_array.append(par)
     return empalmes_array
 
-def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, mindg=-13627, maxdt=5):
+def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5):
     """
     Función principal diseñadora de sondas. De la secuancia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
     :param record: Secuencia anotada de referencia para la creación de las sondas.
@@ -533,9 +533,9 @@ def probe_designer(record, transcripts, minlen=60, maxlen=120, tmmin=65, tmmax=8
     for index, row in df_probes.iterrows():
         if row['sonda'] != 'AAA':
             probes_array.append(df_probes.at[index, 'sonda'])
-    print(probes_array)
+    #print(probes_array)
 
-    if len(probes_array) < 70:
+    if multiplex:
         dict_multiplex = multiplex_probes.multiplex_sequences(probes_array, mindg, maxdt)
         for index, row in df_probes.iterrows():
             if row['sonda'] == 'AAA':
@@ -676,6 +676,15 @@ def get_all_transcripts(seqrecord):
                 transcripts.append(str(info))
     return transcripts
 
+def get_all_genes(seqrecord):
+    genes = []
+    for f in seqrecord.features:
+        if f.type == 'CDS':
+            gen = f.qualifiers.get('gene')[0]
+            if str(gen) not in genes:
+                genes.append(str(gen))
+    return genes
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-an',
@@ -698,7 +707,6 @@ def main():
     dargs = vars(args)
     rec = descarga.parse_file_to_seqrecord('C:/Users/simon/Downloads/tp53.gb')
     #rec = descarga.accnum_to_seqrecord(dargs["accessionnumber"])
-    print(rec.annotations.get("accession", None))
     df = probe_designer(record=rec, transcripts=get_all_transcripts(rec))
                         # ,
                         # minlen=dargs["minimumlength"],
