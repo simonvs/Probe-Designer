@@ -11,6 +11,14 @@ def are_sequences_compatible(seq1, seq2, mindg, maxdt):
     :param seq2: Segunda secuencia de ADN.
     :return: True si son compatibles, False en caso contrario.
     """
+    
+    
+    temp1 = MeltingTemp.Tm_NN(seq1)
+    temp2 = MeltingTemp.Tm_NN(seq2)
+    if abs(temp2-temp1) > maxdt:
+        print("No compatibles, diferencia tm: "+str(abs(temp2-temp1)))
+        return False
+    
     if len(seq1)<=60 or len(seq2)<=60:
         if primer3.calc_heterodimer(seq1,seq2).dg < mindg:
             print('dg')
@@ -28,12 +36,7 @@ def are_sequences_compatible(seq1, seq2, mindg, maxdt):
         if primer3.calc_heterodimer(seq1[60:],seq2[60:]).dg < mindg:
             print('dg')
             return False
-    
-    temp1 = MeltingTemp.Tm_NN(seq1)
-    temp2 = MeltingTemp.Tm_NN(seq2)
-    if abs(temp2-temp1) > maxdt:
-        print("No compatibles, diferencia tm: "+str(abs(temp2-temp1)))
-        return False
+        
     print("Compatibles!")
     return True
     
@@ -45,10 +48,10 @@ def multiplex_sequences(sequences, mindg=-13627, maxdt=5):
     # Agrega nodos (secuencias) al grafo.
     G.add_nodes_from(sequences)
 
-    # Comprueba la compatibilidad y agrega aristas entre secuencias compatibles.
+    # Comprueba la compatibilidad y agrega aristas entre secuencias no compatibles.
     for i, seq1 in enumerate(sequences):
         for j, seq2 in enumerate(sequences):
-            if i < j and are_sequences_compatible(seq1, seq2, mindg, maxdt):
+            if i < j and not are_sequences_compatible(seq1, seq2, mindg, maxdt):
                 G.add_edge(seq1, seq2)
 
     # Colorea el grafo para encontrar grupos.

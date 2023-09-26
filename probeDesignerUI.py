@@ -7,22 +7,25 @@ import os
 import sqlite3
 import datetime
 import platform
+import shutil
+import threading
+import queue
+from diseno import progreso_compartido
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
-from tkinter import font
 from PIL import Image, ImageTk
 
 class PantallaInicial:
     def __init__(self, root):
         self.root = root
         self.root.title("GEMINi - Diseñador de sondas de hibridación para ARN mensajero")
-        self.root.iconbitmap(os.path.join("images", "gemini2.ico"))
+        #self.root.iconbitmap(os.path.join("images", "gemini2.ico"))
         #self.frame = tk.Frame(root)
         self.frame = customtkinter.CTkFrame(master=root)
         self.frame.pack(padx=50, pady=50)
         self.crear_interfaz()
-        self.root.minsize(800,450)
+        #self.root.minsize(800,450)
         #self.root.geometry(f"{self.frame.winfo_reqwidth()+20}x{self.frame.winfo_reqheight()+20}")
 
     def crear_interfaz(self):
@@ -42,19 +45,21 @@ class PantallaInicial:
         historial_button = customtkinter.CTkButton(self.frame, text="Ver historial de sondas", corner_radius=30, fg_color="#E89434",command=self.ver_historial)
         historial_button.pack(pady=60)
         
+        self.root.geometry("800x450")
         
     def seleccionar_archivo(self):
         archivo = filedialog.askopenfilename(filetypes=[("Archivos GenBank", "*.gbk *.gb")])
         if archivo:
             seqrecord = descarga.parse_file_to_seqrecord(archivo)
-            app.mostrar_pantalla("transcripciones", seqrecord)
+            app.mostrar_pantalla("transcripciones", seqrecord, filepath=archivo)
     
     def ver_historial(self):
         app.mostrar_pantalla('historial')
 
 class PantallaTranscripciones(PantallaInicial):
-    def __init__(self, root, seqrecord):
+    def __init__(self, root, seqrecord, filepath):
         self.seqrecord = seqrecord
+        self.filepath = filepath
         super().__init__(root)
 
     def crear_interfaz(self):
@@ -102,26 +107,26 @@ class PantallaTranscripciones(PantallaInicial):
         botones_frame.grid(row=2, column=1)
 
         #self.boton_seleccionar = tk.Button(botones_frame, text="Seleccionar", command=self.seleccionar)
-        self.boton_seleccionar = customtkinter.CTkButton(botones_frame, text="Seleccionar", corner_radius=30, fg_color="#BE272F", command=self.seleccionar)
+        self.boton_seleccionar = customtkinter.CTkButton(botones_frame, text=">", corner_radius=30, fg_color="#BE272F", command=self.seleccionar)
         self.boton_seleccionar.pack(pady=10)
         
         #self.boton_eliminar = tk.Button(botones_frame, text="Eliminar", command=self.eliminar)
-        self.boton_eliminar = customtkinter.CTkButton(botones_frame, text="Eliminar", corner_radius=30, fg_color="#E89434", command=self.eliminar)
+        self.boton_eliminar = customtkinter.CTkButton(botones_frame, text="<", corner_radius=30, fg_color="#E89434", command=self.eliminar)
         self.boton_eliminar.pack(pady=10)
 
         #self.boton_seleccionar_todo = tk.Button(botones_frame, text="Seleccionar Todo", command=self.seleccionar_todo)
-        self.boton_seleccionar_todo = customtkinter.CTkButton(botones_frame, text="Seleccionar Todas", corner_radius=30, fg_color="#BE272F", command=self.seleccionar_todo)
+        self.boton_seleccionar_todo = customtkinter.CTkButton(botones_frame, text=">>>>", corner_radius=30, fg_color="#BE272F", command=self.seleccionar_todo)
         self.boton_seleccionar_todo.pack(pady=10)
 
         #self.boton_eliminar_todo = tk.Button(botones_frame, text="Eliminar Todo", command=self.eliminar_todo)
-        self.boton_eliminar_todo = customtkinter.CTkButton(botones_frame, text="Eliminar Todas", corner_radius=30, fg_color="#E89434", command=self.eliminar_todo)
+        self.boton_eliminar_todo = customtkinter.CTkButton(botones_frame, text="<<<<", corner_radius=30, fg_color="#E89434", command=self.eliminar_todo)
         self.boton_eliminar_todo.pack(pady=10)
 
         def obtener_seleccion():
             seleccionados = self.lista_seleccionadas.get(0, tk.END)
             #pantalla parametreos
             if len(seleccionados) >= 1:
-                app.mostrar_pantalla("parametros", self.seqrecord, [seleccionado for seleccionado in seleccionados])
+                app.mostrar_pantalla("parametros", self.seqrecord, [seleccionado for seleccionado in seleccionados], filepath=self.filepath)
             else:
                 messagebox.showinfo("Error", "Se debe seleccionar al menos una transcripción para el diseño de las sondas")
 
@@ -134,6 +139,8 @@ class PantallaTranscripciones(PantallaInicial):
         #boton_obtener_seleccionadas = tk.Button(self.frame, text="Continuar", command=obtener_seleccion)
         boton_obtener_seleccionadas = customtkinter.CTkButton(self.frame, text="Continuar", corner_radius=30, fg_color="#BE272F", command=obtener_seleccion)
         boton_obtener_seleccionadas.grid(row=3, column=2, pady=20)
+
+        self.root.geometry("800x500")
 
     def seleccionar(self):
         seleccion = self.lista_disponibles.get(tk.ACTIVE)
@@ -170,9 +177,10 @@ class PantallaTranscripciones(PantallaInicial):
         app.mostrar_pantalla("inicial")
 
 class PantallaParametros(PantallaInicial):
-    def __init__(self, root, seqrecord, transcripciones):
+    def __init__(self, root, seqrecord, transcripciones, filepath):
         self.seqrecord = seqrecord
         self.transcripciones = transcripciones
+        self.filepath = filepath
         super().__init__(root)
         self.root.geometry('1000x800')
     
@@ -210,7 +218,7 @@ class PantallaParametros(PantallaInicial):
                     locations.append(str(loc))
 
         #transcripciones_label = tk.Label(self.frame, text=f"Se considerará(n) {len(self.transcripciones)} de las {len(locations)} transcripciones.")
-        transcripciones_label = customtkinter.CTkLabel(self.frame, text=f"Se considerará(n) {len(self.transcripciones)} de las {len(locations)} transcripciones.", text_color="#BE272F")
+        transcripciones_label = customtkinter.CTkLabel(self.frame, text=f"Se considerará(n) {len(self.transcripciones)} de las {len(locations)} transcripciones. ({len(diseno.get_splicings(self.seqrecord, self.transcripciones))} puntos de empalme)", text_color="#BE272F")
         transcripciones_label.grid(row=3, column=0, columnspan=4)
 
         #fuente_negrita = font.Font(weight="bold")
@@ -427,9 +435,9 @@ class PantallaParametros(PantallaInicial):
 
         texto_maxhomopol_simple = "Los homopolímeros simples son secuencias donde se repite una base\nde manera consecutiva: si el máximo de homopolímeros simples\nes 3, se aceptaría una subsecuencia 'GGG' pero no una\nsubsecuencia 'GGGG'"
         tooltip_maxhomopol_simple = ToolTip(maxhomopol_simple_label, texto_maxhomopol_simple)
-        texto_maxhomopol_double = "Homopolímeros dobles"
+        texto_maxhomopol_double = "Los homopolímeros dobles se refieren a las subsecuencias de dos\nbases que se repiten más de una vez, como por\nejemplo AGAGAG. Si el máximo de homopolímeros dobles\nes 3, se aceptaría una subsecuencia 'AGAGAG' pero no una\nsubsecuencia 'AGAGAGAG'"
         tooltip_maxhomopol_double = ToolTip(maxhomopol_double_label, texto_maxhomopol_double)
-        texto_maxhomopol_triple = "Homopolímeros triples"
+        texto_maxhomopol_triple = "Los homopolímeros triples se refieren a las subsecuencias de tres\nbases que se repiten más de una vez, como por\nejemplo AGCAGCAGC. Si el máximo de homopolímeros triples\nes 3, se aceptaría una subsecuencia 'AGCAGCAGC' pero no una\nsubsecuencia 'AGCAGCAGCAGC'"
         tooltip_maxhomopol_triple = ToolTip(maxhomopol_triple_label, texto_maxhomopol_triple)
 
         def param_multiplex():
@@ -446,20 +454,24 @@ class PantallaParametros(PantallaInicial):
 
 
         multiplex_var = customtkinter.StringVar(value="off")
-        checkbox_multiplex = customtkinter.CTkCheckBox(self.frame, text="Multiplexación", command=param_multiplex, variable=multiplex_var, onvalue="on", offvalue="off", fg_color="#BE272F", text_color="#BE272F", hover_color="#E89434")
+        checkbox_multiplex = customtkinter.CTkCheckBox(self.frame, text="Multiplexar sondas", command=param_multiplex, variable=multiplex_var, onvalue="on", offvalue="off", fg_color="#BE272F", text_color="#BE272F", hover_color="#E89434")
         checkbox_multiplex.deselect()
         checkbox_multiplex.grid(row=14, column=2, padx= 5,sticky='e')
 
-        mindg_label = customtkinter.CTkLabel(self.frame, text="Mínimo Delta G Heterodim:", text_color="#BE272F")
-        
+        mindg_label = customtkinter.CTkLabel(self.frame, text="Mínimo delta G heterodimerización:", text_color="#BE272F")
         mindg_spinbox = IntegerSelector(self.frame, default_value=-20000, min_value=-999999, max_value=1000000, increment=1000)
     
-
-        maxdt_label = customtkinter.CTkLabel(self.frame, text="Máxima diferencia de Tm:", text_color="#BE272F")
-
+        maxdt_label = customtkinter.CTkLabel(self.frame, text="Máxima diferencia de Tm (°C):", text_color="#BE272F")
         maxdt_spinbox = IntegerSelector(self.frame, default_value=5, min_value=0, max_value=100, increment=1)
         
+        texto_multiplex = "La multiplexación consiste en agrupar las sondas\npara ser procesadas en conjunto. Los criterios para\nagrupar son: diferencia de temperatura de melting\ny heterodimerización.\nNOTA: El tiempo de carga aumentará considerablemente."
+        tooltip_multiplex = ToolTip(checkbox_multiplex, texto_multiplex)
 
+        texto_mindg = "Para que las sondas se procesen en conjunto, es muy\nnecesario que no se produzca dimerización entre las sondas.\nEsto quiere decir que las secuencias generadas\ndeben tener muy baja probabilidad de que se complementen\nentre sí. Es por esto que se establece un límite para\nla diferencia de energía producto de la dimerización."
+        tooltip_mindg = ToolTip(mindg_label, texto_mindg)
+        texto_maxdt = "Diferencia de temperatura de melting: Este factor\nes determinante debido a que es muy necesario que las\nsondas funcionen de una manera similar. Si tienen\nTM muy diferentes, algunas sondas pueden no funcionar\neficientemente a la temperatura de reacción, mientras\nque otras lo harán de manera óptima."
+        tooltip_maxdt = ToolTip(maxdt_label, texto_maxdt)
+        
 
         def ejecutar():
             dict_params = {}
@@ -481,7 +493,7 @@ class PantallaParametros(PantallaInicial):
             dict_params['multiplex'] = (multiplex_var.get() == "on")
             dict_params['mindg'] = int(mindg_spinbox.valor.get())
             dict_params['maxdt'] = int(maxdt_spinbox.valor.get())
-            app.mostrar_pantalla("carga", self.seqrecord, self.transcripciones, dict_params)
+            app.mostrar_pantalla("carga", seqrecord=self.seqrecord, transcripciones=self.transcripciones, dict_params=dict_params, filepath=self.filepath)
 
         #volver_button = tk.Button(self.frame, text="Volver", command=self.volver_a_transcripciones)
         #continuar_button = tk.Button(self.frame, text="Continuar a la ejecución", command=ejecutar)
@@ -490,31 +502,54 @@ class PantallaParametros(PantallaInicial):
         volver_button.grid(row=20, column=1, pady=20)
         continuar_button.grid(row=20, column=2, pady=20)
 
+        self.root.geometry("800x1000")
+
 
     def volver_a_transcripciones(self):
-        app.mostrar_pantalla("transcripciones", self.seqrecord)
+        app.mostrar_pantalla("transcripciones", seqrecord=self.seqrecord, filepath=self.filepath)
 
 class PantallaCarga(PantallaInicial):
     def __init__(self, root):
         self.root = root
         self.root.title("Cargando...")
-        self.root.geometry("300x100")
-        #self.frame = ttk.Frame(self.root)
-        self.frame = customtkinter.CTkFrame(master=self.root)
+        self.root.geometry("400x200")
+        self.frame = ttk.Frame(self.root)
+        #self.frame = customtkinter.CTkFrame(master=self.root)
         self.frame.pack(padx=20, pady=20)
         #self.label = ttk.Label(self.frame, text="Cargando, por favor espere...")
         self.label = customtkinter.CTkLabel(self.frame, text="Cargando, por favor espere...", text_color="#BE272F")
         self.label.pack()
-        self.progreso = ttk.Progressbar(self.frame, mode="indeterminate", length=200)
-        self.progreso.pack()
-        self.progreso.start()
+        self.progreso = ttk.Progressbar(self.frame, mode="determinate", length=300)
+        self.progreso.pack(pady=10)
+        #self.actualizar_barra_de_progreso()
+
+    def actualizar_progreso(self, progreso_queue):
+        while True:
+            try:
+                progreso_actual = progreso_queue.get_nowait()
+                self.progreso["value"] = progreso_actual
+                root.update_idletasks()
+            except queue.Empty:
+                if tarea_thread.is_alive():
+                    continue
+                break
+
+    def actualizar_barra_de_progreso(self):
+        global progreso_compartido
+        self.progreso["value"] = progreso_compartido
+        self.frame.update()
+        #print(progreso_compartido,'xd')
+        if progreso_compartido < 100:            
+            self.frame.after(10000, self.actualizar_barra_de_progreso())
+    
 
 class PantallaFinal(PantallaInicial):
-    def __init__(self, root, seqrecord, transcripciones, df, dict_params):
+    def __init__(self, root, seqrecord, transcripciones, df, dict_params, filepath):
         self.seqrecord = seqrecord
         self.transcripciones = transcripciones
         self.df = df
         self.dict_params = dict_params
+        self.filepath = filepath
         super().__init__(root)
 
     def crear_interfaz(self):
@@ -535,13 +570,20 @@ class PantallaFinal(PantallaInicial):
                                         dgmin_hairpin=self.dict_params['dgmin_hairpin'],
                                         maxhomopol_simple=self.dict_params['maxhomopol_simple'],
                                         maxhomopol_double=self.dict_params['maxhomopol_double'],
-                                        maxhomopol_triple=self.dict_params['maxhomopol_triple'])
+                                        maxhomopol_triple=self.dict_params['maxhomopol_triple'],
+                                        multiplex=self.dict_params['multiplex'],
+                                        maxdt=self.dict_params['maxdt'],
+                                        mindg=self.dict_params['mindg'])
+        
         imagen.plot_isoforms(self.seqrecord,
                              self.transcripciones,
                              imagen.get_splicings(self.seqrecord, self.transcripciones),
                              filename)
         
         folderpath = os.path.join(os.getcwd(),'sondas',filename)
+
+
+        shutil.copy(self.filepath, folderpath)
 
         conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
         cursor = conn.cursor()
@@ -567,9 +609,17 @@ class PantallaFinal(PantallaInicial):
         resultado_label = customtkinter.CTkLabel(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas: {len(sondas)}", text_color="#BE272F", font=fuente_negrita)
         resultado_label.pack(padx=20, pady=40)
 
+        # img = Image.open(os.path.join(folderpath,self.seqrecord.id+".png"))
+        # tkimg = ImageTk.PhotoImage(img)
+        # label_imagen = tk.Label(self.frame, image=tkimg)
+        # label_imagen.image = tkimg
+        # label_imagen.pack(padx=10, pady=10)
+
         #carpeta_label = tk.Label(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath)
         carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath, text_color="#BE272F")
         carpeta_label.pack(padx=20, pady=20)
+
+
 
         def abrir_carpeta():
             sistema_operativo = platform.system()
@@ -586,6 +636,8 @@ class PantallaFinal(PantallaInicial):
         #boton_volver = tk.Button(self.frame, text="Volver al inicio", command=self.volver_a_inicio)
         boton_volver = customtkinter.CTkButton(self.frame, text="Volver al inicio", corner_radius=30, fg_color="#E89434", command=self.volver_a_inicio)
         boton_volver.pack(pady=20)
+
+        self.root.geometry("1200x800")
 
     
     def volver_a_inicio(self):
@@ -670,9 +722,12 @@ class PantallaHistorial(PantallaInicial):
         boton_volver = customtkinter.CTkButton(self.frame, text="Volver", corner_radius=30, fg_color="#BE272F", command=self.volver_a_seleccion)
         boton_volver.grid(row=3, column=0,columnspan=2, pady=20)
 
+        self.root.geometry("800x600")
+
     
     def volver_a_seleccion(self):
         app.mostrar_pantalla("inicial")
+
 
 class ControladorApp:
     def __init__(self, root):
@@ -687,23 +742,23 @@ class ControladorApp:
         }
         self.mostrar_pantalla("inicial")
 
-    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None):
+    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None):
         # Ocultar pantalla actual
         if hasattr(self, "pantalla_actual"):
             self.pantalla_actual.frame.pack_forget()
         # Mostrar la pantalla solicitada
         if nombre == "transcripciones":
-            self.pantalla_actual = PantallaTranscripciones(self.root, seqrecord)
+            self.pantalla_actual = PantallaTranscripciones(self.root, seqrecord, filepath)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "parametros":
-            self.pantalla_actual = PantallaParametros(self.root, seqrecord, transcripciones)
+            self.pantalla_actual = PantallaParametros(self.root, seqrecord, transcripciones, filepath)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "carga":
             self.carga = tk.Toplevel(self.root)
             self.pantalla_actual = PantallaCarga(self.carga)
-            self.root.after(200, lambda: self.disenar_sondas(seqrecord, transcripciones, dict_params))
+            self.root.after(200, lambda: self.disenar_sondas(seqrecord, transcripciones, dict_params, filepath))
         elif nombre == "final":
-            self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params)
+            self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params, filepath)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "historial":
             self.pantalla_actual = PantallaHistorial(self.root)
@@ -711,10 +766,15 @@ class ControladorApp:
         else:
             self.pantalla_actual = self.pantallas[nombre]
             self.pantalla_actual.frame.pack(padx=50, pady=50)
+            self.root.geometry("800x450")
 
-    def disenar_sondas(self, seqrecord, transcripciones, dict_params):
+    def disenar_sondas(self, seqrecord, transcripciones, dict_params, filepath):
+        global progreso_compartido
+        progreso_compartido = 0
+        progreso_queue = queue.Queue()
         df = diseno.probe_designer(seqrecord,
                                     transcripciones,
+                                    progreso_queue,
                                     minlen=dict_params['minlen'],
                                     maxlen=dict_params['maxlen'],
                                     tmmin=dict_params['tmmin'],
@@ -733,9 +793,11 @@ class ControladorApp:
                                     multiplex=dict_params['multiplex'],
                                     mindg=dict_params['mindg'],
                                     maxdt=dict_params['maxdt'])
-                                    
+        
+
         self.carga.destroy()  # Cierra la pantalla de carga
-        self.mostrar_pantalla(nombre="final", seqrecord=seqrecord, transcripciones=transcripciones, df=df, dict_params=dict_params)  # Muestra la pantalla de configuración
+        self.mostrar_pantalla(nombre="final", seqrecord=seqrecord, transcripciones=transcripciones, df=df, dict_params=dict_params, filepath=filepath)
+
 
 class ToolTip:
     def __init__(self, widget, text, image_path=None):
@@ -817,4 +879,6 @@ if __name__ == "__main__":
     #root = tk.Tk()
     root = customtkinter.CTk()
     app = ControladorApp(root)
+    root.iconbitmap(os.path.join("images", "gemini2.ico"))
+    #root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file=os.path.join('images','gemini2.png')))
     root.mainloop()
