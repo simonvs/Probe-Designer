@@ -440,8 +440,9 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
 
                 dict_generated_probes[str(empalme)] = [donor_probes, acceptor_probes, central_probes]
 
-                progreso_actual += int(100 / num_splicings)
+                progreso_actual += 100 // num_splicings
                 progreso_queue.put(progreso_actual)
+                print(progreso_actual)
 
 
             #Si el punto de empalme ya fue diseñado se extrae del diccionario
@@ -543,7 +544,7 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
     #print(probes_array)
 
     if multiplex:
-        dict_multiplex = multiplex_probes.multiplex_sequences(probes_array, mindg, maxdt)
+        dict_multiplex = multiplex_probes.multiplex_sequences(probes_array, progreso_queue, mindg, maxdt)
         for index, row in df_probes.iterrows():
             if row['sonda'] == 'AAA':
                 df_probes.at[index, 'grupo'] = -1
@@ -552,10 +553,6 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
 
     return df_probes
 
-progreso_compartido = 0
-def actualizar_progreso(valor):
-    global progreso_compartido
-    progreso_compartido = valor
 
 def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5):
     """

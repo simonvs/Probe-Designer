@@ -1,5 +1,6 @@
 import networkx as nx
 import primer3
+import queue
 from Bio.SeqUtils import MeltingTemp
 
 def are_sequences_compatible(seq1, seq2, mindg, maxdt):
@@ -16,43 +17,49 @@ def are_sequences_compatible(seq1, seq2, mindg, maxdt):
     temp1 = MeltingTemp.Tm_NN(seq1)
     temp2 = MeltingTemp.Tm_NN(seq2)
     if abs(temp2-temp1) > maxdt:
-        print("No compatibles, diferencia tm: "+str(abs(temp2-temp1)))
+        #print("No compatibles, diferencia tm: "+str(abs(temp2-temp1)))
         return False
     
     if len(seq1)<=60 or len(seq2)<=60:
         if primer3.calc_heterodimer(seq1,seq2).dg < mindg:
-            print('dg')
+            #print('dg')
             return False
     else:
         if primer3.calc_heterodimer(seq1[:60],seq2[:60]).dg < mindg:
-            print('dg')
+            #print('dg')
             return False
         if primer3.calc_heterodimer(seq1[:60],seq2[60:]).dg < mindg:
-            print('dg')
+            #print('dg')
             return False
         if primer3.calc_heterodimer(seq1[60:],seq2[:60]).dg < mindg:
-            print('dg')
+            #print('dg')
             return False
         if primer3.calc_heterodimer(seq1[60:],seq2[60:]).dg < mindg:
-            print('dg')
+            #print('dg')
             return False
         
-    print("Compatibles!")
+    #print("Compatibles!")
     return True
     
 
-def multiplex_sequences(sequences, mindg=-13627, maxdt=5):
+def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
     # Crea un grafo no dirigido.
     G = nx.Graph()
 
     # Agrega nodos (secuencias) al grafo.
     G.add_nodes_from(sequences)
 
+    progreso_actual = 0
+
     # Comprueba la compatibilidad y agrega aristas entre secuencias no compatibles.
     for i, seq1 in enumerate(sequences):
         for j, seq2 in enumerate(sequences):
             if i < j and not are_sequences_compatible(seq1, seq2, mindg, maxdt):
                 G.add_edge(seq1, seq2)
+        progreso_actual += 100 // (len(sequences))
+        progress_queue.put(progreso_actual)
+        print(progreso_actual)
+
 
     # Colorea el grafo para encontrar grupos.
     color_map = nx.coloring.greedy_color(G, strategy="largest_first")

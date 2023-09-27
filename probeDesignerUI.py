@@ -10,7 +10,6 @@ import platform
 import shutil
 import threading
 import queue
-from diseno import progreso_compartido
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -509,38 +508,73 @@ class PantallaParametros(PantallaInicial):
         app.mostrar_pantalla("transcripciones", seqrecord=self.seqrecord, filepath=self.filepath)
 
 class PantallaCarga(PantallaInicial):
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Cargando...")
-        self.root.geometry("400x200")
-        self.frame = ttk.Frame(self.root)
-        #self.frame = customtkinter.CTkFrame(master=self.root)
-        self.frame.pack(padx=20, pady=20)
-        #self.label = ttk.Label(self.frame, text="Cargando, por favor espere...")
-        self.label = customtkinter.CTkLabel(self.frame, text="Cargando, por favor espere...", text_color="#BE272F")
-        self.label.pack()
-        self.progreso = ttk.Progressbar(self.frame, mode="determinate", length=300)
-        self.progreso.pack(pady=10)
-        #self.actualizar_barra_de_progreso()
+    def __init__(self, root, seqrecord, transcripciones, dict_params, filepath):
+        self.seqrecord = seqrecord
+        self.transcripciones = transcripciones
+        self.dict_params = dict_params
+        self.filepath = filepath
+        super().__init__(root)
 
-    def actualizar_progreso(self, progreso_queue):
+
+    def crear_interfaz(self):
+
+        progreso_queue = queue.Queue()
+
+        tarea_thread = threading.Thread(target=self.ejecutar_diseno, args=(progreso_queue,))
+        tarea_thread.start()
+
+        actualizar_progreso_thread = threading.Thread(target=self.actualizar_progreso, args=(progreso_queue,tarea_thread,))
+        actualizar_progreso_thread.start()
+
+        if self.dict_params['multiplex']:
+            load_label = ttk.Label(self.frame, text="Buscando y verificando sondas, por favor espere...")
+        else:
+            load_label = ttk.Label(self.frame, text="Diseñando y multiplexando sondas, por favor espere...")
+        load_label.pack(padx=10, pady=10)
+
+        self.progress_bar = ttk.Progressbar(self.frame, mode="determinate", length=300)
+        self.progress_bar.pack(padx=10, pady=10)
+
+        self.root.geometry("800x500")
+
+    
+    def ejecutar_diseno(self, progreso_queue):
+        df = diseno.probe_designer(self.seqrecord,
+                                    self.transcripciones,
+                                    progreso_queue,
+                                    minlen=self.dict_params['minlen'],
+                                    maxlen=self.dict_params['maxlen'],
+                                    tmmin=self.dict_params['tmmin'],
+                                    tmmax=self.dict_params['tmmax'],
+                                    gcmin=self.dict_params['gcmin'],
+                                    gcmax=self.dict_params['gcmax'],
+                                    mindist=self.dict_params['mindist'],
+                                    maxdist=self.dict_params['maxdist'],
+                                    minoverlap=self.dict_params['minoverlap'],
+                                    maxoverlap=self.dict_params['maxoverlap'],
+                                    dgmin_homodim=self.dict_params['dgmin_homodim'],
+                                    dgmin_hairpin=self.dict_params['dgmin_hairpin'],
+                                    maxhomopol_simple=self.dict_params['maxhomopol_simple'],
+                                    maxhomopol_double=self.dict_params['maxhomopol_double'],
+                                    maxhomopol_triple=self.dict_params['maxhomopol_triple'],
+                                    multiplex=self.dict_params['multiplex'],
+                                    mindg=self.dict_params['mindg'],
+                                    maxdt=self.dict_params['maxdt'])
+        
+        app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath)
+        
+    
+    def actualizar_progreso(self, progreso_queue, tarea_thread):
         while True:
             try:
                 progreso_actual = progreso_queue.get_nowait()
-                self.progreso["value"] = progreso_actual
+                self.progress_bar["value"] = progreso_actual
                 root.update_idletasks()
             except queue.Empty:
                 if tarea_thread.is_alive():
                     continue
                 break
 
-    def actualizar_barra_de_progreso(self):
-        global progreso_compartido
-        self.progreso["value"] = progreso_compartido
-        self.frame.update()
-        #print(progreso_compartido,'xd')
-        if progreso_compartido < 100:            
-            self.frame.after(10000, self.actualizar_barra_de_progreso())
     
 
 class PantallaFinal(PantallaInicial):
@@ -637,7 +671,7 @@ class PantallaFinal(PantallaInicial):
         boton_volver = customtkinter.CTkButton(self.frame, text="Volver al inicio", corner_radius=30, fg_color="#E89434", command=self.volver_a_inicio)
         boton_volver.pack(pady=20)
 
-        self.root.geometry("1200x800")
+        self.root.geometry("800x500")
 
     
     def volver_a_inicio(self):
@@ -754,9 +788,10 @@ class ControladorApp:
             self.pantalla_actual = PantallaParametros(self.root, seqrecord, transcripciones, filepath)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "carga":
-            self.carga = tk.Toplevel(self.root)
-            self.pantalla_actual = PantallaCarga(self.carga)
-            self.root.after(200, lambda: self.disenar_sondas(seqrecord, transcripciones, dict_params, filepath))
+            #self.carga = tk.Toplevel(self.root)
+            self.pantalla_actual = PantallaCarga(self.root, seqrecord, transcripciones, dict_params, filepath)
+            self.pantalla_actual.frame.pack(padx=50, pady=50)
+            #self.root.after(200, lambda: self.disenar_sondas(seqrecord, transcripciones, dict_params, filepath))
         elif nombre == "final":
             self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params, filepath)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
