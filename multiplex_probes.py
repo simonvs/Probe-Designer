@@ -49,14 +49,14 @@ def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
     # Agrega nodos (secuencias) al grafo.
     G.add_nodes_from(sequences)
 
-    progreso_actual = 0
-
+    progreso_actual = 100
+    print("num seqs:",len(sequences))
     # Comprueba la compatibilidad y agrega aristas entre secuencias no compatibles.
     for i, seq1 in enumerate(sequences):
         for j, seq2 in enumerate(sequences):
             if i < j and not are_sequences_compatible(seq1, seq2, mindg, maxdt):
-                G.add_edge(seq1, seq2)
-        progreso_actual += 100 // (len(sequences))
+                G.add_edge(seq1, seq2)        
+        progreso_actual += 100 / (len(sequences))
         progress_queue.put(progreso_actual)
         print(progreso_actual)
 
@@ -67,8 +67,8 @@ def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
     # Crea un diccionario que asocie cada secuencia con su grupo.
     sequence_to_group = {sequence: color for sequence, color in color_map.items()}
 
-    for seq, group in sequence_to_group.items():
-        print(f"Secuencia: {seq}, Grupo: {group}, tm: {MeltingTemp.Tm_NN(seq)}")
+    #for seq, group in sequence_to_group.items():
+    #    print(f"Secuencia: {seq}, Grupo: {group}, tm: {MeltingTemp.Tm_NN(seq)}")
     return sequence_to_group
 
 # Ejemplo de uso:
