@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-class SeleccionarOpciones(root):
+class SeleccionarOpciones:
     def __init__(self, root):
         super().__init__(root)
         self.root = root

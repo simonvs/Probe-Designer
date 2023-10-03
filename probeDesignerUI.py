@@ -526,18 +526,19 @@ class PantallaCarga(PantallaInicial):
         actualizar_progreso_thread = threading.Thread(target=self.actualizar_progreso, args=(progreso_queue,tarea_thread,))
         actualizar_progreso_thread.start()
 
-        if not self.dict_params['multiplex']:
-            load_label = ttk.Label(self.frame, text="Buscando y verificando sondas, por favor espere...")
-            max_load = 100
-        else:
-            load_label = ttk.Label(self.frame, text="Diseñando y multiplexando sondas, por favor espere...")
-            max_load = 200
+        load_label = customtkinter.CTkLabel(self.frame, text="Buscando y verificando sondas, por favor espere...", text_color="#000000")
         load_label.pack(padx=10, pady=10)
-
-        self.progress_bar = ttk.Progressbar(self.frame, mode="determinate", maximum=max_load, length=300)
+        self.progress_bar = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
         self.progress_bar.pack(padx=10, pady=10)
+        
+        if self.dict_params['multiplex']:
+            multiplex_label = customtkinter.CTkLabel(self.frame, text="Multiplexando sondas, por favor espere...", text_color="#000000")
+            multiplex_label.pack(padx=10, pady=10)
+            
+            self.progress_multiplex = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
+            self.progress_multiplex.pack(padx=10, pady=10)
 
-        self.root.geometry("600x400")
+        self.root.geometry("600x300")
 
     
     def ejecutar_diseno(self, progreso_queue):
@@ -563,34 +564,7 @@ class PantallaCarga(PantallaInicial):
                                     mindg=self.dict_params['mindg'],
                                     maxdt=self.dict_params['maxdt'])
         
-        app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath)
-        
-    
-    def actualizar_progreso(self, progreso_queue, tarea_thread):
-        while True:
-            try:
-                progreso_actual = progreso_queue.get_nowait()
-                self.progress_bar["value"] = progreso_actual
-                root.update_idletasks()
-            except queue.Empty:
-                if tarea_thread.is_alive():
-                    continue
-                break
-
-    
-
-class PantallaFinal(PantallaInicial):
-    def __init__(self, root, seqrecord, transcripciones, df, dict_params, filepath):
-        self.seqrecord = seqrecord
-        self.transcripciones = transcripciones
-        self.df = df
-        self.dict_params = dict_params
-        self.filepath = filepath
-        super().__init__(root)
-
-    def crear_interfaz(self):
-        
-        filename = diseno.generate_xlsx(df=self.df,
+        filename = diseno.generate_xlsx(df=df,
                                         name=self.seqrecord.id,
                                         minlen=self.dict_params['minlen'],
                                         maxlen=self.dict_params['maxlen'],
@@ -618,7 +592,6 @@ class PantallaFinal(PantallaInicial):
         
         folderpath = os.path.join(os.getcwd(),'sondas',filename)
 
-
         shutil.copy(self.filepath, folderpath)
 
         conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
@@ -633,7 +606,38 @@ class PantallaFinal(PantallaInicial):
         cursor.execute("INSERT INTO sondas (secuencia, genes, fecha_hora, carpeta) VALUES (?,?,?,?)", (str(self.seqrecord.id)+" | "+str(self.seqrecord.description), str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now(), folderpath))
         conn.commit()
         conn.close()
+        
+        app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath, folderpath=folderpath)
+        
+    
+    def actualizar_progreso(self, progreso_queue, tarea_thread):
+        while True:
+            try:
+                progreso_actual = progreso_queue.get_nowait()
+                if progreso_actual < 100:
+                    self.progress_bar["value"] = progreso_actual
+                else:
+                    self.progress_multiplex["value"] = progreso_actual - 100
+                root.update_idletasks()
+            except queue.Empty:
+                if tarea_thread.is_alive():
+                    continue
+                break
 
+    
+
+class PantallaFinal(PantallaInicial):
+    def __init__(self, root, seqrecord, transcripciones, df, dict_params, filepath, folderpath):
+        self.seqrecord = seqrecord
+        self.transcripciones = transcripciones
+        self.df = df
+        self.dict_params = dict_params
+        self.filepath = filepath
+        self.folderpath = folderpath
+        super().__init__(root)
+
+    def crear_interfaz(self):
+    
         sondas = []
         for index, row in self.df.iterrows():
             if row['sonda'] != 'AAA' and row['sonda'] not in sondas:
@@ -642,7 +646,7 @@ class PantallaFinal(PantallaInicial):
         #fuente_negrita = font.Font(weight="bold")
         #resultado_label = tk.Label(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas: {len(sondas)}", font=fuente_negrita)
         fuente_negrita = customtkinter.CTkFont(family='Helvetica', weight='bold')
-        resultado_label = customtkinter.CTkLabel(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas: {len(sondas)}", text_color="#000000", font=fuente_negrita)
+        resultado_label = customtkinter.CTkLabel(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas diseñadas: {len(sondas)}", text_color="#000000", font=fuente_negrita)
         resultado_label.pack(padx=20, pady=40)
 
         # img = Image.open(os.path.join(folderpath,self.seqrecord.id+".png"))
@@ -652,7 +656,7 @@ class PantallaFinal(PantallaInicial):
         # label_imagen.pack(padx=10, pady=10)
 
         #carpeta_label = tk.Label(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath)
-        carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath, text_color="#000000")
+        carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + self.folderpath, text_color="#000000")
         carpeta_label.pack(padx=20, pady=20)
 
 
@@ -660,11 +664,11 @@ class PantallaFinal(PantallaInicial):
         def abrir_carpeta():
             sistema_operativo = platform.system()
             if sistema_operativo == 'Windows':
-                os.system(f'explorer "{folderpath}"')
+                os.system(f'explorer "{self.folderpath}"')
             elif sistema_operativo == 'Darwin':  # macOS
-                os.system(f'open "{folderpath}"')
+                os.system(f'open "{self.folderpath}"')
             elif sistema_operativo == 'Linux':
-                os.system(f'xdg-open "{folderpath}"')
+                os.system(f'xdg-open "{self.folderpath}"')
 
         boton_imagen = customtkinter.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
         boton_imagen.pack(pady=20)
@@ -778,7 +782,7 @@ class ControladorApp:
         }
         self.mostrar_pantalla("inicial")
 
-    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None):
+    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None, folderpath=None):
         # Ocultar pantalla actual
         if hasattr(self, "pantalla_actual"):
             self.pantalla_actual.frame.pack_forget()
@@ -795,7 +799,7 @@ class ControladorApp:
             self.pantalla_actual.frame.pack(padx=50, pady=50)
             #self.root.after(200, lambda: self.disenar_sondas(seqrecord, transcripciones, dict_params, filepath))
         elif nombre == "final":
-            self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params, filepath)
+            self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params, filepath, folderpath)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "historial":
             self.pantalla_actual = PantallaHistorial(self.root)

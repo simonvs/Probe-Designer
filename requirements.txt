@@ -6,3 +6,7 @@ primer3-py
 tkinter
 customtkinter
 bcbio-gff
+openpyxl
+sqlite3
+Pillow
+matplotlib
