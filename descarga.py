@@ -26,7 +26,7 @@ def accnum_to_seqrecord(accesion_number):
     if not os.path.isfile(filepath):
         try:
             #Descargar la secuencia y escribirla en un archivo
-            Entrez.mail = "simonvergaraswett@hotmail.com"
+            #Entrez.mail = "simonvergaraswett@hotmail.com"
             with Entrez.efetch(db="nucleotide", id=accesion_number, rettype="gb", retmode="text") as handle:
                 with open(filepath, "w") as out_handle:
                     out_handle.write(handle.read())

@@ -1,7 +1,9 @@
+import matplotlib
 import matplotlib.pyplot as plt
 import descarga
 import pandas as pd
 import os
+matplotlib.use('agg')
 
 def get_all_transcripts(seqrecord):
     transcripts = []
@@ -110,7 +112,7 @@ def plot_show():
 
 if __name__ == "__main__":
     sequence_data = descarga.parse_file_to_seqrecord('files/tp53.gb')
-    plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)),"PKD1")
+    plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)),"images")
 
 
 

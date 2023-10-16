@@ -32,28 +32,51 @@ class PantallaInicial:
         #fuente_titulo = font.Font(weight="bold", size=16)
         #titulo_archivo = tk.Label(self.frame, text="Seleccione un archivo GenBank", font=fuente_titulo)
         fuente_titulo = customtkinter.CTkFont(family='Helvetica', size=20, weight='bold')
-        titulo_archivo = customtkinter.CTkLabel(self.frame, text="Seleccione un archivo GenBank\n(.gb o .gbk)", text_color="#000000", font=fuente_titulo)
-        titulo_archivo.pack(padx=100, pady=30)
+        titulo_archivo = customtkinter.CTkLabel(self.frame, text="Seleccione un archivo GenBank (.gb o .gbk)\no introduzca su accession number", text_color="#000000", font=fuente_titulo)
+        titulo_archivo.grid(row=0, column=0, columnspan=3, padx=100, pady=30)
 
         # Pantalla de selección de archivo
         #seleccion_button = tk.Button(self.frame, text="Seleccionar Archivo", command=self.seleccionar_archivo)
         seleccion_button = customtkinter.CTkButton(self.frame, text="Seleccionar Archivo", corner_radius=30, fg_color="#404040", command=self.seleccionar_archivo)
-        seleccion_button.pack(pady=30)
+        seleccion_button.grid(row=1, column=0, rowspan=2, padx=15, pady=30)
+
+        obien_label = customtkinter.CTkLabel(self.frame, text="o bien...", text_color="#000000")
+        obien_label.grid(row=1, column=1, rowspan=2, pady=30)
+
+        accession_entry = customtkinter.CTkEntry(self.frame, placeholder_text="Accession Number", corner_radius=30)
+        accession_entry.grid(row=1, column=2, padx=15, pady=30)
+
+
+        def descargar_secuencia():
+            accnum = accession_entry.get()
+            if len(accnum) > 5:
+                try:
+                    seqrecord = descarga.accnum_to_seqrecord(accnum)
+                    filepath = os.path.join(os.getcwd(), 'files', accnum+".gbk")
+                    app.mostrar_pantalla("transcripciones", seqrecord, filepath=filepath)
+                except:
+                    messagebox.showinfo("Error", "Error al descargar la secuencia")
+
+        descargar_button = customtkinter.CTkButton(self.frame, text="Descargar Secuencia", corner_radius=30, fg_color="#404040", command=descargar_secuencia)
+        descargar_button.grid(row=2, column=2, pady=10)
 
         #historial_button = tk.Button(self.frame, text="Ver historial de sondas", command=self.ver_historial)
         historial_button = customtkinter.CTkButton(self.frame, text="Ver historial de sondas", corner_radius=30, fg_color="#7a7a7a",command=self.ver_historial)
-        historial_button.pack(pady=60)
+        historial_button.grid(row=3, column=0, columnspan=3, pady=25)
         
         self.root.geometry("800x450")
+
         
     def seleccionar_archivo(self):
         archivo = filedialog.askopenfilename(filetypes=[("Archivos GenBank", "*.gbk *.gb")])
         if archivo:
             seqrecord = descarga.parse_file_to_seqrecord(archivo)
             app.mostrar_pantalla("transcripciones", seqrecord, filepath=archivo)
+
     
     def ver_historial(self):
         app.mostrar_pantalla('historial')
+
 
 class PantallaTranscripciones(PantallaInicial):
     def __init__(self, root, seqrecord, filepath):
@@ -65,13 +88,13 @@ class PantallaTranscripciones(PantallaInicial):
         # Crear widgets de la pantalla de inicio
         #transcripciones_label = tk.Label(self.frame, text=f"Seleccione las transcripciones para el diseño de sondas", font=fuente_titulo)
         fuente_titulo = customtkinter.CTkFont(family='Helvetica', size=20, weight='bold')
-        transcripciones_label = customtkinter.CTkLabel(self.frame, text="Seleccione las transcripciones para el diseño de sondas", text_color="#000000", font=fuente_titulo)
+        transcripciones_label = customtkinter.CTkLabel(self.frame, text="Seleccione los transcritos para el diseño de sondas", text_color="#000000", font=fuente_titulo)
         transcripciones_label.grid(row=0, column=0, columnspan=3, padx=10, pady=20)
 
-        label_izq = customtkinter.CTkLabel(self.frame, text="Transcripciones no seleccionadas", text_color="#000000")
+        label_izq = customtkinter.CTkLabel(self.frame, text="Transcritos no seleccionadas", text_color="#000000")
         label_izq.grid(row=1, column=0, padx=10, pady=10)
 
-        label_der = customtkinter.CTkLabel(self.frame, text="Transcripciones seleccionadas", text_color="#000000")
+        label_der = customtkinter.CTkLabel(self.frame, text="Transcritos seleccionadas", text_color="#000000")
         label_der.grid(row=1, column=2, padx=10, pady=10)
 
         #Obtener lista con transcripciones
@@ -175,13 +198,14 @@ class PantallaTranscripciones(PantallaInicial):
     def volver_a_seleccion(self):
         app.mostrar_pantalla("inicial")
 
+
 class PantallaParametros(PantallaInicial):
     def __init__(self, root, seqrecord, transcripciones, filepath):
         self.seqrecord = seqrecord
         self.transcripciones = transcripciones
         self.filepath = filepath
         super().__init__(root)
-        self.root.geometry('1000x800')
+        self.root.geometry('1000x750')
     
     def crear_interfaz(self):
         #Espaciadores
@@ -376,7 +400,7 @@ class PantallaParametros(PantallaInicial):
         dgmin_homodim_label.grid(row=11, column=2, padx=5, pady=10, sticky="e")
         
         #dgmin_homodim_spinbox = tk.Spinbox(self.frame, from_=-50000, to=10000, increment=1000, width=5)
-        dgmin_homodim_spinbox = IntegerSelector(self.frame, default_value=-10000, min_value=-999999, max_value=1000000, increment=1000)
+        dgmin_homodim_spinbox = IntegerSelector(self.frame, default_value=-15000, min_value=-999999, max_value=1000000, increment=1000)
         dgmin_homodim_spinbox.grid(row=11, column=3, padx= 5, pady=10)
         #dgmin_homodim_spinbox.delete(0, "end")
         #dgmin_homodim_spinbox.insert(0, "-10000")
@@ -388,7 +412,7 @@ class PantallaParametros(PantallaInicial):
         dgmin_hairpin_label.grid(row=12, column=2, padx=5, sticky="e")
         
         #dgmin_hairpin_spinbox = tk.Spinbox(self.frame, from_=-50000, to=10000, increment=1000, width=6)
-        dgmin_hairpin_spinbox = IntegerSelector(self.frame, default_value=-10000, min_value=-999999, max_value=1000000, increment=1000)
+        dgmin_hairpin_spinbox = IntegerSelector(self.frame, default_value=-15000, min_value=-999999, max_value=1000000, increment=1000)
         dgmin_hairpin_spinbox.grid(row=12, column=3, padx= 5)
         #dgmin_hairpin_spinbox.delete(0, "end")
         #dgmin_hairpin_spinbox.insert(0, "-10000")
@@ -507,6 +531,7 @@ class PantallaParametros(PantallaInicial):
     def volver_a_transcripciones(self):
         app.mostrar_pantalla("transcripciones", seqrecord=self.seqrecord, filepath=self.filepath)
 
+
 class PantallaCarga(PantallaInicial):
     def __init__(self, root, seqrecord, transcripciones, dict_params, filepath):
         self.seqrecord = seqrecord
@@ -518,28 +543,30 @@ class PantallaCarga(PantallaInicial):
 
     def crear_interfaz(self):
 
+        self.load_label = customtkinter.CTkLabel(self.frame, text="Buscando y verificando sondas, por favor espere...", text_color="#000000")
+        self.load_label.pack(padx=10, pady=10)
+        self.progress_bar = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
+        self.progress_bar.pack(padx=10, pady=10)
+        
+        if self.dict_params['multiplex']:
+            #multiplex_label = customtkinter.CTkLabel(self.frame, text="Multiplexando sondas, por favor espere...", text_color="#000000")
+            #multiplex_label.pack(padx=10, pady=10)
+            
+            self.progress_multiplex = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
+            self.progress_multiplex.pack(padx=10, pady=10)
+
         progreso_queue = queue.Queue()
 
         tarea_thread = threading.Thread(target=self.ejecutar_diseno, args=(progreso_queue,))
         tarea_thread.start()
 
-        actualizar_progreso_thread = threading.Thread(target=self.actualizar_progreso, args=(progreso_queue,tarea_thread,))
+        actualizar_progreso_thread = threading.Thread(target=self.actualizar_progreso, args=(progreso_queue,tarea_thread,self.dict_params['multiplex'],))
         actualizar_progreso_thread.start()
 
-        load_label = customtkinter.CTkLabel(self.frame, text="Buscando y verificando sondas, por favor espere...", text_color="#000000")
-        load_label.pack(padx=10, pady=10)
-        self.progress_bar = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
-        self.progress_bar.pack(padx=10, pady=10)
-        
-        if self.dict_params['multiplex']:
-            multiplex_label = customtkinter.CTkLabel(self.frame, text="Multiplexando sondas, por favor espere...", text_color="#000000")
-            multiplex_label.pack(padx=10, pady=10)
-            
-            self.progress_multiplex = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
-            self.progress_multiplex.pack(padx=10, pady=10)
+        #reporte_label = customtkinter.CTkLabel(self.frame, text="Generando reporte e imagen, por favor espere...", text_color="#000000")
+        #reporte_label.pack(padx=10, pady=10)
 
         self.root.geometry("600x300")
-
     
     def ejecutar_diseno(self, progreso_queue):
         df = diseno.probe_designer(self.seqrecord,
@@ -566,6 +593,7 @@ class PantallaCarga(PantallaInicial):
         
         filename = diseno.generate_xlsx(df=df,
                                         name=self.seqrecord.id,
+                                        genes=str(diseno.get_all_genes(self.seqrecord))[1:-1],
                                         minlen=self.dict_params['minlen'],
                                         maxlen=self.dict_params['maxlen'],
                                         tmmin=self.dict_params['tmmin'],
@@ -610,21 +638,31 @@ class PantallaCarga(PantallaInicial):
         app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath, folderpath=folderpath)
         
     
-    def actualizar_progreso(self, progreso_queue, tarea_thread):
+    def actualizar_progreso(self, progreso_queue, tarea_thread, multiplex):
         while True:
             try:
                 progreso_actual = progreso_queue.get_nowait()
-                if progreso_actual < 100:
-                    self.progress_bar["value"] = progreso_actual
+                if not multiplex:
+                    if progreso_actual < 95:
+                        self.progress_bar["value"] = progreso_actual
+                    else:
+                        self.progress_bar["value"] = 100
+                        self.load_label.configure(text="Generando reporte e imagen, por favor espere...")
                 else:
-                    self.progress_multiplex["value"] = progreso_actual - 100
+                    if progreso_actual < 100:
+                        self.progress_bar["value"] = progreso_actual
+                    else:
+                        self.progress_bar["value"] = 100
+                        self.load_label.configure(text="Multiplexando sondas, por favor espere...")
+                        self.progress_multiplex["value"] = progreso_actual - 100
+                        if progreso_actual > 195:
+                                self.load_label.configure(text="Generando reporte e imagen, por favor espere...")
                 root.update_idletasks()
             except queue.Empty:
                 if tarea_thread.is_alive():
                     continue
                 break
 
-    
 
 class PantallaFinal(PantallaInicial):
     def __init__(self, root, seqrecord, transcripciones, df, dict_params, filepath, folderpath):
@@ -659,7 +697,13 @@ class PantallaFinal(PantallaInicial):
         carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + self.folderpath, text_color="#000000")
         carpeta_label.pack(padx=20, pady=20)
 
+        def abrir_imagen():
+            ventana = tk.Toplevel(root)
+            ventana.geometry("700x400")
+            Zoom_Advanced(ventana, path=os.path.join(self.folderpath, self.seqrecord.id+'.png'))
 
+        boton_imagen = customtkinter.CTkButton(self.frame, text="Visualizar transcritos", corner_radius=30, fg_color="#404040", command=abrir_imagen)
+        boton_imagen.pack(pady=20)
 
         def abrir_carpeta():
             sistema_operativo = platform.system()
@@ -670,8 +714,8 @@ class PantallaFinal(PantallaInicial):
             elif sistema_operativo == 'Linux':
                 os.system(f'xdg-open "{self.folderpath}"')
 
-        boton_imagen = customtkinter.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
-        boton_imagen.pack(pady=20)
+        boton_carpeta = customtkinter.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
+        boton_carpeta.pack(pady=20)
 
         #boton_volver = tk.Button(self.frame, text="Volver al inicio", command=self.volver_a_inicio)
         boton_volver = customtkinter.CTkButton(self.frame, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio)
@@ -682,6 +726,7 @@ class PantallaFinal(PantallaInicial):
     
     def volver_a_inicio(self):
         app.mostrar_pantalla('inicial')
+
 
 class PantallaHistorial(PantallaInicial):
     def __init__(self, root):
@@ -792,7 +837,7 @@ class ControladorApp:
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "parametros":
             self.pantalla_actual = PantallaParametros(self.root, seqrecord, transcripciones, filepath)
-            self.pantalla_actual.frame.pack(padx=50, pady=50)
+            self.pantalla_actual.frame.pack(padx=10, pady=10)
         elif nombre == "carga":
             #self.carga = tk.Toplevel(self.root)
             self.pantalla_actual = PantallaCarga(self.root, seqrecord, transcripciones, dict_params, filepath)
@@ -807,37 +852,7 @@ class ControladorApp:
         else:
             self.pantalla_actual = self.pantallas[nombre]
             self.pantalla_actual.frame.pack(padx=50, pady=50)
-            self.root.geometry("800x450")
-
-    def disenar_sondas(self, seqrecord, transcripciones, dict_params, filepath):
-        global progreso_compartido
-        progreso_compartido = 0
-        progreso_queue = queue.Queue()
-        df = diseno.probe_designer(seqrecord,
-                                    transcripciones,
-                                    progreso_queue,
-                                    minlen=dict_params['minlen'],
-                                    maxlen=dict_params['maxlen'],
-                                    tmmin=dict_params['tmmin'],
-                                    tmmax=dict_params['tmmax'],
-                                    gcmin=dict_params['gcmin'],
-                                    gcmax=dict_params['gcmax'],
-                                    mindist=dict_params['mindist'],
-                                    maxdist=dict_params['maxdist'],
-                                    minoverlap=dict_params['minoverlap'],
-                                    maxoverlap=dict_params['maxoverlap'],
-                                    dgmin_homodim=dict_params['dgmin_homodim'],
-                                    dgmin_hairpin=dict_params['dgmin_hairpin'],
-                                    maxhomopol_simple=dict_params['maxhomopol_simple'],
-                                    maxhomopol_double=dict_params['maxhomopol_double'],
-                                    maxhomopol_triple=dict_params['maxhomopol_triple'],
-                                    multiplex=dict_params['multiplex'],
-                                    mindg=dict_params['mindg'],
-                                    maxdt=dict_params['maxdt'])
-        
-
-        self.carga.destroy()  # Cierra la pantalla de carga
-        self.mostrar_pantalla(nombre="final", seqrecord=seqrecord, transcripciones=transcripciones, df=df, dict_params=dict_params, filepath=filepath)
+            self.root.geometry("800x450")      
 
 
 class ToolTip:
@@ -872,6 +887,7 @@ class ToolTip:
         if self.tooltip:
             self.tooltip.destroy()
             self.tooltip = None
+
 
 class IntegerSelector(customtkinter.CTkFrame):
     def __init__(self, master, default_value=0, min_value=None, max_value=None, increment=1, **kwargs):
@@ -914,9 +930,137 @@ class IntegerSelector(customtkinter.CTkFrame):
             nuevo_valor = min(nuevo_valor, self.max_value)
         self.valor.set(nuevo_valor)
 
+
+class AutoScrollbar(ttk.Scrollbar):
+    ''' A scrollbar that hides itself if it's not needed.
+        Works only if you use the grid geometry manager '''
+    def set(self, lo, hi):
+        if float(lo) <= 0.0 and float(hi) >= 1.0:
+            self.grid_remove()
+        else:
+            self.grid()
+            ttk.Scrollbar.set(self, lo, hi)
+
+    def pack(self, **kw):
+        raise tk.TclError('Cannot use pack with this widget')
+
+    def place(self, **kw):
+        raise tk.TclError('Cannot use place with this widget')
+
+
+#https://stackoverflow.com/questions/41656176/tkinter-canvas-zoom-move-pan
+class Zoom_Advanced(ttk.Frame):
+    ''' Advanced zoom of the image '''
+    def __init__(self, mainframe, path):
+        ''' Initialize the main Frame '''
+        ttk.Frame.__init__(self, master=mainframe)
+        self.master.title('Visualizador de transcritos')
+        # Vertical and horizontal scrollbars for canvas
+        vbar = AutoScrollbar(self.master, orient='vertical')
+        hbar = AutoScrollbar(self.master, orient='horizontal')
+        vbar.grid(row=0, column=1, sticky='ns')
+        hbar.grid(row=1, column=0, sticky='we')
+        # Create canvas and put image on it
+        self.canvas = tk.Canvas(self.master, highlightthickness=0,
+                                xscrollcommand=hbar.set, yscrollcommand=vbar.set)
+        self.canvas.grid(row=0, column=0, sticky='nswe')
+        self.canvas.update()  # wait till canvas is created
+        vbar.configure(command=self.scroll_y)  # bind scrollbars to the canvas
+        hbar.configure(command=self.scroll_x)
+        # Make the canvas expandable
+        self.master.rowconfigure(0, weight=1)
+        self.master.columnconfigure(0, weight=1)
+        # Bind events to the Canvas
+        self.canvas.bind('<Configure>', self.show_image)  # canvas is resized
+        self.canvas.bind('<ButtonPress-1>', self.move_from)
+        self.canvas.bind('<B1-Motion>',     self.move_to)
+        self.canvas.bind('<MouseWheel>', self.wheel)  # with Windows and MacOS, but not Linux
+        self.canvas.bind('<Button-5>',   self.wheel)  # only with Linux, wheel scroll down
+        self.canvas.bind('<Button-4>',   self.wheel)  # only with Linux, wheel scroll up
+        self.image = Image.open(path)  # open image
+        self.width, self.height = self.image.size
+        self.imscale = 1.0  # scale for the canvaas image
+        self.delta = 1.3  # zoom magnitude
+        # Put image into container rectangle and use it to set proper coordinates to the image
+        self.container = self.canvas.create_rectangle(0, 0, self.width, self.height, width=0)
+        self.show_image()
+
+    def scroll_y(self, *args, **kwargs):
+        ''' Scroll canvas vertically and redraw the image '''
+        self.canvas.yview(*args, **kwargs)  # scroll vertically
+        self.show_image()  # redraw the image
+
+    def scroll_x(self, *args, **kwargs):
+        ''' Scroll canvas horizontally and redraw the image '''
+        self.canvas.xview(*args, **kwargs)  # scroll horizontally
+        self.show_image()  # redraw the image
+
+    def move_from(self, event):
+        ''' Remember previous coordinates for scrolling with the mouse '''
+        self.canvas.scan_mark(event.x, event.y)
+
+    def move_to(self, event):
+        ''' Drag (move) canvas to the new position '''
+        self.canvas.scan_dragto(event.x, event.y, gain=1)
+        self.show_image()  # redraw the image
+
+    def wheel(self, event):
+        ''' Zoom with mouse wheel '''
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+        bbox = self.canvas.bbox(self.container)  # get image area
+        if bbox[0] < x < bbox[2] and bbox[1] < y < bbox[3]: pass  # Ok! Inside the image
+        else: return  # zoom only inside image area
+        scale = 1.0
+        # Respond to Linux (event.num) or Windows (event.delta) wheel event
+        if event.num == 5 or event.delta == -120:  # scroll down
+            i = min(self.width, self.height)
+            if int(i * self.imscale) < 30: return  # image is less than 30 pixels
+            self.imscale /= self.delta
+            scale        /= self.delta
+        if event.num == 4 or event.delta == 120:  # scroll up
+            i = min(self.canvas.winfo_width(), self.canvas.winfo_height())
+            if i < self.imscale: return  # 1 pixel is bigger than the visible area
+            self.imscale *= self.delta
+            scale        *= self.delta
+        self.canvas.scale('all', x, y, scale, scale)  # rescale all canvas objects
+        self.show_image()
+
+    def show_image(self, event=None):
+        ''' Show image on the Canvas '''
+        bbox1 = self.canvas.bbox(self.container)  # get image area
+        # Remove 1 pixel shift at the sides of the bbox1
+        bbox1 = (bbox1[0] + 1, bbox1[1] + 1, bbox1[2] - 1, bbox1[3] - 1)
+        bbox2 = (self.canvas.canvasx(0),  # get visible area of the canvas
+                 self.canvas.canvasy(0),
+                 self.canvas.canvasx(self.canvas.winfo_width()),
+                 self.canvas.canvasy(self.canvas.winfo_height()))
+        bbox = [min(bbox1[0], bbox2[0]), min(bbox1[1], bbox2[1]),  # get scroll region box
+                max(bbox1[2], bbox2[2]), max(bbox1[3], bbox2[3])]
+        if bbox[0] == bbox2[0] and bbox[2] == bbox2[2]:  # whole image in the visible area
+            bbox[0] = bbox1[0]
+            bbox[2] = bbox1[2]
+        if bbox[1] == bbox2[1] and bbox[3] == bbox2[3]:  # whole image in the visible area
+            bbox[1] = bbox1[1]
+            bbox[3] = bbox1[3]
+        self.canvas.configure(scrollregion=bbox)  # set scroll region
+        x1 = max(bbox2[0] - bbox1[0], 0)  # get coordinates (x1,y1,x2,y2) of the image tile
+        y1 = max(bbox2[1] - bbox1[1], 0)
+        x2 = min(bbox2[2], bbox1[2]) - bbox1[0]
+        y2 = min(bbox2[3], bbox1[3]) - bbox1[1]
+        if int(x2 - x1) > 0 and int(y2 - y1) > 0:  # show image if it in the visible area
+            x = min(int(x2 / self.imscale), self.width)   # sometimes it is larger on 1 pixel...
+            y = min(int(y2 / self.imscale), self.height)  # ...and sometimes not
+            image = self.image.crop((int(x1 / self.imscale), int(y1 / self.imscale), x, y))
+            imagetk = ImageTk.PhotoImage(image.resize((int(x2 - x1), int(y2 - y1))))
+            imageid = self.canvas.create_image(max(bbox2[0], bbox1[0]), max(bbox2[1], bbox1[1]),
+                                               anchor='nw', image=imagetk)
+            self.canvas.lower(imageid)  # set image into background
+            self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
+
+
 if __name__ == "__main__":
     customtkinter.set_appearance_mode("light")
-    #customtkinter.set_default_color_theme("dark-blue")
     #root = tk.Tk()
     root = customtkinter.CTk()
     app = ControladorApp(root)

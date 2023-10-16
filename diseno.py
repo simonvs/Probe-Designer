@@ -20,6 +20,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     sonda cumpla los parámetros establecidos.
     Retorna un valor booleano que determina si cumple las restricciones o no.
     :param seq: La secuencia que se quiere verificar.
+    :param iscentral: Booleano que indica si la sonda es central (una mitad en un exón y la otra en el siguiente)
     :param minlen: El largo mínimo de la sonda.
     :param maxlen: El largo máximo de la sonda.
     :param tmmin: Temperatura de melting mínima.
@@ -28,7 +29,9 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     :param gcmax: Porcentaje de GC máximo.
     :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
     :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
-    :param
+    :param maxhomopol_simple: Cantidad máxima permitida de homopolímeros simples (AAAAA)
+    :param maxhomopol_double: Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+    :param maxhomopol_triple: Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
     :return: Booleano que determina su factibilidad
     """
 
@@ -53,12 +56,18 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     #Chequear hetero - homodimeros - horquilla
     #dg_hairpin = primer3.calcHairpin(str(seq)).dg
     if largo <= 60:
-        if primer3.calcHairpin(str(seq)).dg < dgmin_hairpin or primer3.calcHomodimer(str(seq)).dg < dgmin_homodim:
-            #print('Delta G')
+        if primer3.calcHairpin(str(seq)).dg < dgmin_hairpin:
+            print('Delta G hairpin')
+            return False
+        if primer3.calcHomodimer(str(seq)).dg < dgmin_homodim:
+            print('Delta G homodim')
             return False
     else:
-        if primer3.calcHairpin(str(seq[:60])).dg < dgmin_hairpin or primer3.calcHomodimer(str(seq[:60])).dg < dgmin_homodim:
-            #print('Delta G')
+        if primer3.calcHairpin(str(seq[:60])).dg < dgmin_hairpin or primer3.calcHairpin(str(seq[60:])).dg < dgmin_hairpin:
+            print('Delta G hairpin')
+            return False
+        if primer3.calcHomodimer(str(seq[:60])).dg < dgmin_homodim or primer3.calcHomodimer(str(seq[60:])).dg < dgmin_homodim:
+            print('Delta G homodim')
             return False
 
     
@@ -66,7 +75,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     bases = ['A', 'C', 'G', 'T']
     for b in bases:
         if b * (maxhomopol_simple + 1) in seq:
-            #print('Homopolimero de 1 nucleotido')
+            print('Homopolimero de 1 nucleotido')
             return False
         
     # Chequear homopolimeros de 2 bases
@@ -75,7 +84,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
         subseq = str(seq[i:i+1])
         if subseq not in checked:
             if subseq * (maxhomopol_double + 1) in seq:
-                #print('Homopolimero de 2 nucleotidos')
+                print('Homopolimero de 2 nucleotidos')
                 return False
             checked.append(subseq)
 
@@ -85,7 +94,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
         subseq = str(seq[i:i+2])
         if subseq not in checked:
             if subseq * (maxhomopol_triple + 1) in seq:
-                #print('Homopolimero de 3 nucleotidos')
+                print('Homopolimero de 3 nucleotidos')
                 return False
             checked.append(subseq)
     
@@ -117,7 +126,9 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
     :param maxoverlap: Sobrelape máximo entre sondas.
     :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
     :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
-    :
+    :param maxhomopol_simple: Cantidad máxima permitida de homopolímeros simples (AAAAA)
+    :param maxhomopol_double: Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+    :param maxhomopol_triple: Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
     :return: Lista con dos sondas, cada sonda es una tupla con la secuencia, la posición de inicio, la posición final y la distancia al borde del exón si aplica.
     """
     b = False
@@ -133,7 +144,7 @@ def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcm
             return [(Seq('AAA'), -1, -1, -1), (Seq('AAA'), -1, -1, -1)]
         else:
             b = False
-            i +=1
+            i += 3
             while i <= maxlen and not b:
                 pos_inicio_ext = empalme[0]-i//2
                 pos_fin_ext = empalme[1]+i//2
@@ -216,7 +227,7 @@ def verify_specificity(seq, iscentral):
     Es necesario tener instalado Blast+ y las bases de datos en la carpeta 'refseq'.
     :param seq: Secuencia de nuecleótidos que se quiere validar.
     :param iscentral: Booleano que indica si se trata de una sonda central. Se utilizan diferentes criterios para chequear la especificidad de una sonda central.
-    :return: Bolleano que indica si la secuencia se considera específica.
+    :return: Booleano que indica si la secuencia se considera específica.
     """
     db1_name = "refseq/db1_genoma"
     db2_name = "refseq/db2_transcriptoma"
@@ -442,7 +453,7 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
 
                 progreso_actual += 100 // num_splicings
                 progreso_queue.put(progreso_actual)
-                print(progreso_actual)
+                #print(progreso_actual)
 
 
             #Si el punto de empalme ya fue diseñado se extrae del diccionario
@@ -554,7 +565,7 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
     return df_probes
 
 
-def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5):
+def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5):
     """
     Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales. 
     :param df: DataFrame de pandas que contiene las sondas y sus parámetros.
@@ -580,7 +591,7 @@ def generate_xlsx(df, name, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30,
     sheet1 = wb.active
     sheet1.title = 'Parámetros'
 
-    sheet1.cell(row=1, column=1).value = 'PARÁMETROS DE DISEÑO'
+    sheet1.cell(row=1, column=1).value = 'Genes: '+genes
 
     sheet1.cell(row=3, column=1).value = 'Largo de sonda mínimo'
     sheet1.cell(row=3, column=2).value = minlen
