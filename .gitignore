@@ -4,5 +4,6 @@ __pycache__/
 sondas/
 probesdb.db
 Pruebas.ipynb
+resultados.xml
 db*
 multiplexador.py

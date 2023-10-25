@@ -624,19 +624,6 @@ class PantallaCarga(PantallaInicial):
         folderpath = os.path.join(os.getcwd(),'sondas',filename)
 
         shutil.copy(self.filepath, folderpath)
-
-        conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
-                            id INTEGER PRIMARY KEY,
-                            secuencia TEXT,
-                            genes TEXT,
-                            fecha_hora DATETIME,
-                            carpeta TEXT)''')
-        
-        cursor.execute("INSERT INTO sondas (secuencia, genes, fecha_hora, carpeta) VALUES (?,?,?,?)", (str(self.seqrecord.id)+" | "+str(self.seqrecord.description), str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now(), folderpath))
-        conn.commit()
-        conn.close()
         
         app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath, folderpath=folderpath)
         
@@ -684,11 +671,14 @@ class PantallaFinal(PantallaInicial):
             if row['sonda'] != 'AAA' and row['sonda'] not in sondas:
                 sondas.append(row['sonda'])
 
+        df_resumen = self.df.drop_duplicates(subset='sonda')
+        df_resumen = df_resumen[df_resumen['sonda'] != "AAA"]
+
         #fuente_negrita = font.Font(weight="bold")
         #resultado_label = tk.Label(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas: {len(sondas)}", font=fuente_negrita)
         fuente_negrita = customtkinter.CTkFont(family='Helvetica', weight='bold')
-        resultado_label = customtkinter.CTkLabel(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas diseñadas: {len(sondas)}", text_color="#000000", font=fuente_negrita)
-        resultado_label.pack(padx=20, pady=40)
+        resultado_label = customtkinter.CTkLabel(self.frame, text=f"Se ejecutó con éxito el diseño para {str(diseno.get_all_genes(self.seqrecord))[1:-1]}\nNúmero de sondas diferentes: {df_resumen.shape[0]}", text_color="#000000", font=fuente_negrita)
+        resultado_label.pack(padx=20, pady=30)
 
         # img = Image.open(os.path.join(folderpath,self.seqrecord.id+".png"))
         # tkimg = ImageTk.PhotoImage(img)
@@ -698,7 +688,7 @@ class PantallaFinal(PantallaInicial):
 
         #carpeta_label = tk.Label(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath)
         carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte, la imagen y el archivo GenBank se almacenaron en\n" + self.folderpath, text_color="#000000")
-        carpeta_label.pack(padx=20, pady=20)
+        carpeta_label.pack(padx=20, pady=10)
 
         def abrir_imagen():
             ventana = tk.Toplevel(root)
@@ -720,11 +710,53 @@ class PantallaFinal(PantallaInicial):
         boton_carpeta = customtkinter.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
         boton_carpeta.pack(pady=20)
 
+        def abrir_registro():
+            self.ventana = tk.Toplevel(root)
+            self.ventana.title("Registrar diseño")
+            self.ventana.geometry("")
+
+            descripcion_label = tk.Label(self.ventana, text="Descripción del diseño:")
+            descripcion_label.grid(row=1, column=0, padx=10, pady=10)
+
+            descripcion_entry = ttk.Entry(self.ventana)
+            descripcion_entry.grid(row=1, column=1, padx=10, pady=10)
+            
+            boton_registrar = customtkinter.CTkButton(self.ventana, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=lambda: registrar_diseno(descripcion_entry.get()))
+            boton_registrar.grid(row=2, column=0, padx=20, pady=20)
+
+            boton_cancelar = customtkinter.CTkButton(self.ventana, text="Cancelar", corner_radius=30, fg_color="#7a7a7a", command=cancelar)
+            boton_cancelar.grid(row=2, column=1, padx=20, pady=20)
+
+
+
+        def registrar_diseno(descripcion):
+            conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
+            cursor = conn.cursor()
+            cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
+                                id INTEGER PRIMARY KEY,
+                                descripcion TEXT,
+                                secuencia TEXT,
+                                genes TEXT,
+                                fecha_hora DATETIME,
+                                carpeta TEXT)''')
+            
+            cursor.execute("INSERT INTO sondas (secuencia, descripcion, genes, fecha_hora, carpeta) VALUES (?,?,?,?,?)", (str(self.seqrecord.id)+" | "+str(self.seqrecord.description), descripcion, str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now(), self.folderpath))
+            conn.commit()
+            conn.close()
+            self.ventana.destroy()
+            messagebox.showinfo("Registro completado", "Se registró correctamente el diseño de las sondas para " + str(diseno.get_all_genes(self.seqrecord))[1:-1])
+
+        def cancelar():
+            self.ventana.destroy()
+
+        boton_registrar = customtkinter.CTkButton(self.frame, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=abrir_registro)
+        boton_registrar.pack(pady=20)
+
         #boton_volver = tk.Button(self.frame, text="Volver al inicio", command=self.volver_a_inicio)
         boton_volver = customtkinter.CTkButton(self.frame, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio)
         boton_volver.pack(pady=20)
 
-        self.root.geometry("800x500")
+        self.root.geometry("800x540")
 
     
     def volver_a_inicio(self):
@@ -740,6 +772,7 @@ class PantallaHistorial(PantallaInicial):
         cursor = conexion.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
                             id INTEGER PRIMARY KEY,
+                            descripcion TEXT,
                             secuencia TEXT,
                             genes TEXT,
                             fecha_hora DATETIME,
@@ -751,8 +784,8 @@ class PantallaHistorial(PantallaInicial):
 
         genes = []
         for registro in registros:
-            if registro[2] not in genes:
-                genes.append(registro[2])
+            if registro[3] not in genes:
+                genes.append(registro[3])
 
         def maxlen(a):
             maximo = 0
@@ -773,10 +806,11 @@ class PantallaHistorial(PantallaInicial):
             texto_registros.delete("0.0", "end")
             for registro in registros:
                 texto_registros.insert("end", f"ID: {registro[0]}\n")
-                texto_registros.insert("end", f"Secuencia: {registro[1]}\n")
-                texto_registros.insert("end", f"Genes: {registro[2]}\n")
-                texto_registros.insert("end", f"Fecha y Hora: {registro[3]}\n")
-                texto_registros.insert("end", f"Carpeta: {registro[4]}\n\n")
+                texto_registros.insert("end", f"Descripción: {registro[1]}\n")
+                texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
+                texto_registros.insert("end", f"Genes: {registro[3]}\n")
+                texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
+                texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
             texto_registros.configure(state="disabled")
 
         
@@ -799,10 +833,11 @@ class PantallaHistorial(PantallaInicial):
 
         for registro in registros:
             texto_registros.insert("end", f"ID: {registro[0]}\n")
-            texto_registros.insert("end", f"Secuencia: {registro[1]}\n")
-            texto_registros.insert("end", f"Genes: {registro[2]}\n")
-            texto_registros.insert("end", f"Fecha y Hora: {registro[3]}\n")
-            texto_registros.insert("end", f"Carpeta: {registro[4]}\n\n")
+            texto_registros.insert("end", f"Descripción: {registro[1]}\n")
+            texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
+            texto_registros.insert("end", f"Genes: {registro[3]}\n")
+            texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
+            texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
         
         texto_registros.configure(state="disabled")
 

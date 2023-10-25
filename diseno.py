@@ -754,16 +754,17 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
         cell.style = 'Pandas'
     for cell in sheet4['B']:
         cell.style = 'Pandas'
-    for cell in sheet4['D']:
-        cell.style = 'Pandas'
-    for cell in sheet4['E']:
-        cell.style = 'Pandas'
-    for cell in sheet4['F']:
-        cell.style = 'Pandas'
-    for cell in sheet4['G']:
-        cell.style = 'Pandas'
-    for cell in sheet4['H']:
-        cell.style = 'Pandas'
+    if multiplex:
+        for cell in sheet4['D']:
+            cell.style = 'Pandas'
+        for cell in sheet4['E']:
+            cell.style = 'Pandas'
+        for cell in sheet4['F']:
+            cell.style = 'Pandas'
+        for cell in sheet4['G']:
+            cell.style = 'Pandas'
+        for cell in sheet4['H']:
+            cell.style = 'Pandas'
 
     for column_cells in sheet4.columns:
         max_length = 2
