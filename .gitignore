@@ -2,7 +2,7 @@ files/
 __pycache__/
 .ipynb_checkpoints/
 sondas/
-databases/
+probesdb.db
 Pruebas.ipynb
 db*
 multiplexador.py

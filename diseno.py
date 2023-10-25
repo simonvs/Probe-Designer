@@ -81,7 +81,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     # Chequear homopolimeros de 2 bases
     checked = []
     for i in range(len(seq)-2):
-        subseq = str(seq[i:i+1])
+        subseq = str(seq[i:i+2])
         if subseq not in checked:
             if subseq * (maxhomopol_double + 1) in seq:
                 print('Homopolimero de 2 nucleotidos')
@@ -91,7 +91,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     # Chequear homopolimeros de 3 bases
     checked = []
     for i in range(len(seq)-3):
-        subseq = str(seq[i:i+2])
+        subseq = str(seq[i:i+3])
         if subseq not in checked:
             if subseq * (maxhomopol_triple + 1) in seq:
                 print('Homopolimero de 3 nucleotidos')
@@ -103,7 +103,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     #    print('Especificidad')
     #    return False
     
-    #print('Sonda Aceptada: ', str(seq))
+    print('Sonda Aceptada: ', str(seq))
     return True
 
 
@@ -241,7 +241,7 @@ def verify_specificity(seq, iscentral):
     blastn_cmd = ['blastn',
                 '-task', 'blastn-short',
                 '-query', query,
-                '-db', db1_name,
+                '-db', db2_name,
                 '-out', outxml,
                 '-outfmt', '5',
                 '-word_size', '11',
@@ -565,7 +565,7 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
     return df_probes
 
 
-def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5):
+def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5, tiempo_diseno=0):
     """
     Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales. 
     :param df: DataFrame de pandas que contiene las sondas y sus parámetros.
@@ -589,7 +589,7 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     wb = Workbook()
 
     sheet1 = wb.active
-    sheet1.title = 'Parámetros'
+    sheet1.title = 'Parámetros iniciales'
 
     sheet1.cell(row=1, column=1).value = 'Genes: '+genes
 
@@ -648,6 +648,8 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
 
     for cell in sheet1['A']:
         cell.style = 'Pandas'
+    for cell in sheet1['B']:
+        cell.style = 'Pandas'
 
     for column_cells in sheet1.columns:
         max_length = 2
@@ -682,10 +684,102 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
         adjusted_width = (max_length + 2) * 1.2
         sheet2.column_dimensions[column].width = adjusted_width
 
-    
+
+    df_resumen = df.drop_duplicates(subset='sonda')
+    df_resumen = df_resumen[df_resumen['sonda'] != "AAA"]
+    sheet3 = wb.create_sheet("Resumen")
+    for r in dataframe_to_rows(df_resumen, index=False, header=True):
+        sheet3.append(r)
+
+    for cell in sheet3['A'] + sheet3[1]:
+        cell.style = 'Pandas'
+
+    #Ajustar ancho de columnas
+    for column_cells in sheet3.columns:
+        max_length = 2
+        column = column_cells[0].column_letter
+        for cell in column_cells:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        sheet3.column_dimensions[column].width = adjusted_width
+
+    sheet4 = wb.create_sheet("Información")
+
+    sheet4.cell(row=1, column=1).value = 'Número deseable de sondas'
+    sheet4.cell(row=1, column=2).value = df.shape[0]
+
+    sheet4.cell(row=2, column=1).value = 'Número de sondas válidas'
+    sheet4.cell(row=2, column=2).value = df[df['sonda'] != "AAA"].shape[0]
+
+    sheet4.cell(row=3, column=1).value = 'Número de sondas diferentes'
+    sheet4.cell(row=3, column=2).value = df_resumen.shape[0]
+
+    sheet4.cell(row=5, column=1).value = 'Tm promedio'
+    sheet4.cell(row=5, column=2).value = str("{:.1f}").format(df_resumen['tm'].mean())+'°'
+
+    sheet4.cell(row=6, column=1).value = '%GC promedio'
+    sheet4.cell(row=6, column=2).value = str("{:.1f}").format(df_resumen['gc'].mean())+'%'
+
+    sheet4.cell(row=7, column=1).value = 'Largo promedio'
+    sheet4.cell(row=7, column=2).value = str("{:.1f}").format(df_resumen['largo'].mean())+' nt'
+
+    if multiplex:
+        sheet4.cell(row=8, column=1).value = 'Número de grupos (multiplex)'
+        sheet4.cell(row=8, column=2).value = int(df_resumen['grupo'].max())
+
+        sheet4.cell(row=1, column=4).value = 'GRUPO'  
+        sheet4.cell(row=1, column=5).value = 'Cantidad de sondas'
+        sheet4.cell(row=1, column=6).value = 'Tm promedio'
+        sheet4.cell(row=1, column=7).value = '%GC promedio'
+        sheet4.cell(row=1, column=8).value = 'Largo promedio'
+
+        for i in range(int(df_resumen['grupo'].max())):
+            grupo = i+1
+            sheet4.cell(row=1+grupo, column=4).value = grupo
+            sheet4.cell(row=1+grupo, column=5).value = df_resumen[df_resumen['grupo'] == grupo]['grupo'].count()
+            sheet4.cell(row=1+grupo, column=6).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['tm'].mean())
+            sheet4.cell(row=1+grupo, column=7).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['gc'].mean())
+            sheet4.cell(row=1+grupo, column=8).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['largo'].mean())
+
+
+    h1, m1, s1 = segundos_a_hms(tiempo_diseno)
+    sheet4.cell(row=10, column=1).value = 'Tiempo de ejecución'
+    sheet4.cell(row=10, column=2).value = str(h1)+':'+str(m1)+':'+str(s1)
+
+    for cell in sheet4['A']:
+        cell.style = 'Pandas'
+    for cell in sheet4['B']:
+        cell.style = 'Pandas'
+    for cell in sheet4['D']:
+        cell.style = 'Pandas'
+    for cell in sheet4['E']:
+        cell.style = 'Pandas'
+    for cell in sheet4['F']:
+        cell.style = 'Pandas'
+    for cell in sheet4['G']:
+        cell.style = 'Pandas'
+    for cell in sheet4['H']:
+        cell.style = 'Pandas'
+
+    for column_cells in sheet4.columns:
+        max_length = 2
+        column = column_cells[0].column_letter
+        for cell in column_cells:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        sheet4.column_dimensions[column].width = adjusted_width
+
     now = datetime.now()
     filename = name+'_'+now.strftime("%Y%m%d_%H%M%S")
-    filepath = os.path.join(os.getcwd(),'sondas', filename, filename+'.xlsx')
+    filepath = os.path.join(os.getcwd(),'sondas', filename, name+'.xlsx')
 
     folder_path = os.path.join(os.getcwd(), "sondas", filename)
     if not os.path.exists(folder_path):
@@ -712,6 +806,10 @@ def get_all_genes(seqrecord):
                 genes.append(str(gen))
     return genes
 
+def segundos_a_hms(segundos):
+    horas, segundos = divmod(segundos, 3600)
+    minutos, segundos = divmod(segundos, 60)
+    return horas, minutos, segundos
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -748,16 +846,15 @@ def main():
                         # maxoverlap=dargs["deltaghairpin"],
                         # maxoverlap=dargs["deltaghomodimer"])
     
-    generate_xlsx(df=df,
-                  name='sondas',
-                  minlen=dargs["minimumlength"],
-                  maxlen=dargs["maximumlength"],
-                  tmmin=dargs["mintempmelting"],
-                  tmmax=dargs["maxtempmelting"],
-                  gcmin=dargs["minumumgc"],
-                  gcmax=dargs["maximumgc"],
-                  minoverlap=dargs["minimumoverlap"],
-                  maxoverlap=dargs["maximumoverlap"])
+    generate_xlsx(df=df, name='sondas', genes=get_all_genes(rec))
+                #   minlen=dargs["minimumlength"],
+                #   maxlen=dargs["maximumlength"],
+                #   tmmin=dargs["mintempmelting"],
+                #   tmmax=dargs["maxtempmelting"],
+                #   gcmin=dargs["minumumgc"],
+                #   gcmax=dargs["maximumgc"],
+                #   minoverlap=dargs["minimumoverlap"],
+                #   maxoverlap=dargs["maximumoverlap"])
 
 if __name__ == "__main__":
     main()

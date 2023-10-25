@@ -10,6 +10,7 @@ import platform
 import shutil
 import threading
 import queue
+import time
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -357,7 +358,7 @@ class PantallaParametros(PantallaInicial):
         maxdist_label.grid(row=9, column=2, padx=5, sticky="e")
         
         #maxdist_spinbox = tk.Spinbox(self.frame, from_=0, to=500, increment=1, width=5)
-        maxdist_spinbox = IntegerSelector(self.frame, default_value=100, min_value=0, max_value=500, increment=1)
+        maxdist_spinbox = IntegerSelector(self.frame, default_value=50, min_value=0, max_value=500, increment=1)
         maxdist_spinbox.grid(row=9, column=3, padx= 5)
         #maxdist_spinbox.delete(0, "end")
         #maxdist_spinbox.insert(0, "100")
@@ -569,6 +570,7 @@ class PantallaCarga(PantallaInicial):
         self.root.geometry("600x300")
     
     def ejecutar_diseno(self, progreso_queue):
+        inicio = time.time()
         df = diseno.probe_designer(self.seqrecord,
                                     self.transcripciones,
                                     progreso_queue,
@@ -590,7 +592,7 @@ class PantallaCarga(PantallaInicial):
                                     multiplex=self.dict_params['multiplex'],
                                     mindg=self.dict_params['mindg'],
                                     maxdt=self.dict_params['maxdt'])
-        
+        fin = time.time()
         filename = diseno.generate_xlsx(df=df,
                                         name=self.seqrecord.id,
                                         genes=str(diseno.get_all_genes(self.seqrecord))[1:-1],
@@ -611,7 +613,8 @@ class PantallaCarga(PantallaInicial):
                                         maxhomopol_triple=self.dict_params['maxhomopol_triple'],
                                         multiplex=self.dict_params['multiplex'],
                                         maxdt=self.dict_params['maxdt'],
-                                        mindg=self.dict_params['mindg'])
+                                        mindg=self.dict_params['mindg'],
+                                        tiempo_diseno=int(fin-inicio))
         
         imagen.plot_isoforms(self.seqrecord,
                              self.transcripciones,
@@ -656,7 +659,7 @@ class PantallaCarga(PantallaInicial):
                         self.load_label.configure(text="Multiplexando sondas, por favor espere...")
                         self.progress_multiplex["value"] = progreso_actual - 100
                         if progreso_actual > 195:
-                                self.load_label.configure(text="Generando reporte e imagen, por favor espere...")
+                                self.load_label.configure(text="Generando reporte e imagen, esto podría tomar unos minutos...")
                 root.update_idletasks()
             except queue.Empty:
                 if tarea_thread.is_alive():
@@ -694,7 +697,7 @@ class PantallaFinal(PantallaInicial):
         # label_imagen.pack(padx=10, pady=10)
 
         #carpeta_label = tk.Label(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath)
-        carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + self.folderpath, text_color="#000000")
+        carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte, la imagen y el archivo GenBank se almacenaron en\n" + self.folderpath, text_color="#000000")
         carpeta_label.pack(padx=20, pady=20)
 
         def abrir_imagen():
