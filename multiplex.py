@@ -43,6 +43,15 @@ def are_sequences_compatible(seq1, seq2, mindg, maxdt):
     
 
 def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
+    """
+    Función principal de multiplexación de sondas. Recibe las secuencias, los parámetros de multiplexación y la cola para informar progreso.
+
+    :param sequences: Lista con todas las diferentes secuencias.
+    :param progress_queue: Cola para informar el progreso a la interfaz.
+    :param mindg: Mínimo delta G heterodimerización para que dos secuencias sean compatibles.
+    :param maxdt: Máxima diferencia de Tm para que dos secuencias sean compatibles.
+    :return: True si son compatibles, False en caso contrario.
+    """
     # Crea un grafo no dirigido.
     G = nx.Graph()
 
@@ -57,7 +66,8 @@ def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
             if i < j and not are_sequences_compatible(seq1, seq2, mindg, maxdt):
                 G.add_edge(seq1, seq2)        
         progreso_actual += 100 / (len(sequences))
-        progress_queue.put(progreso_actual)
+        if (progress_queue):
+            progress_queue.put(progreso_actual)
         #print(progreso_actual)
 
 

@@ -66,7 +66,7 @@
 
 
 \title{Diseñador de sondas de hibridación}
-\date{24 de mayo de 2023}
+\date{27 de noviembre de 2023}
 \release{}
 \author{Simón Vergara}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -108,13 +108,12 @@ Por otra parte se implementó la función que retorna una secuencia a partir de 
 
 \sphinxAtStartPar
 El producto de estas funciones implementadas es la secuencia en formato SeqRecord, una estructura de datos propia de la librería BioPython que permite almacenar grandes secuencias con su respectiva notación, como por ejemplo las posiciones de cada uno de los exones, las transcripciones, secciones no codificantes, entre otros. Además contiene información extra de la secuencia tal como la especie, el cromosoma, la fuente de donde salieron los datos, etc.
-
-\phantomsection\label{\detokenize{descarga:module-descarga}}\index{módulo@\spxentry{módulo}!descarga@\spxentry{descarga}}\index{descarga@\spxentry{descarga}!módulo@\spxentry{módulo}}\index{accnum\_to\_seqrecord() (en el módulo descarga)@\spxentry{accnum\_to\_seqrecord()}\spxextra{en el módulo descarga}}
+\index{module@\spxentry{module}!descarga@\spxentry{descarga}}\index{descarga@\spxentry{descarga}!module@\spxentry{module}}\index{accnum\_to\_seqrecord() (en el módulo descarga)@\spxentry{accnum\_to\_seqrecord()}\spxextra{en el módulo descarga}}\phantomsection\label{\detokenize{descarga:module-descarga}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{descarga:descarga.accnum_to_seqrecord}}
 \pysigstartsignatures
-\pysiglinewithargsret{\sphinxcode{\sphinxupquote{descarga.}}\sphinxbfcode{\sphinxupquote{accnum\_to\_seqrecord}}}{\sphinxparam{\DUrole{n,n}{accesion\_number}}}{}
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{descarga.}}\sphinxbfcode{\sphinxupquote{accnum\_to\_seqrecord}}}{\sphinxparam{\DUrole{n}{accesion\_number}}}{}
 \pysigstopsignatures
 \sphinxAtStartPar
 Función que recibe un accession number de la base de datos “nucleotide” de NCBI
@@ -157,12 +156,12 @@ descargar una secuencia mediante la función accnum\_to\_seqrecord.
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{descarga:descarga.parse_file_to_seqrecord}}
 \pysigstartsignatures
-\pysiglinewithargsret{\sphinxcode{\sphinxupquote{descarga.}}\sphinxbfcode{\sphinxupquote{parse\_file\_to\_seqrecord}}}{\sphinxparam{\DUrole{n,n}{filepath}}}{}
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{descarga.}}\sphinxbfcode{\sphinxupquote{parse\_file\_to\_seqrecord}}}{\sphinxparam{\DUrole{n}{filepath}}}{}
 \pysigstopsignatures
 \sphinxAtStartPar
 Función que recibe la ruta de un archivo genético anotado y lo retorna como SeqRecord. Genera una copia
-del achivo en la carpeta files. Solo se aceptan archivos en formato «GenBank» y «GFF3», o sea “.gbk”,
-“.gb” y “.gff3”. Estos archivos pueden estar comprimidos en formato “.gz”.
+del achivo en la carpeta files. Solo se aceptan archivos en formato «GenBank», o sea “.gbk” y
+“.gb”. Estos archivos pueden estar comprimidos en formato “.gz”.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parámetros}
 \sphinxAtStartPar
@@ -180,12 +179,608 @@ La secuencia en formato SeqRecord con todas sus anotaciones.
 \sphinxstepscope
 
 
-\section{test module}
-\label{\detokenize{test:test-module}}\label{\detokenize{test::doc}}
+\section{diseno module}
+\label{\detokenize{diseno:diseno-module}}\label{\detokenize{diseno::doc}}
 \sphinxAtStartPar
-Este módulo prueba las funciones implementadas en el módulo descarga, usando los métodos para obtener secuencias: mediante un archivo y mediante un accesion number. Accede a las ubicaciones de las anotaciones de las secuencias.
+El módulo diseño contiene las funciones que permiten ejecutar el algoritmo diseñador y multiplexador de sondas. El diseño de las sondas de hibridación requiere de cierto procesamiento de datos para poder obtener el resultado adecuado, desde obtener las regiones de interés hasta verificar la validez de las sondas.
 
-\phantomsection\label{\detokenize{test:module-test}}\index{módulo@\spxentry{módulo}!test@\spxentry{test}}\index{test@\spxentry{test}!módulo@\spxentry{módulo}}
+\sphinxAtStartPar
+Este módulo está desarrollado para ser importado e utilizado por una interfaz de usuario.
+\index{module@\spxentry{module}!diseno@\spxentry{diseno}}\index{diseno@\spxentry{diseno}!module@\spxentry{module}}\index{check\_probe() (en el módulo diseno)@\spxentry{check\_probe()}\spxextra{en el módulo diseno}}\phantomsection\label{\detokenize{diseno:module-diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.check_probe}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{check\_probe}}}{\sphinxparam{\DUrole{n}{seq}}\sphinxparamcomma \sphinxparam{\DUrole{n}{iscentral}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minlen}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxlen}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmin}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmax}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmin}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmax}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_homodim}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_hairpin}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_simple}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_double}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_triple}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función que recibe una sonda (secuencia de nucleótidos) y las restricciones para verificar que la
+sonda cumpla los parámetros establecidos.
+Retorna un valor booleano que determina si cumple las restricciones o no.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seq}} \textendash{} La secuencia que se quiere verificar.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{iscentral}} \textendash{} Booleano que indica si la sonda es central (una mitad en un exón y la otra en el siguiente)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minlen}} \textendash{} El largo mínimo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxlen}} \textendash{} El largo máximo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmin}} \textendash{} Temperatura de melting mínima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmax}} \textendash{} Temperatura de melting máxima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC mínimo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmax}} \textendash{} Porcentaje de GC máximo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_homodim}} \textendash{} Delta G mínimo permitido para validación de homodimerización.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_hairpin}} \textendash{} Delta G mínimo permitido para validación de hairpin u horquilla.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_simple}} \textendash{} Cantidad máxima permitida de homopolímeros simples (AAAAA)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_double}} \textendash{} Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_triple}} \textendash{} Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Booleano que determina la validez de la secuencia
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{generate\_xlsx() (en el módulo diseno)@\spxentry{generate\_xlsx()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.generate_xlsx}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{generate\_xlsx}}}{\sphinxparam{\DUrole{n}{df}}\sphinxparamcomma \sphinxparam{\DUrole{n}{name}}\sphinxparamcomma \sphinxparam{\DUrole{n}{genes}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minlen}\DUrole{o}{=}\DUrole{default_value}{60}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxlen}\DUrole{o}{=}\DUrole{default_value}{120}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmin}\DUrole{o}{=}\DUrole{default_value}{65}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmax}\DUrole{o}{=}\DUrole{default_value}{80}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmin}\DUrole{o}{=}\DUrole{default_value}{30}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmax}\DUrole{o}{=}\DUrole{default_value}{70}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindist}\DUrole{o}{=}\DUrole{default_value}{0}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdist}\DUrole{o}{=}\DUrole{default_value}{50}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minoverlap}\DUrole{o}{=}\DUrole{default_value}{25}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxoverlap}\DUrole{o}{=}\DUrole{default_value}{50}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_homodim}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_hairpin}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_simple}\DUrole{o}{=}\DUrole{default_value}{6}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_double}\DUrole{o}{=}\DUrole{default_value}{5}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_triple}\DUrole{o}{=}\DUrole{default_value}{4}}\sphinxparamcomma \sphinxparam{\DUrole{n}{multiplex}\DUrole{o}{=}\DUrole{default_value}{True}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindg}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}13627}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdt}\DUrole{o}{=}\DUrole{default_value}{5}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tiempo\_diseno}\DUrole{o}{=}\DUrole{default_value}{0}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales y los grupos de multiplexación.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{df}} \textendash{} DataFrame de pandas que contiene las sondas y sus parámetros.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{name}} \textendash{} Nombre que se le quiere dar al reporte.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minlen}} \textendash{} El largo mínimo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxlen}} \textendash{} El largo máximo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmin}} \textendash{} Temperatura de melting mínima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmax}} \textendash{} Temperatura de melting máxima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC mínimo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC máximo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{mindist}} \textendash{} Distancia mínima al borde del exón.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxdist}} \textendash{} Distancia máxima al borde del exón.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minoverlap}} \textendash{} Sobrelape mínimo entre sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxoverlap}} \textendash{} Sobrelape máximo entre sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_homodim}} \textendash{} Delta G mínimo permitido para validación de homodimerización.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_hairpin}} \textendash{} Delta G mínimo permitido para validación de hairpin u horquilla.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_simple}} \textendash{} Cantidad máxima permitida de homopolímeros simples (AAAAA)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_double}} \textendash{} Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_triple}} \textendash{} Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{multiplex}} \textendash{} Booleano que indica si el diseño considera multiplexación
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{mindg}} \textendash{} Delta G mínimo para heterodimerización (multiplex)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxdt}} \textendash{} Diferencia máxima de Tm (multiplex)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tiempo\_diseno}} \textendash{} Tiempo que demoró la ejecución en segundos
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Nombre del archivo XLSX generado
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{get\_all\_genes() (en el módulo diseno)@\spxentry{get\_all\_genes()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.get_all_genes}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{get\_all\_genes}}}{\sphinxparam{\DUrole{n}{seqrecord}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Obtener todos los genes anotados
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seqrecord}} \textendash{} Subregiones que representan la secuencia codificante o secuencia de exones
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{get\_all\_transcripts() (en el módulo diseno)@\spxentry{get\_all\_transcripts()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.get_all_transcripts}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{get\_all\_transcripts}}}{\sphinxparam{\DUrole{n}{seqrecord}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función que retorna todos los transcritos anotados dentro de una secuancia.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seqrecord}} \textendash{} Subregiones que representan la secuencia codificante o secuencia de exones
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{get\_probes\_from\_pos() (en el módulo diseno)@\spxentry{get\_probes\_from\_pos()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.get_probes_from_pos}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{get\_probes\_from\_pos}}}{\sphinxparam{\DUrole{n}{empalme}}\sphinxparamcomma \sphinxparam{\DUrole{n}{record}}\sphinxparamcomma \sphinxparam{\DUrole{n}{site}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minlen}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxlen}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmin}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmax}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmin}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmax}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindist}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdist}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minoverlap}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxoverlap}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_homodim}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_hairpin}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_simple}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_double}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_triple}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Esta función genera un par de sondas a partir de la secuencia de referencia y dos posiciones que representan el punto de empalme entre dos exones.
+El par de sondas generadas pueden ubicarse en el exón donor, acceptor o en ambos (central).
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{empalme}} \textendash{} Tupla con posiciones que representan al punto de empalme o splicing.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{record}} \textendash{} Secuencia de referencia.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{site}} \textendash{} Entero que representa si las sondas son donor, acceptor o central.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minlen}} \textendash{} El largo mínimo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxlen}} \textendash{} El largo máximo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmin}} \textendash{} Temperatura de melting mínima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmax}} \textendash{} Temperatura de melting máxima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC mínimo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC máximo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{mindist}} \textendash{} Distancia mínima al borde del exón.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxdist}} \textendash{} Distancia máxima al borde del exón.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minoverlap}} \textendash{} Sobrelape mínimo entre sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxoverlap}} \textendash{} Sobrelape máximo entre sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_homodim}} \textendash{} Delta G mínimo permitido para validación de homodimerización.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_hairpin}} \textendash{} Delta G mínimo permitido para validación de hairpin u horquilla.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_simple}} \textendash{} Cantidad máxima permitida de homopolímeros simples (AAAAA)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_double}} \textendash{} Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_triple}} \textendash{} Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Lista con dos sondas, cada sonda es una tupla con la secuencia, la posición de inicio, la posición final y la distancia al borde del exón si aplica.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{get\_splicing\_pairs() (en el módulo diseno)@\spxentry{get\_splicing\_pairs()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.get_splicing_pairs}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{get\_splicing\_pairs}}}{\sphinxparam{\DUrole{n}{locations}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función que obtiene las zonas de empalme a partir de una serie de regiones que representan una transcripción.
+Las zonas de empalme se representan por dos posiciones: el fin de un exón y el inicio del siguiente.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{locations}} \textendash{} Subregiones que representan la secuencia codificante o secuencia de exones
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{get\_splicings() (en el módulo diseno)@\spxentry{get\_splicings()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.get_splicings}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{get\_splicings}}}{\sphinxparam{\DUrole{n}{seqrecord}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripts}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función que retorna los empalmes sin repetición de una secuencia anotada en ciertos transcritos.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seqrecord}} \textendash{} Secuencia anotada de referencia
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{transcripts}} \textendash{} Lista de transcritos
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{main() (en el módulo diseno)@\spxentry{main()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.main}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{main}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{probe\_designer() (en el módulo diseno)@\spxentry{probe\_designer()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.probe_designer}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{probe\_designer}}}{\sphinxparam{\DUrole{n}{record}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripts}}\sphinxparamcomma \sphinxparam{\DUrole{n}{progreso\_queue}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minlen}\DUrole{o}{=}\DUrole{default_value}{60}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxlen}\DUrole{o}{=}\DUrole{default_value}{120}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmin}\DUrole{o}{=}\DUrole{default_value}{65}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmax}\DUrole{o}{=}\DUrole{default_value}{80}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmin}\DUrole{o}{=}\DUrole{default_value}{30}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmax}\DUrole{o}{=}\DUrole{default_value}{70}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindist}\DUrole{o}{=}\DUrole{default_value}{0}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdist}\DUrole{o}{=}\DUrole{default_value}{200}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minoverlap}\DUrole{o}{=}\DUrole{default_value}{25}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxoverlap}\DUrole{o}{=}\DUrole{default_value}{50}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_homodim}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_hairpin}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_simple}\DUrole{o}{=}\DUrole{default_value}{6}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_double}\DUrole{o}{=}\DUrole{default_value}{5}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_triple}\DUrole{o}{=}\DUrole{default_value}{4}}\sphinxparamcomma \sphinxparam{\DUrole{n}{multiplex}\DUrole{o}{=}\DUrole{default_value}{True}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindg}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}13627}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdt}\DUrole{o}{=}\DUrole{default_value}{5}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función principal diseñadora de sondas. De la secuencia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{record}} \textendash{} Secuencia anotada de referencia para la creación de las sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{transcripts}} \textendash{} Transcripciones en las cuales se quiere diseñar.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minlen}} \textendash{} El largo mínimo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxlen}} \textendash{} El largo máximo de la sonda.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmin}} \textendash{} Temperatura de melting mínima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{tmmax}} \textendash{} Temperatura de melting máxima.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC mínimo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{gcmin}} \textendash{} Porcentaje de GC máximo.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{mindist}} \textendash{} Distancia mínima al borde del exón.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxdist}} \textendash{} Distancia máxima al borde del exón.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{minoverlap}} \textendash{} Sobrelape mínimo entre sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxoverlap}} \textendash{} Sobrelape máximo entre sondas.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_homodim}} \textendash{} Delta G mínimo permitido para validación de homodimerización.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{dgmin\_hairpin}} \textendash{} Delta G mínimo permitido para validación de hairpin u horquilla.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_simple}} \textendash{} Cantidad máxima permitida de homopolímeros simples (AAAAA)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_double}} \textendash{} Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxhomopol\_triple}} \textendash{} Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{multiplex}} \textendash{} Booleano que indica si el diseño considera multiplexación
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{mindg}} \textendash{} Delta G mínimo para heterodimerización (multiplex)
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxdt}} \textendash{} Diferencia máxima de Tm (multiplex)
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Dataframe con las sondas y sus características
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{segundos\_a\_hms() (en el módulo diseno)@\spxentry{segundos\_a\_hms()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.segundos_a_hms}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{segundos\_a\_hms}}}{\sphinxparam{\DUrole{n}{segundos}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{verify\_specificity() (en el módulo diseno)@\spxentry{verify\_specificity()}\spxextra{en el módulo diseno}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{diseno:diseno.verify_specificity}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{verify\_specificity}}}{\sphinxparam{\DUrole{n}{seq}}\sphinxparamcomma \sphinxparam{\DUrole{n}{iscentral}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función que verifica la especificidad o unicidad de una secuencia usando la herramienta de alineamiento BLAST de manera local.
+Es necesario tener instalado Blast+ y las bases de datos en la carpeta “refseq”.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seq}} \textendash{} Secuencia de nuecleótidos que se quiere validar.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{iscentral}} \textendash{} Booleano que indica si se trata de una sonda central. Se utilizan diferentes criterios para chequear la especificidad de una sonda central.
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+Booleano que indica si la secuencia se considera específica.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+
+\sphinxstepscope
+
+
+\section{multiplex module}
+\label{\detokenize{multiplex:multiplex-module}}\label{\detokenize{multiplex::doc}}
+\sphinxAtStartPar
+El módulo multiplex contiene las funciones que utiliza el módulo diseñador para poder llevar a cabo la multiplexación de las sondas diseñadas.
+\index{module@\spxentry{module}!multiplex@\spxentry{multiplex}}\index{multiplex@\spxentry{multiplex}!module@\spxentry{module}}\index{are\_sequences\_compatible() (en el módulo multiplex)@\spxentry{are\_sequences\_compatible()}\spxextra{en el módulo multiplex}}\phantomsection\label{\detokenize{multiplex:module-multiplex}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{multiplex:multiplex.are_sequences_compatible}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{multiplex.}}\sphinxbfcode{\sphinxupquote{are\_sequences\_compatible}}}{\sphinxparam{\DUrole{n}{seq1}}\sphinxparamcomma \sphinxparam{\DUrole{n}{seq2}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindg}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdt}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Esta función determina si dos secuencias de ADN son compatibles. 
+Debes personalizar las condiciones de compatibilidad según tus necesidades.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seq1}} \textendash{} Primera secuencia de ADN.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{seq2}} \textendash{} Segunda secuencia de ADN.
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+True si son compatibles, False en caso contrario.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{multiplex\_sequences() (en el módulo multiplex)@\spxentry{multiplex\_sequences()}\spxextra{en el módulo multiplex}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{multiplex:multiplex.multiplex_sequences}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{multiplex.}}\sphinxbfcode{\sphinxupquote{multiplex\_sequences}}}{\sphinxparam{\DUrole{n}{sequences}}\sphinxparamcomma \sphinxparam{\DUrole{n}{progress\_queue}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindg}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}13627}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdt}\DUrole{o}{=}\DUrole{default_value}{5}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Función principal de multiplexación de sondas. Recibe las secuencias, los parámetros de multiplexación y la cola para informar progreso.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parámetros}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{sequences}} \textendash{} Lista con todas las diferentes secuencias.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{progress\_queue}} \textendash{} Cola para informar el progreso a la interfaz.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{mindg}} \textendash{} Mínimo delta G heterodimerización para que dos secuencias sean compatibles.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{maxdt}} \textendash{} Máxima diferencia de Tm para que dos secuencias sean compatibles.
+
+\end{itemize}
+
+\sphinxlineitem{Devuelve}
+\sphinxAtStartPar
+True si son compatibles, False en caso contrario.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+
 
 \chapter{Índices y tablas}
 \label{\detokenize{index:indices-y-tablas}}\begin{itemize}
@@ -209,9 +804,10 @@ Este módulo prueba las funciones implementadas en el módulo descarga, usando l
 \let\bigletter\sphinxstyleindexlettergroup
 \bigletter{d}
 \item\relax\sphinxstyleindexentry{descarga}\sphinxstyleindexpageref{descarga:\detokenize{module-descarga}}
+\item\relax\sphinxstyleindexentry{diseno}\sphinxstyleindexpageref{diseno:\detokenize{module-diseno}}
 \indexspace
-\bigletter{t}
-\item\relax\sphinxstyleindexentry{test}\sphinxstyleindexpageref{test:\detokenize{module-test}}
+\bigletter{m}
+\item\relax\sphinxstyleindexentry{multiplex}\sphinxstyleindexpageref{multiplex:\detokenize{module-multiplex}}
 \end{sphinxtheindex}
 
 \renewcommand{\indexname}{Índice}

@@ -11,10 +11,10 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script src="_static/translations.js"></script>
+        <script src="_static/documentation_options.js?v=e2bb6099"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=efdbd0b9"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Índice" href="genindex.html" />
     <link rel="search" title="Búsqueda" href="search.html" />
@@ -81,14 +81,14 @@
            <div itemprop="articleBody">
              
   <section id="descarga-module">
-<h1>descarga module<a class="headerlink" href="#descarga-module" title="Enlace permanente a este encabezado">¶</a></h1>
+<h1>descarga module<a class="headerlink" href="#descarga-module" title="Link to this heading">¶</a></h1>
 <p>Para obtener el ADN que se utilizará como referencia para el diseño de las sondas se va a descargar directamente el archivo genético desde la base de datos ‘Nucleotide’ de NCBI (National Center for Biotechnology Information) del NIH (National Institute of Health, EEUU) (<a class="reference external" href="https://www.ncbi.nlm.nih.gov/nuccore">https://www.ncbi.nlm.nih.gov/nuccore</a>). Esta base de datos contiene millones de registros de secuencias de nucleótidos con mucha información adicional, como la especie, cromosoma, nombre del gen, exones, la fuente de los datos, etc.</p>
 <p>Para llevar a cabo la descarga de los archivos genéticos, se implementó un módulo que permite realizar descargas desde esta base de datos a través de la librería Entrez de BioPython y almacenar los archivos en una carpeta. De esta manera se puede automatizar la obtención de las secuencias de referencia.</p>
 <p>Por otra parte se implementó la función que retorna una secuencia a partir de un archivo almacenado localmente, además de crear una copia del archivo y almacenarla. Esta función sólo podrá recibir archivos de secuencia anotados como GenBank y GFF3.</p>
 <p>El producto de estas funciones implementadas es la secuencia en formato SeqRecord, una estructura de datos propia de la librería BioPython que permite almacenar grandes secuencias con su respectiva notación, como por ejemplo las posiciones de cada uno de los exones, las transcripciones, secciones no codificantes, entre otros. Además contiene información extra de la secuencia tal como la especie, el cromosoma, la fuente de donde salieron los datos, etc.</p>
-<span class="target" id="module-descarga"></span><dl class="py function">
+<dl class="py function" id="module-descarga">
 <dt class="sig sig-object py" id="descarga.accnum_to_seqrecord">
-<span class="sig-prename descclassname"><span class="pre">descarga.</span></span><span class="sig-name descname"><span class="pre">accnum_to_seqrecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accesion_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#descarga.accnum_to_seqrecord" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">descarga.</span></span><span class="sig-name descname"><span class="pre">accnum_to_seqrecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">accesion_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#descarga.accnum_to_seqrecord" title="Link to this definition">¶</a></dt>
 <dd><p>Función que recibe un accession number de la base de datos “nucleotide” de NCBI
 <a class="reference external" href="https://www.ncbi.nlm.nih.gov/nuccore">https://www.ncbi.nlm.nih.gov/nuccore</a>.
 Genera el archivo .gbk (GenBank) en la carpeta “files” y retorna la secuencia en formato SeqRecord.</p>
@@ -104,7 +104,7 @@ Genera el archivo .gbk (GenBank) en la carpeta “files” y retorna la secuenci
 
 <dl class="py function">
 <dt class="sig sig-object py" id="descarga.main">
-<span class="sig-prename descclassname"><span class="pre">descarga.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#descarga.main" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">descarga.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#descarga.main" title="Link to this definition">¶</a></dt>
 <dd><p>Ejecutar directamente el archivo “descarga” requiere entregar el parámetro –accessionnumber para
 descargar una secuencia mediante la función accnum_to_seqrecord.</p>
 <dl class="field-list simple">
@@ -116,10 +116,10 @@ descargar una secuencia mediante la función accnum_to_seqrecord.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="descarga.parse_file_to_seqrecord">
-<span class="sig-prename descclassname"><span class="pre">descarga.</span></span><span class="sig-name descname"><span class="pre">parse_file_to_seqrecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#descarga.parse_file_to_seqrecord" title="Enlazar permanentemente con esta definición">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">descarga.</span></span><span class="sig-name descname"><span class="pre">parse_file_to_seqrecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#descarga.parse_file_to_seqrecord" title="Link to this definition">¶</a></dt>
 <dd><p>Función que recibe la ruta de un archivo genético anotado y lo retorna como SeqRecord. Genera una copia
-del achivo en la carpeta files. Solo se aceptan archivos en formato «GenBank» y «GFF3», o sea “.gbk”,
-“.gb” y “.gff3”. Estos archivos pueden estar comprimidos en formato “.gz”.</p>
+del achivo en la carpeta files. Solo se aceptan archivos en formato «GenBank», o sea “.gbk” y
+“.gb”. Estos archivos pueden estar comprimidos en formato “.gz”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parámetros<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filepath</strong> – La ruta donde se encuentra el archivo que se quiere utilizar</p>
@@ -143,7 +143,7 @@ del achivo en la carpeta files. Solo se aceptan archivos en formato «GenBank» 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Derechos de autor 2023, Simón Vergara.</p>
+    <p>&#169; Copyright 2023, Simón Vergara.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

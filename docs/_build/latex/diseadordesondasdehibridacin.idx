@@ -1,7 +1,22 @@
-\indexentry{módulo@\spxentry{módulo}!descarga@\spxentry{descarga}|hyperpage}{1}
-\indexentry{descarga@\spxentry{descarga}!módulo@\spxentry{módulo}|hyperpage}{1}
+\indexentry{module@\spxentry{module}!descarga@\spxentry{descarga}|hyperpage}{1}
+\indexentry{descarga@\spxentry{descarga}!module@\spxentry{module}|hyperpage}{1}
 \indexentry{accnum\_to\_seqrecord() (en el módulo descarga)@\spxentry{accnum\_to\_seqrecord()}\spxextra{en el módulo descarga}|hyperpage}{1}
 \indexentry{main() (en el módulo descarga)@\spxentry{main()}\spxextra{en el módulo descarga}|hyperpage}{1}
 \indexentry{parse\_file\_to\_seqrecord() (en el módulo descarga)@\spxentry{parse\_file\_to\_seqrecord()}\spxextra{en el módulo descarga}|hyperpage}{2}
-\indexentry{módulo@\spxentry{módulo}!test@\spxentry{test}|hyperpage}{2}
-\indexentry{test@\spxentry{test}!módulo@\spxentry{módulo}|hyperpage}{2}
+\indexentry{module@\spxentry{module}!diseno@\spxentry{diseno}|hyperpage}{2}
+\indexentry{diseno@\spxentry{diseno}!module@\spxentry{module}|hyperpage}{2}
+\indexentry{check\_probe() (en el módulo diseno)@\spxentry{check\_probe()}\spxextra{en el módulo diseno}|hyperpage}{2}
+\indexentry{generate\_xlsx() (en el módulo diseno)@\spxentry{generate\_xlsx()}\spxextra{en el módulo diseno}|hyperpage}{2}
+\indexentry{get\_all\_genes() (en el módulo diseno)@\spxentry{get\_all\_genes()}\spxextra{en el módulo diseno}|hyperpage}{3}
+\indexentry{get\_all\_transcripts() (en el módulo diseno)@\spxentry{get\_all\_transcripts()}\spxextra{en el módulo diseno}|hyperpage}{3}
+\indexentry{get\_probes\_from\_pos() (en el módulo diseno)@\spxentry{get\_probes\_from\_pos()}\spxextra{en el módulo diseno}|hyperpage}{4}
+\indexentry{get\_splicing\_pairs() (en el módulo diseno)@\spxentry{get\_splicing\_pairs()}\spxextra{en el módulo diseno}|hyperpage}{4}
+\indexentry{get\_splicings() (en el módulo diseno)@\spxentry{get\_splicings()}\spxextra{en el módulo diseno}|hyperpage}{5}
+\indexentry{main() (en el módulo diseno)@\spxentry{main()}\spxextra{en el módulo diseno}|hyperpage}{5}
+\indexentry{probe\_designer() (en el módulo diseno)@\spxentry{probe\_designer()}\spxextra{en el módulo diseno}|hyperpage}{5}
+\indexentry{segundos\_a\_hms() (en el módulo diseno)@\spxentry{segundos\_a\_hms()}\spxextra{en el módulo diseno}|hyperpage}{6}
+\indexentry{verify\_specificity() (en el módulo diseno)@\spxentry{verify\_specificity()}\spxextra{en el módulo diseno}|hyperpage}{6}
+\indexentry{module@\spxentry{module}!multiplex@\spxentry{multiplex}|hyperpage}{6}
+\indexentry{multiplex@\spxentry{multiplex}!module@\spxentry{module}|hyperpage}{6}
+\indexentry{are\_sequences\_compatible() (en el módulo multiplex)@\spxentry{are\_sequences\_compatible()}\spxextra{en el módulo multiplex}|hyperpage}{6}
+\indexentry{multiplex\_sequences() (en el módulo multiplex)@\spxentry{multiplex\_sequences()}\spxextra{en el módulo multiplex}|hyperpage}{6}

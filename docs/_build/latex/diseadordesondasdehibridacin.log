@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.24)  24 MAY 2023 20:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.24)  27 NOV 2023 15:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -553,13 +553,14 @@ Package: titlesec 2021/07/05 v2.14 Sectioning titles
 \titlewidthlast=\dimen281
 \titlewidthfirst=\dimen282
 )) (sphinxlatexstyletext.sty
-File: sphinxlatexstyletext.sty 2023/03/26 text styling
+File: sphinxlatexstyletext.sty 2023/07/23 text styling
 ) (sphinxlatexobjects.sty
-File: sphinxlatexobjects.sty 2022/01/13 documentation environments
+File: sphinxlatexobjects.sty 2023/07/23 documentation environments
 \sphinxsignaturesep=\skip81
-\py@argswidth=\skip82
-\lineblockindentation=\skip83
-\DUlineblockindent=\skip84
+\sphinxsignaturelistskip=\skip82
+\py@argswidth=\skip83
+\lineblockindentation=\skip84
+\DUlineblockindent=\skip85
 ))
 (C:\Users\simon\AppData\Local\Programs\MiKTeX\tex/latex/geometry\geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
@@ -721,7 +722,7 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 85.
 )
-\Hy@SectionHShift=\skip85
+\Hy@SectionHShift=\skip86
 )
 (C:\Users\simon\AppData\Local\Programs\MiKTeX\tex/latex/oberdiek\hypcap.sty
 Package: hypcap 2016/05/16 v1.12 Adjusting the anchors of captions (HO)
@@ -878,38 +879,49 @@ enc}] [2
 ]
 Cap\'{\i }tulo 1.
 LaTeX Font Info:    Trying to load font information for T1+txtt on input line 1
-17.
+16.
 (C:\Users\simon\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\t1txtt.fd
 File: t1txtt.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `T1/txtt/b/n' in size <10> not available
-(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 117.
+(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 116.
 
 [1
 
 ]
-LaTeX Info: Redefining \. on input line 190.
-LaTeX Info: Redefining \% on input line 190.
+LaTeX Info: Redefining \. on input line 270.
+LaTeX Info: Redefining \% on input line 270.
  [2]
+LaTeX Info: Redefining \. on input line 404.
+LaTeX Info: Redefining \% on input line 404.
+ [3]
+LaTeX Info: Redefining \. on input line 525.
+LaTeX Info: Redefining \% on input line 525.
+ [4]
+LaTeX Info: Redefining \. on input line 659.
+LaTeX Info: Redefining \% on input line 659.
+ [5]
+LaTeX Info: Redefining \. on input line 785.
+LaTeX Info: Redefining \% on input line 785.
+ [6]
 Cap\'{\i }tulo 2.
-[3
+[7
 
 ]
-LaTeX Info: Redefining \. on input line 208.
-LaTeX Info: Redefining \% on input line 208.
- [4
+LaTeX Info: Redefining \. on input line 803.
+LaTeX Info: Redefining \% on input line 803.
+ [8
 
-] [5
+] [9
 
 
 ] (diseadordesondasdehibridacin.ind
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
- [6
+ [10
 
 
-] [7
-
+] [11
 
 ])
 (diseadordesondasdehibridacin.aux
@@ -918,16 +930,16 @@ LaTeX Info: Redefining \% on input line 22.
 )
 Package rerunfilecheck Info: File `diseadordesondasdehibridacin.out' has not ch
 anged.
-(rerunfilecheck)             Checksum: C2D010F48C9F5D8C4582E95572CA1ACA;745.
+(rerunfilecheck)             Checksum: 063E4B24807C32FC6370500F577265CE;894.
  ) 
 Here is how much of TeX's memory you used:
- 16848 strings out of 476410
- 287231 string characters out of 5789113
- 1861845 words of memory out of 5000000
- 36793 multiletter control sequences out of 15000+600000
+ 16903 strings out of 476410
+ 288365 string characters out of 5789113
+ 1867845 words of memory out of 5000000
+ 36829 multiletter control sequences out of 15000+600000
  563093 words of font info for 70 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 72i,11n,76p,625b,686s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,11n,76p,2113b,746s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre/qhv
 b.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre
 /qhvr.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-
@@ -936,9 +948,9 @@ tex-gyre/qtmr.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/pub
 lic/tex-gyre/qtmri.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type
 1/public/txfonts/t1xbtt.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts
 /type1/public/txfonts/t1xtt.pfb>
-Output written on diseadordesondasdehibridacin.pdf (11 pages, 160702 bytes).
+Output written on diseadordesondasdehibridacin.pdf (15 pages, 183236 bytes).
 PDF statistics:
- 142 PDF objects out of 1000 (max. 8388607)
- 23 named destinations out of 1000 (max. 500000)
- 69 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 199 PDF objects out of 1000 (max. 8388607)
+ 42 named destinations out of 1000 (max. 500000)
+ 77 words of extra memory for PDF output out of 10000 (max. 10000000)
 

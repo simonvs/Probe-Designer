@@ -6,26 +6,51 @@
 
   \bigletter A
   \item \spxentry{accnum\_to\_seqrecord()}\spxextra{en el módulo descarga}, \hyperpage{1}
+  \item \spxentry{are\_sequences\_compatible()}\spxextra{en el módulo multiplex}, \hyperpage{6}
+
+  \indexspace
+  \bigletter C
+  \item \spxentry{check\_probe()}\spxextra{en el módulo diseno}, \hyperpage{2}
 
   \indexspace
   \bigletter D
   \item \spxentry{descarga}
-    \subitem \spxentry{módulo}, \hyperpage{1}
+    \subitem \spxentry{module}, \hyperpage{1}
+  \item \spxentry{diseno}
+    \subitem \spxentry{module}, \hyperpage{2}
+
+  \indexspace
+  \bigletter G
+  \item \spxentry{generate\_xlsx()}\spxextra{en el módulo diseno}, \hyperpage{2}
+  \item \spxentry{get\_all\_genes()}\spxextra{en el módulo diseno}, \hyperpage{3}
+  \item \spxentry{get\_all\_transcripts()}\spxextra{en el módulo diseno}, \hyperpage{3}
+  \item \spxentry{get\_probes\_from\_pos()}\spxextra{en el módulo diseno}, \hyperpage{4}
+  \item \spxentry{get\_splicing\_pairs()}\spxextra{en el módulo diseno}, \hyperpage{4}
+  \item \spxentry{get\_splicings()}\spxextra{en el módulo diseno}, \hyperpage{5}
 
   \indexspace
   \bigletter M
   \item \spxentry{main()}\spxextra{en el módulo descarga}, \hyperpage{1}
-  \item \spxentry{módulo}
+  \item \spxentry{main()}\spxextra{en el módulo diseno}, \hyperpage{5}
+  \item \spxentry{module}
     \subitem \spxentry{descarga}, \hyperpage{1}
-    \subitem \spxentry{test}, \hyperpage{2}
+    \subitem \spxentry{diseno}, \hyperpage{2}
+    \subitem \spxentry{multiplex}, \hyperpage{6}
+  \item \spxentry{multiplex}
+    \subitem \spxentry{module}, \hyperpage{6}
+  \item \spxentry{multiplex\_sequences()}\spxextra{en el módulo multiplex}, \hyperpage{6}
 
   \indexspace
   \bigletter P
   \item \spxentry{parse\_file\_to\_seqrecord()}\spxextra{en el módulo descarga}, \hyperpage{2}
+  \item \spxentry{probe\_designer()}\spxextra{en el módulo diseno}, \hyperpage{5}
 
   \indexspace
-  \bigletter T
-  \item \spxentry{test}
-    \subitem \spxentry{módulo}, \hyperpage{2}
+  \bigletter S
+  \item \spxentry{segundos\_a\_hms()}\spxextra{en el módulo diseno}, \hyperpage{6}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{verify\_specificity()}\spxextra{en el módulo diseno}, \hyperpage{6}
 
 \end{sphinxtheindex}

@@ -16,6 +16,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
+
 class PantallaInicial:
     def __init__(self, root):
         self.root = root
@@ -92,10 +93,10 @@ class PantallaTranscripciones(PantallaInicial):
         transcripciones_label = customtkinter.CTkLabel(self.frame, text="Seleccione los transcritos para el diseño de sondas", text_color="#000000", font=fuente_titulo)
         transcripciones_label.grid(row=0, column=0, columnspan=3, padx=10, pady=20)
 
-        label_izq = customtkinter.CTkLabel(self.frame, text="Transcritos no seleccionadas", text_color="#000000")
+        label_izq = customtkinter.CTkLabel(self.frame, text="Transcritos no seleccionados", text_color="#000000")
         label_izq.grid(row=1, column=0, padx=10, pady=10)
 
-        label_der = customtkinter.CTkLabel(self.frame, text="Transcritos seleccionadas", text_color="#000000")
+        label_der = customtkinter.CTkLabel(self.frame, text="Transcritos seleccionados", text_color="#000000")
         label_der.grid(row=1, column=2, padx=10, pady=10)
 
         #Obtener lista con transcripciones
@@ -309,7 +310,7 @@ class PantallaParametros(PantallaInicial):
         #tmmax_spinbox.delete(0, "end")
         #tmmax_spinbox.insert(0, "80")
 
-        texto_tm = "La temperatura melting (Tm) o temperatura de fusión de\nuna secuencia se refiere a la temperatura en la cual\nse desnaturalizaría la doble hebra. Más en concreto\nes la temperatura en la cual 50 % de las copias de esa secuencia\npresentes en una reacción se encuentra en forma monocatenaria\ny 50 % en forma bicatenaria, que interactúan con su secuencia\ncomplementaria."
+        texto_tm = "La temperatura melting (Tm) o temperatura de fusión de\nuna secuencia se refiere a la temperatura en la cual\nse desnaturaliza la doble hebra. Más en concreto\nes la temperatura en la cual 50 % de las copias de esa secuencia\npresentes en una reacción se encuentra en forma monocatenaria\ny 50 % en forma bicatenaria, que interactúan con su secuencia\ncomplementaria."
         tooltip_tmmin = ToolTip(tmmin_label, texto_tm)
         tooltip_tmmax = ToolTip(tmmax_label, texto_tm)
 
@@ -336,7 +337,7 @@ class PantallaParametros(PantallaInicial):
         #gcmax_spinbox.delete(0, "end")
         #gcmax_spinbox.insert(0, "70")
 
-        texto_gc = "Porcentaje de GC: Se refiere a la fracción de bases\nnitrogenadas que son citosinas o guaninas dentro de\nla secuancia de nucleótidos."
+        texto_gc = "Porcentaje de GC: Se refiere a la fracción de bases\nnitrogenadas que son citosinas o guaninas dentro de\nla secuencia de nucleótidos."
         tooltip_gcmin = ToolTip(gcmin_label, texto_gc)
         tooltip_gcmax = ToolTip(gcmax_label, texto_gc)
 
@@ -363,7 +364,7 @@ class PantallaParametros(PantallaInicial):
         #maxdist_spinbox.delete(0, "end")
         #maxdist_spinbox.insert(0, "100")
 
-        texto_dist = "Se refiere a la cantidad de nucleótidos que hay entre\nel punto de empalme y las sondas internas donor y acceptor.\n(No aplica para sondas centrales)"
+        texto_dist = "La distancia al borde del exón se refiere a la cantidad de nucleótidos que hay entre\nel punto de empalme y las sondas internas donor y acceptor.\n(No aplica para sondas centrales)"
         tooltip_mindist = ToolTip(mindist_label, texto_dist, os.path.join("images","distancia.png"))
         tooltip_maxdist = ToolTip(maxdist_label, texto_dist, os.path.join("images","distancia.png"))
 
@@ -589,7 +590,7 @@ class PantallaCarga(PantallaInicial):
                                     maxhomopol_simple=self.dict_params['maxhomopol_simple'],
                                     maxhomopol_double=self.dict_params['maxhomopol_double'],
                                     maxhomopol_triple=self.dict_params['maxhomopol_triple'],
-                                    multiplex=self.dict_params['multiplex'],
+                                    ismultiplex=self.dict_params['multiplex'],
                                     mindg=self.dict_params['mindg'],
                                     maxdt=self.dict_params['maxdt'])
         fin = time.time()

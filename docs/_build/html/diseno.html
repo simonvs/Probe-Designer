@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>diseno module &mdash; documentación de Diseñador de sondas de hibridación - </title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/documentation_options.js?v=e2bb6099"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/translations.js?v=efdbd0b9"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="multiplex module" href="multiplex.html" />
+    <link rel="prev" title="descarga module" href="descarga.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Diseñador de sondas de hibridación
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Probe-Designer</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="descarga.html">descarga module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">diseno module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.check_probe"><code class="docutils literal notranslate"><span class="pre">check_probe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.generate_xlsx"><code class="docutils literal notranslate"><span class="pre">generate_xlsx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.get_all_genes"><code class="docutils literal notranslate"><span class="pre">get_all_genes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.get_all_transcripts"><code class="docutils literal notranslate"><span class="pre">get_all_transcripts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.get_probes_from_pos"><code class="docutils literal notranslate"><span class="pre">get_probes_from_pos()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.get_splicing_pairs"><code class="docutils literal notranslate"><span class="pre">get_splicing_pairs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.get_splicings"><code class="docutils literal notranslate"><span class="pre">get_splicings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.probe_designer"><code class="docutils literal notranslate"><span class="pre">probe_designer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.segundos_a_hms"><code class="docutils literal notranslate"><span class="pre">segundos_a_hms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diseno.verify_specificity"><code class="docutils literal notranslate"><span class="pre">verify_specificity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="multiplex.html">multiplex module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Diseñador de sondas de hibridación</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Probe-Designer</a></li>
+      <li class="breadcrumb-item active">diseno module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/diseno.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="diseno-module">
+<h1>diseno module<a class="headerlink" href="#diseno-module" title="Link to this heading">¶</a></h1>
+<p>El módulo diseño contiene las funciones que permiten ejecutar el algoritmo diseñador y multiplexador de sondas. El diseño de las sondas de hibridación requiere de cierto procesamiento de datos para poder obtener el resultado adecuado, desde obtener las regiones de interés hasta verificar la validez de las sondas.</p>
+<p>Este módulo está desarrollado para ser importado e utilizado por una interfaz de usuario.</p>
+<dl class="py function" id="module-diseno">
+<dt class="sig sig-object py" id="diseno.check_probe">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">check_probe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iscentral</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minlen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_homodim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_hairpin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_simple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_double</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_triple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.check_probe" title="Link to this definition">¶</a></dt>
+<dd><p>Función que recibe una sonda (secuencia de nucleótidos) y las restricciones para verificar que la
+sonda cumpla los parámetros establecidos.
+Retorna un valor booleano que determina si cumple las restricciones o no.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> – La secuencia que se quiere verificar.</p></li>
+<li><p><strong>iscentral</strong> – Booleano que indica si la sonda es central (una mitad en un exón y la otra en el siguiente)</p></li>
+<li><p><strong>minlen</strong> – El largo mínimo de la sonda.</p></li>
+<li><p><strong>maxlen</strong> – El largo máximo de la sonda.</p></li>
+<li><p><strong>tmmin</strong> – Temperatura de melting mínima.</p></li>
+<li><p><strong>tmmax</strong> – Temperatura de melting máxima.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC mínimo.</p></li>
+<li><p><strong>gcmax</strong> – Porcentaje de GC máximo.</p></li>
+<li><p><strong>dgmin_homodim</strong> – Delta G mínimo permitido para validación de homodimerización.</p></li>
+<li><p><strong>dgmin_hairpin</strong> – Delta G mínimo permitido para validación de hairpin u horquilla.</p></li>
+<li><p><strong>maxhomopol_simple</strong> – Cantidad máxima permitida de homopolímeros simples (AAAAA)</p></li>
+<li><p><strong>maxhomopol_double</strong> – Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)</p></li>
+<li><p><strong>maxhomopol_triple</strong> – Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Booleano que determina la validez de la secuencia</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.generate_xlsx">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">generate_xlsx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mindist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minoverlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxoverlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_homodim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_hairpin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_simple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_double</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_triple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mindg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-13627</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiempo_diseno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.generate_xlsx" title="Link to this definition">¶</a></dt>
+<dd><p>Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales y los grupos de multiplexación.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – DataFrame de pandas que contiene las sondas y sus parámetros.</p></li>
+<li><p><strong>name</strong> – Nombre que se le quiere dar al reporte.</p></li>
+<li><p><strong>minlen</strong> – El largo mínimo de la sonda.</p></li>
+<li><p><strong>maxlen</strong> – El largo máximo de la sonda.</p></li>
+<li><p><strong>tmmin</strong> – Temperatura de melting mínima.</p></li>
+<li><p><strong>tmmax</strong> – Temperatura de melting máxima.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC mínimo.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC máximo.</p></li>
+<li><p><strong>mindist</strong> – Distancia mínima al borde del exón.</p></li>
+<li><p><strong>maxdist</strong> – Distancia máxima al borde del exón.</p></li>
+<li><p><strong>minoverlap</strong> – Sobrelape mínimo entre sondas.</p></li>
+<li><p><strong>maxoverlap</strong> – Sobrelape máximo entre sondas.</p></li>
+<li><p><strong>dgmin_homodim</strong> – Delta G mínimo permitido para validación de homodimerización.</p></li>
+<li><p><strong>dgmin_hairpin</strong> – Delta G mínimo permitido para validación de hairpin u horquilla.</p></li>
+<li><p><strong>maxhomopol_simple</strong> – Cantidad máxima permitida de homopolímeros simples (AAAAA)</p></li>
+<li><p><strong>maxhomopol_double</strong> – Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)</p></li>
+<li><p><strong>maxhomopol_triple</strong> – Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)</p></li>
+<li><p><strong>multiplex</strong> – Booleano que indica si el diseño considera multiplexación</p></li>
+<li><p><strong>mindg</strong> – Delta G mínimo para heterodimerización (multiplex)</p></li>
+<li><p><strong>maxdt</strong> – Diferencia máxima de Tm (multiplex)</p></li>
+<li><p><strong>tiempo_diseno</strong> – Tiempo que demoró la ejecución en segundos</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Nombre del archivo XLSX generado</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.get_all_genes">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">get_all_genes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seqrecord</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.get_all_genes" title="Link to this definition">¶</a></dt>
+<dd><p>Obtener todos los genes anotados</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seqrecord</strong> – Subregiones que representan la secuencia codificante o secuencia de exones</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.get_all_transcripts">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">get_all_transcripts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seqrecord</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.get_all_transcripts" title="Link to this definition">¶</a></dt>
+<dd><p>Función que retorna todos los transcritos anotados dentro de una secuancia.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seqrecord</strong> – Subregiones que representan la secuencia codificante o secuencia de exones</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.get_probes_from_pos">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">get_probes_from_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">empalme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minlen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mindist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minoverlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxoverlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_homodim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_hairpin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_simple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_double</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_triple</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.get_probes_from_pos" title="Link to this definition">¶</a></dt>
+<dd><p>Esta función genera un par de sondas a partir de la secuencia de referencia y dos posiciones que representan el punto de empalme entre dos exones.
+El par de sondas generadas pueden ubicarse en el exón donor, acceptor o en ambos (central).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>empalme</strong> – Tupla con posiciones que representan al punto de empalme o splicing.</p></li>
+<li><p><strong>record</strong> – Secuencia de referencia.</p></li>
+<li><p><strong>site</strong> – Entero que representa si las sondas son donor, acceptor o central.</p></li>
+<li><p><strong>minlen</strong> – El largo mínimo de la sonda.</p></li>
+<li><p><strong>maxlen</strong> – El largo máximo de la sonda.</p></li>
+<li><p><strong>tmmin</strong> – Temperatura de melting mínima.</p></li>
+<li><p><strong>tmmax</strong> – Temperatura de melting máxima.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC mínimo.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC máximo.</p></li>
+<li><p><strong>mindist</strong> – Distancia mínima al borde del exón.</p></li>
+<li><p><strong>maxdist</strong> – Distancia máxima al borde del exón.</p></li>
+<li><p><strong>minoverlap</strong> – Sobrelape mínimo entre sondas.</p></li>
+<li><p><strong>maxoverlap</strong> – Sobrelape máximo entre sondas.</p></li>
+<li><p><strong>dgmin_homodim</strong> – Delta G mínimo permitido para validación de homodimerización.</p></li>
+<li><p><strong>dgmin_hairpin</strong> – Delta G mínimo permitido para validación de hairpin u horquilla.</p></li>
+<li><p><strong>maxhomopol_simple</strong> – Cantidad máxima permitida de homopolímeros simples (AAAAA)</p></li>
+<li><p><strong>maxhomopol_double</strong> – Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)</p></li>
+<li><p><strong>maxhomopol_triple</strong> – Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista con dos sondas, cada sonda es una tupla con la secuencia, la posición de inicio, la posición final y la distancia al borde del exón si aplica.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.get_splicing_pairs">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">get_splicing_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.get_splicing_pairs" title="Link to this definition">¶</a></dt>
+<dd><p>Función que obtiene las zonas de empalme a partir de una serie de regiones que representan una transcripción.
+Las zonas de empalme se representan por dos posiciones: el fin de un exón y el inicio del siguiente.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>locations</strong> – Subregiones que representan la secuencia codificante o secuencia de exones</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.get_splicings">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">get_splicings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seqrecord</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transcripts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.get_splicings" title="Link to this definition">¶</a></dt>
+<dd><p>Función que retorna los empalmes sin repetición de una secuencia anotada en ciertos transcritos.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seqrecord</strong> – Secuencia anotada de referencia</p></li>
+<li><p><strong>transcripts</strong> – Lista de transcritos</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.main">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#diseno.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.probe_designer">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">probe_designer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transcripts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progreso_queue</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxlen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mindist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minoverlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxoverlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_homodim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dgmin_hairpin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_simple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_double</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxhomopol_triple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mindg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-13627</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.probe_designer" title="Link to this definition">¶</a></dt>
+<dd><p>Función principal diseñadora de sondas. De la secuencia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>record</strong> – Secuencia anotada de referencia para la creación de las sondas.</p></li>
+<li><p><strong>transcripts</strong> – Transcripciones en las cuales se quiere diseñar.</p></li>
+<li><p><strong>minlen</strong> – El largo mínimo de la sonda.</p></li>
+<li><p><strong>maxlen</strong> – El largo máximo de la sonda.</p></li>
+<li><p><strong>tmmin</strong> – Temperatura de melting mínima.</p></li>
+<li><p><strong>tmmax</strong> – Temperatura de melting máxima.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC mínimo.</p></li>
+<li><p><strong>gcmin</strong> – Porcentaje de GC máximo.</p></li>
+<li><p><strong>mindist</strong> – Distancia mínima al borde del exón.</p></li>
+<li><p><strong>maxdist</strong> – Distancia máxima al borde del exón.</p></li>
+<li><p><strong>minoverlap</strong> – Sobrelape mínimo entre sondas.</p></li>
+<li><p><strong>maxoverlap</strong> – Sobrelape máximo entre sondas.</p></li>
+<li><p><strong>dgmin_homodim</strong> – Delta G mínimo permitido para validación de homodimerización.</p></li>
+<li><p><strong>dgmin_hairpin</strong> – Delta G mínimo permitido para validación de hairpin u horquilla.</p></li>
+<li><p><strong>maxhomopol_simple</strong> – Cantidad máxima permitida de homopolímeros simples (AAAAA)</p></li>
+<li><p><strong>maxhomopol_double</strong> – Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)</p></li>
+<li><p><strong>maxhomopol_triple</strong> – Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)</p></li>
+<li><p><strong>multiplex</strong> – Booleano que indica si el diseño considera multiplexación</p></li>
+<li><p><strong>mindg</strong> – Delta G mínimo para heterodimerización (multiplex)</p></li>
+<li><p><strong>maxdt</strong> – Diferencia máxima de Tm (multiplex)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataframe con las sondas y sus características</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.segundos_a_hms">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">segundos_a_hms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segundos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.segundos_a_hms" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diseno.verify_specificity">
+<span class="sig-prename descclassname"><span class="pre">diseno.</span></span><span class="sig-name descname"><span class="pre">verify_specificity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iscentral</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diseno.verify_specificity" title="Link to this definition">¶</a></dt>
+<dd><p>Función que verifica la especificidad o unicidad de una secuencia usando la herramienta de alineamiento BLAST de manera local.
+Es necesario tener instalado Blast+ y las bases de datos en la carpeta “refseq”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seq</strong> – Secuencia de nuecleótidos que se quiere validar.</p></li>
+<li><p><strong>iscentral</strong> – Booleano que indica si se trata de una sonda central. Se utilizan diferentes criterios para chequear la especificidad de una sonda central.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>Booleano que indica si la secuencia se considera específica.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="descarga.html" class="btn btn-neutral float-left" title="descarga module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multiplex.html" class="btn btn-neutral float-right" title="multiplex module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Simón Vergara.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

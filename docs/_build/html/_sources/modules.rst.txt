@@ -5,4 +5,5 @@ Probe-Designer
    :maxdepth: 4
 
    descarga
-   test
+   diseno
+   multiplex

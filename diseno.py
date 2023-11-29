@@ -1,5 +1,5 @@
 import descarga
-import multiplex_probes
+import multiplex
 import os
 import argparse
 import pandas as pd
@@ -16,9 +16,10 @@ from datetime import datetime
 
 def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple):
     """
-    Función que recibe una sonda (secuencia) y las restricciones para verificar que la
+    Función que recibe una sonda (secuencia de nucleótidos) y las restricciones para verificar que la
     sonda cumpla los parámetros establecidos.
     Retorna un valor booleano que determina si cumple las restricciones o no.
+
     :param seq: La secuencia que se quiere verificar.
     :param iscentral: Booleano que indica si la sonda es central (una mitad en un exón y la otra en el siguiente)
     :param minlen: El largo mínimo de la sonda.
@@ -32,7 +33,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     :param maxhomopol_simple: Cantidad máxima permitida de homopolímeros simples (AAAAA)
     :param maxhomopol_double: Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
     :param maxhomopol_triple: Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
-    :return: Booleano que determina su factibilidad
+    :return: Booleano que determina la validez de la secuencia
     """
 
     #Chequear largo
@@ -106,11 +107,11 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     print('Sonda Aceptada: ', str(seq))
     return True
 
-
-#Generar par de sondas para una ubicación y un site con ciertos parametros
 def get_probes_from_pos(empalme, record, site, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, mindist, maxdist, minoverlap, maxoverlap, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple):
     """
     Esta función genera un par de sondas a partir de la secuencia de referencia y dos posiciones que representan el punto de empalme entre dos exones.
+    El par de sondas generadas pueden ubicarse en el exón donor, acceptor o en ambos (central).
+
     :param empalme: Tupla con posiciones que representan al punto de empalme o splicing.
     :param record: Secuencia de referencia.
     :param site: Entero que representa si las sondas son donor, acceptor o central.
@@ -225,6 +226,7 @@ def verify_specificity(seq, iscentral):
     """
     Función que verifica la especificidad o unicidad de una secuencia usando la herramienta de alineamiento BLAST de manera local.
     Es necesario tener instalado Blast+ y las bases de datos en la carpeta 'refseq'.
+    
     :param seq: Secuencia de nuecleótidos que se quiere validar.
     :param iscentral: Booleano que indica si se trata de una sonda central. Se utilizan diferentes criterios para chequear la especificidad de una sonda central.
     :return: Booleano que indica si la secuencia se considera específica.
@@ -263,11 +265,11 @@ def verify_specificity(seq, iscentral):
             return False
     return True
 
-#Obtener zonas de empalme
 def get_splicing_pairs(locations):
     """
     Función que obtiene las zonas de empalme a partir de una serie de regiones que representan una transcripción.
     Las zonas de empalme se representan por dos posiciones: el fin de un exón y el inicio del siguiente.
+    
     :param locations: Subregiones que representan la secuencia codificante o secuencia de exones
     :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
     """
@@ -281,6 +283,13 @@ def get_splicing_pairs(locations):
     return empalmes
 
 def get_splicings(seqrecord, transcripts):
+    """
+    Función que retorna los empalmes sin repetición de una secuencia anotada en ciertos transcritos.
+    
+    :param seqrecord: Secuencia anotada de referencia
+    :param transcripts: Lista de transcritos
+    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    """
     empalmes_array = []
     for f in seqrecord.features:
         if f.type == 'CDS':
@@ -292,9 +301,10 @@ def get_splicings(seqrecord, transcripts):
                         empalmes_array.append(par)
     return empalmes_array
 
-def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5):
+def probe_designer(record, transcripts, progreso_queue=None, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=200, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, ismultiplex=True, mindg=-13627, maxdt=5):
     """
-    Función principal diseñadora de sondas. De la secuancia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
+    Función principal diseñadora de sondas. De la secuencia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
+    
     :param record: Secuencia anotada de referencia para la creación de las sondas.
     :param transcripts: Transcripciones en las cuales se quiere diseñar.
     :param minlen: El largo mínimo de la sonda.
@@ -309,8 +319,13 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
     :param maxoverlap: Sobrelape máximo entre sondas.
     :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
     :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
-    :param maxhomopol_simple:
-    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    :param maxhomopol_simple: Cantidad máxima permitida de homopolímeros simples (AAAAA)
+    :param maxhomopol_double: Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+    :param maxhomopol_triple: Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
+    :param ismultiplex: Booleano que indica si el diseño considera multiplexación
+    :param mindg: Delta G mínimo para heterodimerización (multiplex)
+    :param maxdt: Diferencia máxima de Tm (multiplex)
+    :return: Dataframe con las sondas y sus características
     """
     locations = []
     dict_cds = {
@@ -452,7 +467,9 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
                 dict_generated_probes[str(empalme)] = [donor_probes, acceptor_probes, central_probes]
 
                 progreso_actual += 100 // num_splicings
-                progreso_queue.put(progreso_actual)
+
+                if (progreso_queue):
+                    progreso_queue.put(progreso_actual)
                 #print(progreso_actual)
 
 
@@ -554,8 +571,8 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
             probes_array.append(df_probes.at[index, 'sonda'])
     #print(probes_array)
 
-    if multiplex:
-        dict_multiplex = multiplex_probes.multiplex_sequences(probes_array, progreso_queue, mindg, maxdt)
+    if ismultiplex:
+        dict_multiplex = multiplex.multiplex_sequences(probes_array, progreso_queue, mindg, maxdt)
         for index, row in df_probes.iterrows():
             if row['sonda'] == 'AAA':
                 df_probes.at[index, 'grupo'] = -1
@@ -564,10 +581,11 @@ def probe_designer(record, transcripts, progreso_queue, minlen=60, maxlen=120, t
 
     return df_probes
 
-
 def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gcmin=30, gcmax=70, mindist=0, maxdist=50, minoverlap=25, maxoverlap=50, dgmin_homodim=-10000, dgmin_hairpin=-10000, maxhomopol_simple=6, maxhomopol_double=5, maxhomopol_triple=4, multiplex=True, mindg=-13627, maxdt=5, tiempo_diseno=0):
     """
-    Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales. 
+    Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales y los grupos de multiplexación.
+    Almacena el reporte en la carpeta 'sondas' 
+    
     :param df: DataFrame de pandas que contiene las sondas y sus parámetros.
     :param name: Nombre que se le quiere dar al reporte.
     :param minlen: El largo mínimo de la sonda.
@@ -582,8 +600,14 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     :param maxoverlap: Sobrelape máximo entre sondas.
     :param dgmin_homodim: Delta G mínimo permitido para validación de homodimerización.
     :param dgmin_hairpin: Delta G mínimo permitido para validación de hairpin u horquilla.
-    :
-    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    :param maxhomopol_simple: Cantidad máxima permitida de homopolímeros simples (AAAAA)
+    :param maxhomopol_double: Cantidad máxima permitida de homopolímeros dobles (AGAGAGAG)
+    :param maxhomopol_triple: Cantidad máxima permitida de homopolímeros triples (AGCAGCAGC)
+    :param multiplex: Booleano que indica si el diseño considera multiplexación
+    :param mindg: Delta G mínimo para heterodimerización (multiplex)
+    :param maxdt: Diferencia máxima de Tm (multiplex)
+    :param tiempo_diseno: Tiempo que demoró la ejecución en segundos
+    :return: Nombre del archivo XLSX generado
     """
     
     wb = Workbook()
@@ -591,7 +615,7 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     sheet1 = wb.active
     sheet1.title = 'Parámetros iniciales'
 
-    sheet1.cell(row=1, column=1).value = 'Genes: '+genes
+    sheet1.cell(row=1, column=1).value = 'Genes: '+str(genes)
 
     sheet1.cell(row=3, column=1).value = 'Largo de sonda mínimo'
     sheet1.cell(row=3, column=2).value = minlen
@@ -790,6 +814,12 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     return filename
 
 def get_all_transcripts(seqrecord):
+    """
+    Función que retorna todos los transcritos anotados dentro de una secuancia.
+    
+    :param seqrecord: Subregiones que representan la secuencia codificante o secuencia de exones
+    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    """
     transcripts = []
     for f in seqrecord.features:
         if f.type == 'CDS':
@@ -799,6 +829,12 @@ def get_all_transcripts(seqrecord):
     return transcripts
 
 def get_all_genes(seqrecord):
+    """
+    Obtener todos los genes anotados 
+    
+    :param seqrecord: Subregiones que representan la secuencia codificante o secuencia de exones
+    :return: Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del siguiente.
+    """
     genes = []
     for f in seqrecord.features:
         if f.type == 'CDS':
