@@ -2,7 +2,8 @@ import descarga
 import diseno
 import imagen
 import tkinter as tk
-import customtkinter
+import pandas as pd
+import customtkinter as ctk
 import os
 import sqlite3
 import datetime
@@ -11,6 +12,7 @@ import shutil
 import threading
 import queue
 import time
+import openpyxl
 from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -21,59 +23,83 @@ class PantallaInicial:
     def __init__(self, root):
         self.root = root
         self.root.title("GEMINi - Diseñador de sondas de hibridación para ARN mensajero")
-        #self.root.iconbitmap(os.path.join("images", "gemini2.ico"))
+        self.root.iconbitmap(os.path.join("images", "gemini2.ico"))
         #self.frame = tk.Frame(root)
-        self.frame = customtkinter.CTkFrame(master=root)
-        self.frame.pack(padx=50, pady=50)
+        self.frame = ctk.CTkFrame(master=root)
+        self.frame.place(in_=root, relx=0.5, rely=0.5, anchor='c')
+        #self.frame.pack(padx=100, pady=200)
         self.crear_interfaz()
         #self.root.minsize(800,450)
-        #self.root.geometry(f"{self.frame.winfo_reqwidth()+20}x{self.frame.winfo_reqheight()+20}")
+        ancho_pantalla = self.root.winfo_screenwidth()
+        alto_pantalla = self.root.winfo_screenheight()
+        #self.root.minsize(ancho_pantalla,alto_pantalla)
+        #print(ancho_pantalla, alto_pantalla)
+        self.root.state("zoomed")
+        #self.root.geometry("800x450")
+        #self.root.attributes("-alpha", True)
+        #self.root.geometry(f"{ancho_pantalla}x{alto_pantalla}")
+    
 
     def crear_interfaz(self):
         # Crear widgets de la pantalla de inicio
         #fuente_titulo = font.Font(weight="bold", size=16)
         #titulo_archivo = tk.Label(self.frame, text="Seleccione un archivo GenBank", font=fuente_titulo)
-        fuente_titulo = customtkinter.CTkFont(family='Helvetica', size=20, weight='bold')
-        titulo_archivo = customtkinter.CTkLabel(self.frame, text="Seleccione un archivo GenBank (.gb o .gbk)\no introduzca su accession number", text_color="#000000", font=fuente_titulo)
-        titulo_archivo.grid(row=0, column=0, columnspan=3, padx=100, pady=30)
+        fuente_titulo = ctk.CTkFont(family='Helvetica', size=20, weight='bold')
+        titulo_archivo = ctk.CTkLabel(self.frame, text="Seleccione un archivo GenBank (.gb o .gbk)\no introduzca su accession number", text_color="#000000", font=fuente_titulo)
+        titulo_archivo.grid(row=0, column=0, columnspan=3, padx=100, pady=20)
 
         # Pantalla de selección de archivo
         #seleccion_button = tk.Button(self.frame, text="Seleccionar Archivo", command=self.seleccionar_archivo)
-        seleccion_button = customtkinter.CTkButton(self.frame, text="Seleccionar Archivo", corner_radius=30, fg_color="#404040", command=self.seleccionar_archivo)
+        seleccion_button = ctk.CTkButton(self.frame, text="Seleccionar Archivo", corner_radius=30, fg_color="#404040", command=self.seleccionar_archivo)
         seleccion_button.grid(row=1, column=0, rowspan=2, padx=15, pady=30)
 
-        obien_label = customtkinter.CTkLabel(self.frame, text="o bien...", text_color="#000000")
+        obien_label = ctk.CTkLabel(self.frame, text="o bien...", text_color="#000000")
         obien_label.grid(row=1, column=1, rowspan=2, pady=30)
 
-        accession_entry = customtkinter.CTkEntry(self.frame, placeholder_text="Accession Number", corner_radius=30)
+        accession_entry = ctk.CTkEntry(self.frame, placeholder_text="Accession Number", corner_radius=30)
         accession_entry.grid(row=1, column=2, padx=15, pady=30)
 
 
         def descargar_secuencia():
             accnum = accession_entry.get()
             if len(accnum) > 5:
-                try:
-                    seqrecord = descarga.accnum_to_seqrecord(accnum)
-                    filepath = os.path.join(os.getcwd(), 'files', accnum+".gbk")
-                    app.mostrar_pantalla("transcripciones", seqrecord, filepath=filepath)
+                try:                    
+                    self.seqrecord = descarga.accnum_to_seqrecord(accnum)
+                    self.continuar_button.configure(state='normal')
+                    self.file_label.configure(text='Archivo seleccionado: '+accnum+".gbk")
+                    self.archivo = os.path.join(os.getcwd(), 'files', accnum+".gbk")
+                    #app.mostrar_pantalla("transcripciones", seqrecord, filepath=self.archivo)
                 except:
                     messagebox.showinfo("Error", "Error al descargar la secuencia")
 
-        descargar_button = customtkinter.CTkButton(self.frame, text="Descargar Secuencia", corner_radius=30, fg_color="#404040", command=descargar_secuencia)
+        descargar_button = ctk.CTkButton(self.frame, text="Descargar Secuencia", corner_radius=30, fg_color="#404040", command=descargar_secuencia)
         descargar_button.grid(row=2, column=2, pady=10)
 
+        self.frame.grid_rowconfigure(3, minsize=25)
+
         #historial_button = tk.Button(self.frame, text="Ver historial de sondas", command=self.ver_historial)
-        historial_button = customtkinter.CTkButton(self.frame, text="Ver historial de sondas", corner_radius=30, fg_color="#7a7a7a",command=self.ver_historial)
-        historial_button.grid(row=3, column=0, columnspan=3, pady=25)
-        
-        self.root.geometry("800x450")
+        historial_button = ctk.CTkButton(self.frame, text="Ver historial de sondas", corner_radius=30, fg_color="#7a7a7a",command=self.ver_historial)
+        historial_button.grid(row=4, column=0, rowspan=2, pady=25)
+
+        def continuar():
+            app.mostrar_pantalla("transcripciones", self.seqrecord, filepath=self.archivo)
+
+        self.file_label = ctk.CTkLabel(self.frame, text="", text_color="#000000")
+        self.file_label.grid(row=4, column=2, pady=5)
+
+        self.continuar_button = ctk.CTkButton(self.frame, text="Continuar", corner_radius=30, fg_color="#404040", state='disabled', command=continuar)
+        self.continuar_button.grid(row=5, column=2, pady=10)
+        #self.root.geometry("800x450")
 
         
     def seleccionar_archivo(self):
-        archivo = filedialog.askopenfilename(filetypes=[("Archivos GenBank", "*.gbk *.gb")])
-        if archivo:
-            seqrecord = descarga.parse_file_to_seqrecord(archivo)
-            app.mostrar_pantalla("transcripciones", seqrecord, filepath=archivo)
+        self.archivo = filedialog.askopenfilename(filetypes=[("Archivos GenBank", "*.gbk *.gb")])
+        if self.archivo:            
+            self.file = os.path.split(self.archivo)[1]
+            self.continuar_button.configure(state='normal')
+            self.file_label.configure(text='Archivo seleccionado: '+self.file)
+            self.seqrecord = descarga.parse_file_to_seqrecord(self.archivo)
+            #app.mostrar_pantalla("transcripciones", self.seqrecord, filepath=archivo)
 
     
     def ver_historial(self):
@@ -89,14 +115,14 @@ class PantallaTranscripciones(PantallaInicial):
     def crear_interfaz(self):
         # Crear widgets de la pantalla de inicio
         #transcripciones_label = tk.Label(self.frame, text=f"Seleccione las transcripciones para el diseño de sondas", font=fuente_titulo)
-        fuente_titulo = customtkinter.CTkFont(family='Helvetica', size=20, weight='bold')
-        transcripciones_label = customtkinter.CTkLabel(self.frame, text="Seleccione los transcritos para el diseño de sondas", text_color="#000000", font=fuente_titulo)
+        fuente_titulo = ctk.CTkFont(family='Helvetica', size=20, weight='bold')
+        transcripciones_label = ctk.CTkLabel(self.frame, text="Seleccione los transcritos para el diseño de sondas", text_color="#000000", font=fuente_titulo)
         transcripciones_label.grid(row=0, column=0, columnspan=3, padx=10, pady=20)
 
-        label_izq = customtkinter.CTkLabel(self.frame, text="Transcritos no seleccionados", text_color="#000000")
+        label_izq = ctk.CTkLabel(self.frame, text="Transcritos no seleccionados", text_color="#000000")
         label_izq.grid(row=1, column=0, padx=10, pady=10)
 
-        label_der = customtkinter.CTkLabel(self.frame, text="Transcritos seleccionados", text_color="#000000")
+        label_der = ctk.CTkLabel(self.frame, text="Transcritos seleccionados", text_color="#000000")
         label_der.grid(row=1, column=2, padx=10, pady=10)
 
         #Obtener lista con transcripciones
@@ -118,32 +144,32 @@ class PantallaTranscripciones(PantallaInicial):
                     maximo = length
             return maximo
         
-        self.lista_disponibles = tk.Listbox(self.frame, selectmode=tk.SINGLE, selectbackground="#404040", width=maxlen(self.opciones_disponibles))
+        self.lista_disponibles = tk.Listbox(self.frame, selectmode=tk.MULTIPLE, selectbackground="#404040", width=maxlen(self.opciones_disponibles))
         self.lista_disponibles.grid(row=2, column= 0, padx=10, pady=10)
 
         for opcion in self.opciones_disponibles:
             self.lista_disponibles.insert(tk.END, opcion)
 
-        self.lista_seleccionadas = tk.Listbox(self.frame, selectmode=tk.SINGLE, selectbackground="#404040", width=maxlen(self.opciones_disponibles))
+        self.lista_seleccionadas = tk.Listbox(self.frame, selectmode=tk.MULTIPLE, selectbackground="#404040", width=maxlen(self.opciones_disponibles))
         self.lista_seleccionadas.grid(row=2, column= 2, padx=10, pady=10)
 
-        botones_frame = customtkinter.CTkFrame(master=self.frame, bg_color="transparent")
+        botones_frame = ctk.CTkFrame(master=self.frame, bg_color="transparent")
         botones_frame.grid(row=2, column=1)
 
         #self.boton_seleccionar = tk.Button(botones_frame, text="Seleccionar", command=self.seleccionar)
-        self.boton_seleccionar = customtkinter.CTkButton(botones_frame, text=">", corner_radius=30, fg_color="#7a7a7a", command=self.seleccionar)
+        self.boton_seleccionar = ctk.CTkButton(botones_frame, text=">", corner_radius=30, fg_color="#7a7a7a", command=self.seleccionar)
         self.boton_seleccionar.pack(pady=10)
         
         #self.boton_eliminar = tk.Button(botones_frame, text="Eliminar", command=self.eliminar)
-        self.boton_eliminar = customtkinter.CTkButton(botones_frame, text="<", corner_radius=30, fg_color="#7a7a7a", command=self.eliminar)
+        self.boton_eliminar = ctk.CTkButton(botones_frame, text="<", corner_radius=30, fg_color="#7a7a7a", command=self.eliminar)
         self.boton_eliminar.pack(pady=10)
 
         #self.boton_seleccionar_todo = tk.Button(botones_frame, text="Seleccionar Todo", command=self.seleccionar_todo)
-        self.boton_seleccionar_todo = customtkinter.CTkButton(botones_frame, text=">>>>", corner_radius=30, fg_color="#404040", command=self.seleccionar_todo)
+        self.boton_seleccionar_todo = ctk.CTkButton(botones_frame, text=">>>>", corner_radius=30, fg_color="#404040", command=self.seleccionar_todo)
         self.boton_seleccionar_todo.pack(pady=10)
 
         #self.boton_eliminar_todo = tk.Button(botones_frame, text="Eliminar Todo", command=self.eliminar_todo)
-        self.boton_eliminar_todo = customtkinter.CTkButton(botones_frame, text="<<<<", corner_radius=30, fg_color="#404040", command=self.eliminar_todo)
+        self.boton_eliminar_todo = ctk.CTkButton(botones_frame, text="<<<<", corner_radius=30, fg_color="#404040", command=self.eliminar_todo)
         self.boton_eliminar_todo.pack(pady=10)
 
         def obtener_seleccion():
@@ -156,31 +182,41 @@ class PantallaTranscripciones(PantallaInicial):
 
         # Botón para obtener las opciones seleccionadas
         #boton_volver = tk.Button(self.frame, text="Volver", command=self.volver_a_seleccion)
-        boton_volver = customtkinter.CTkButton(self.frame, text="Volver", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_seleccion)
+        boton_volver = ctk.CTkButton(self.frame, text="Volver", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_seleccion)
         boton_volver.grid(row=3, column=0, pady=20)
 
         # Botón para obtener las opciones seleccionadas
         #boton_obtener_seleccionadas = tk.Button(self.frame, text="Continuar", command=obtener_seleccion)
-        boton_obtener_seleccionadas = customtkinter.CTkButton(self.frame, text="Continuar", corner_radius=30, fg_color="#404040", command=obtener_seleccion)
+        boton_obtener_seleccionadas = ctk.CTkButton(self.frame, text="Continuar", corner_radius=30, fg_color="#404040", command=obtener_seleccion)
         boton_obtener_seleccionadas.grid(row=3, column=2, pady=20)
 
         self.root.geometry("800x500")
 
     def seleccionar(self):
-        seleccion = self.lista_disponibles.get(tk.ACTIVE)
-        if seleccion not in self.opciones_seleccionadas:
-            self.opciones_seleccionadas.append(seleccion)
-            self.lista_seleccionadas.insert(tk.END, seleccion)
-            self.lista_disponibles.delete(tk.ACTIVE)
-            self.opciones_disponibles.remove(seleccion)
+        #seleccion = self.lista_disponibles.get(tk.ACTIVE)
+        selecciones = self.lista_disponibles.curselection()
+        selecciones = sorted(selecciones, reverse=True)
+        print(selecciones)
+        for indice in selecciones:
+            seleccion = self.lista_disponibles.get(indice)
+            if seleccion not in self.opciones_seleccionadas:
+                self.opciones_seleccionadas.append(seleccion)
+                self.lista_seleccionadas.insert(tk.END, seleccion)
+                self.lista_disponibles.delete(indice)
+                self.opciones_disponibles.remove(seleccion)
 
     def eliminar(self):
-        seleccion = self.lista_seleccionadas.get(tk.ACTIVE)
-        if seleccion in self.opciones_seleccionadas:
-            self.opciones_disponibles.append(seleccion)
-            self.lista_disponibles.insert(tk.END, seleccion)
-            self.lista_seleccionadas.delete(tk.ACTIVE)
-            self.opciones_seleccionadas.remove(seleccion)
+        #seleccion = self.lista_seleccionadas.get(tk.ACTIVE)
+        selecciones = self.lista_seleccionadas.curselection()
+        selecciones = sorted(selecciones, reverse=True)
+        print(selecciones)
+        for indice in selecciones:
+            seleccion = self.lista_seleccionadas.get(indice)
+            if seleccion in self.opciones_seleccionadas:
+                self.opciones_disponibles.append(seleccion)
+                self.lista_disponibles.insert(tk.END, seleccion)
+                self.lista_seleccionadas.delete(indice)
+                self.opciones_seleccionadas.remove(seleccion)
 
     def seleccionar_todo(self):
         for opcion in self.opciones_disponibles:
@@ -207,7 +243,7 @@ class PantallaParametros(PantallaInicial):
         self.transcripciones = transcripciones
         self.filepath = filepath
         super().__init__(root)
-        self.root.geometry('1000x750')
+        #self.root.geometry('1000x750')
     
     def crear_interfaz(self):
         #Espaciadores
@@ -223,16 +259,16 @@ class PantallaParametros(PantallaInicial):
         self.frame.grid_columnconfigure(4, minsize=20)
 
         #nombre_label = tk.Label(self.frame, text=f"Nombre de la secuencia: {self.seqrecord.id}")
-        nombre_label = customtkinter.CTkLabel(self.frame, text=f"{self.seqrecord.id} | {self.seqrecord.description}", text_color="#000000")
+        nombre_label = ctk.CTkLabel(self.frame, text=f"{self.seqrecord.id} | {self.seqrecord.description}", text_color="#000000")
         nombre_label.grid(row=0, column=0, columnspan=4)
 
         genes = diseno.get_all_genes(self.seqrecord)
         #descripcion_label = tk.Label(self.frame, text=f"Descripción: {self.seqrecord.description}")
-        descripcion_label = customtkinter.CTkLabel(self.frame, text=f"Genes: {str(genes)[1:-1]}", text_color="#000000")
+        descripcion_label = ctk.CTkLabel(self.frame, text=f"Genes: {str(genes)[1:-1]}", text_color="#000000")
         descripcion_label.grid(row=1, column=0, columnspan=4)
 
         #largo_label = tk.Label(self.frame, text=f"Largo de la secuencia: {len(self.seqrecord)}")
-        largo_label = customtkinter.CTkLabel(self.frame, text=f"Largo de la secuencia: {len(self.seqrecord)}", text_color="#000000")
+        largo_label = ctk.CTkLabel(self.frame, text=f"Largo de la secuencia: {len(self.seqrecord)}", text_color="#000000")
         largo_label.grid(row=2, column=0, columnspan=4)
 
         locations = []
@@ -243,13 +279,13 @@ class PantallaParametros(PantallaInicial):
                     locations.append(str(loc))
 
         #transcripciones_label = tk.Label(self.frame, text=f"Se considerará(n) {len(self.transcripciones)} de las {len(locations)} transcripciones.")
-        transcripciones_label = customtkinter.CTkLabel(self.frame, text=f"Se considerará(n) {len(self.transcripciones)} de las {len(locations)} transcripciones. ({len(diseno.get_splicings(self.seqrecord, self.transcripciones))} puntos de empalme)", text_color="#000000")
+        transcripciones_label = ctk.CTkLabel(self.frame, text=f"Se considerará(n) {len(self.transcripciones)} de las {len(locations)} transcripciones. ({len(diseno.get_splicings(self.seqrecord, self.transcripciones))} puntos de empalme)", text_color="#000000")
         transcripciones_label.grid(row=3, column=0, columnspan=4)
 
         #fuente_negrita = font.Font(weight="bold")
         #parametros_label = tk.Label(self.frame, text="Ingrese los parámetros para el diseño de las sondas:", font=fuente_negrita)
-        fuente_titulo = customtkinter.CTkFont(family='Helvetica', size=20, weight='bold')
-        parametros_label = customtkinter.CTkLabel(self.frame, text="Ingrese los parámetros para el diseño de las sondas:", text_color="#000000", font=fuente_titulo)
+        fuente_titulo = ctk.CTkFont(family='Helvetica', size=20, weight='bold')
+        parametros_label = ctk.CTkLabel(self.frame, text="Ingrese los parámetros para el diseño de las sondas:", text_color="#000000", font=fuente_titulo)
         parametros_label.grid(row=4, column=0, columnspan=3, padx=20, pady=10)
 
         def mostrar_ayuda():
@@ -257,12 +293,12 @@ class PantallaParametros(PantallaInicial):
             messagebox.showinfo("Ayuda", ayuda_texto)
 
         #boton_ayuda = tk.Button(self.frame, text="?", command=mostrar_ayuda)
-        boton_ayuda = customtkinter.CTkButton(master=self.frame, text="?", fg_color="#7a7a7a", corner_radius=20, width=10, height=10,command=mostrar_ayuda)
+        boton_ayuda = ctk.CTkButton(master=self.frame, text="?", fg_color="#7a7a7a", corner_radius=20, width=10, height=10,command=mostrar_ayuda)
         boton_ayuda.grid(row=4, column=3)
 
         #Largo mínimo
         #minlen_label = tk.Label(self.frame, text="Largo mínimo (nt)")
-        minlen_label = customtkinter.CTkLabel(self.frame, text="Largo mínimo (nt):", text_color="#000000")
+        minlen_label = ctk.CTkLabel(self.frame, text="Largo mínimo (nt):", text_color="#000000")
         minlen_label.grid(row=5, column=0, padx=5, pady=10, sticky="e")
         
         #minlen_spinbox = tk.Spinbox(self.frame, from_=10, to=300, increment=1, width=5)
@@ -274,7 +310,7 @@ class PantallaParametros(PantallaInicial):
 
         #Largo máximo
         #maxlen_label = tk.Label(self.frame, text="Largo máximo (nt)")
-        maxlen_label = customtkinter.CTkLabel(self.frame, text="Largo máximo (nt):", text_color="#000000")
+        maxlen_label = ctk.CTkLabel(self.frame, text="Largo máximo (nt):", text_color="#000000")
         maxlen_label.grid(row=6, column=0, padx=5, sticky="e")
 
         #maxlen_spinbox = tk.Spinbox(self.frame, from_=10, to=300, increment=1, width=5)
@@ -289,7 +325,7 @@ class PantallaParametros(PantallaInicial):
 
         #TM mínima
         #tmmin_label = tk.Label(self.frame, text="Temp melting mínima (°C)")
-        tmmin_label = customtkinter.CTkLabel(self.frame, text="Temp melting mínima (°C):", text_color="#000000")
+        tmmin_label = ctk.CTkLabel(self.frame, text="Temp melting mínima (°C):", text_color="#000000")
         tmmin_label.grid(row=5, column=2, padx=5, pady=10, sticky="e")
         
         #tmmin_spinbox = tk.Spinbox(self.frame, from_=10, to=300, increment=1, width=5)
@@ -301,7 +337,7 @@ class PantallaParametros(PantallaInicial):
 
         #TM máxima
         #tmmax_label = tk.Label(self.frame, text="Temp melting máxima (°C)")
-        tmmax_label = customtkinter.CTkLabel(self.frame, text="Temp melting máxima (°C):", text_color="#000000")
+        tmmax_label = ctk.CTkLabel(self.frame, text="Temp melting máxima (°C):", text_color="#000000")
         tmmax_label.grid(row=6, column=2, padx=5, sticky="e")
         
         #tmmax_spinbox = tk.Spinbox(self.frame, from_=10, to=300, increment=1, width=5)
@@ -316,7 +352,7 @@ class PantallaParametros(PantallaInicial):
 
         #%GC mínimo
         #gcmin_label = tk.Label(self.frame, text="%GC mínimo")
-        gcmin_label = customtkinter.CTkLabel(self.frame, text="%GC mínimo:", text_color="#000000")
+        gcmin_label = ctk.CTkLabel(self.frame, text="%GC mínimo:", text_color="#000000")
         gcmin_label.grid(row=8, column=0, padx=5, pady=10, sticky="e")
         
         #gcmin_spinbox = tk.Spinbox(self.frame, from_=0, to=100, increment=1, width=5)
@@ -328,7 +364,7 @@ class PantallaParametros(PantallaInicial):
 
         #%GC máximo
         #gcmax_label = tk.Label(self.frame, text="%GC máximo")
-        gcmax_label = customtkinter.CTkLabel(self.frame, text="%GC máximo:", text_color="#000000")
+        gcmax_label = ctk.CTkLabel(self.frame, text="%GC máximo:", text_color="#000000")
         gcmax_label.grid(row=9, column=0, padx=5, sticky="e")
 
         #gcmax_spinbox = tk.Spinbox(self.frame, from_=0, to=100, increment=1, width=5)
@@ -343,7 +379,7 @@ class PantallaParametros(PantallaInicial):
 
         #Distancia mínima al borde del exón
         #mindist_label = tk.Label(self.frame, text="Distancia mínima al borde del exón (nt)")
-        mindist_label = customtkinter.CTkLabel(self.frame, text="Distancia mínima al borde del exón (nt):", text_color="#000000")
+        mindist_label = ctk.CTkLabel(self.frame, text="Distancia mínima al borde del exón (nt):", text_color="#000000")
         mindist_label.grid(row=8, column=2, padx=5, pady=10, sticky="e")
         
         #mindist_spinbox = tk.Spinbox(self.frame, from_=0, to=500, increment=1, width=5)
@@ -355,7 +391,7 @@ class PantallaParametros(PantallaInicial):
 
         #Distancia máxima al borde del exón
         #maxdist_label = tk.Label(self.frame, text="Distancia máxima al borde del exón (nt)")
-        maxdist_label = customtkinter.CTkLabel(self.frame, text="Distancia máxima al borde del exón (nt):", text_color="#000000")
+        maxdist_label = ctk.CTkLabel(self.frame, text="Distancia máxima al borde del exón (nt):", text_color="#000000")
         maxdist_label.grid(row=9, column=2, padx=5, sticky="e")
         
         #maxdist_spinbox = tk.Spinbox(self.frame, from_=0, to=500, increment=1, width=5)
@@ -371,7 +407,7 @@ class PantallaParametros(PantallaInicial):
 
         #Sobrelape mínimo
         #minoverlap_label = tk.Label(self.frame, text="Sobrelape mínimo (%)")
-        minoverlap_label = customtkinter.CTkLabel(self.frame, text="Sobrelape mínimo (%):", text_color="#000000")
+        minoverlap_label = ctk.CTkLabel(self.frame, text="Sobrelape mínimo (%):", text_color="#000000")
         minoverlap_label.grid(row=11, column=0, padx=5, pady=10, sticky="e")
         
         #minoverlap_spinbox = tk.Spinbox(self.frame, from_=0, to=100, increment=1, width=5)
@@ -383,7 +419,7 @@ class PantallaParametros(PantallaInicial):
 
         #Sobrelape máximo
         #maxoverlap_label = tk.Label(self.frame, text="Sobrelape máximo (%)")
-        maxoverlap_label = customtkinter.CTkLabel(self.frame, text="Sobrelape máximo (%):", text_color="#000000")
+        maxoverlap_label = ctk.CTkLabel(self.frame, text="Sobrelape máximo (%):", text_color="#000000")
         maxoverlap_label.grid(row=12, column=0, padx=5, sticky="e")
 
         maxoverlap_spinbox = tk.Spinbox(self.frame, from_=0, to=100, increment=1, width=5)
@@ -398,7 +434,7 @@ class PantallaParametros(PantallaInicial):
 
         #Delta G mínimo homodimerización
         #dgmin_homodim_label = tk.Label(self.frame, text="Delta G mínimo homodimerización")
-        dgmin_homodim_label = customtkinter.CTkLabel(self.frame, text="Delta G mínimo homodimerización:", text_color="#000000")
+        dgmin_homodim_label = ctk.CTkLabel(self.frame, text="Delta G mínimo homodimerización:", text_color="#000000")
         dgmin_homodim_label.grid(row=11, column=2, padx=5, pady=10, sticky="e")
         
         #dgmin_homodim_spinbox = tk.Spinbox(self.frame, from_=-50000, to=10000, increment=1000, width=5)
@@ -410,7 +446,7 @@ class PantallaParametros(PantallaInicial):
 
         #Delta G mínimo hairpin
         #dgmin_hairpin_label = tk.Label(self.frame, text="Delta G mínimo hairpin")
-        dgmin_hairpin_label = customtkinter.CTkLabel(self.frame, text="Delta G mínimo hairpin:", text_color="#000000")
+        dgmin_hairpin_label = ctk.CTkLabel(self.frame, text="Delta G mínimo hairpin:", text_color="#000000")
         dgmin_hairpin_label.grid(row=12, column=2, padx=5, sticky="e")
         
         #dgmin_hairpin_spinbox = tk.Spinbox(self.frame, from_=-50000, to=10000, increment=1000, width=6)
@@ -426,7 +462,7 @@ class PantallaParametros(PantallaInicial):
 
         #Máximo homopolímeros simples
         #maxhomopol_simple_label = tk.Label(self.frame, text="Máximo homopolímeros simples")
-        maxhomopol_simple_label = customtkinter.CTkLabel(self.frame, text="Máximo homopolímeros simples:", text_color="#000000")
+        maxhomopol_simple_label = ctk.CTkLabel(self.frame, text="Máximo homopolímeros simples:", text_color="#000000")
         maxhomopol_simple_label.grid(row=14, column=0, padx=5, sticky="e")
         
         #maxhomopol_simple_spinbox = tk.Spinbox(self.frame, from_=2, to=100, increment=1, width=5)
@@ -438,7 +474,7 @@ class PantallaParametros(PantallaInicial):
 
         #Máximo homopolímeros dobles
         #maxhomopol_double_label = tk.Label(self.frame, text="Máximo homopolímeros dobles")
-        maxhomopol_double_label = customtkinter.CTkLabel(self.frame, text="Máximo homopolímeros dobles:", text_color="#000000")
+        maxhomopol_double_label = ctk.CTkLabel(self.frame, text="Máximo homopolímeros dobles:", text_color="#000000")
         maxhomopol_double_label.grid(row=15, column=0, padx=5, pady=10, sticky="e")
 
         #maxhomopol_double_spinbox = tk.Spinbox(self.frame, from_=2, to=100, increment=1, width=5)
@@ -449,7 +485,7 @@ class PantallaParametros(PantallaInicial):
 
         #Máximo homopolímeros triples
         #maxhomopol_triple_label = tk.Label(self.frame, text="Máximo homopolímeros triples")
-        maxhomopol_triple_label = customtkinter.CTkLabel(self.frame, text="Máximo homopolímeros triples:", text_color="#000000")
+        maxhomopol_triple_label = ctk.CTkLabel(self.frame, text="Máximo homopolímeros triples:", text_color="#000000")
         maxhomopol_triple_label.grid(row=16, column=0, padx=5, sticky="e")
 
         #maxhomopol_triple_spinbox = tk.Spinbox(self.frame, from_=2, to=100, increment=1, width=5)
@@ -478,15 +514,15 @@ class PantallaParametros(PantallaInicial):
                 maxdt_spinbox.grid_forget()
 
 
-        multiplex_var = customtkinter.StringVar(value="off")
-        checkbox_multiplex = customtkinter.CTkCheckBox(self.frame, text="Multiplexar sondas", command=param_multiplex, variable=multiplex_var, onvalue="on", offvalue="off", fg_color="#000000", text_color="#000000", hover_color="#7a7a7a")
+        multiplex_var = ctk.StringVar(value="off")
+        checkbox_multiplex = ctk.CTkCheckBox(self.frame, text="Multiplexar sondas", command=param_multiplex, variable=multiplex_var, onvalue="on", offvalue="off", fg_color="#000000", text_color="#000000", hover_color="#7a7a7a")
         checkbox_multiplex.deselect()
         checkbox_multiplex.grid(row=14, column=2, padx= 5,sticky='e')
 
-        mindg_label = customtkinter.CTkLabel(self.frame, text="Mínimo delta G heterodimerización:", text_color="#000000")
+        mindg_label = ctk.CTkLabel(self.frame, text="Mínimo delta G heterodimerización:", text_color="#000000")
         mindg_spinbox = IntegerSelector(self.frame, default_value=-20000, min_value=-999999, max_value=1000000, increment=1000)
     
-        maxdt_label = customtkinter.CTkLabel(self.frame, text="Máxima diferencia de Tm (°C):", text_color="#000000")
+        maxdt_label = ctk.CTkLabel(self.frame, text="Máxima diferencia de Tm (°C):", text_color="#000000")
         maxdt_spinbox = IntegerSelector(self.frame, default_value=5, min_value=0, max_value=100, increment=1)
         
         texto_multiplex = "La multiplexación consiste en agrupar las sondas\npara ser procesadas en conjunto. Los criterios para\nagrupar son: diferencia de temperatura de melting\ny heterodimerización.\nNOTA: El tiempo de carga aumentará considerablemente."
@@ -522,12 +558,12 @@ class PantallaParametros(PantallaInicial):
 
         #volver_button = tk.Button(self.frame, text="Volver", command=self.volver_a_transcripciones)
         #continuar_button = tk.Button(self.frame, text="Continuar a la ejecución", command=ejecutar)
-        volver_button = customtkinter.CTkButton(master=self.frame, text="Volver", fg_color="#7a7a7a", corner_radius=30, width=70 ,command=self.volver_a_transcripciones)
-        continuar_button = customtkinter.CTkButton(master=self.frame, text="Continuar a la ejecución", fg_color="#404040", corner_radius=30,command=ejecutar)
+        volver_button = ctk.CTkButton(master=self.frame, text="Volver", fg_color="#7a7a7a", corner_radius=30, width=70 ,command=self.volver_a_transcripciones)
+        continuar_button = ctk.CTkButton(master=self.frame, text="Continuar a la ejecución", fg_color="#404040", corner_radius=30,command=ejecutar)
         volver_button.grid(row=20, column=1, pady=20)
         continuar_button.grid(row=20, column=2, pady=20)
 
-        self.root.geometry("800x1000")
+        #self.root.geometry("800x1000")
 
 
     def volver_a_transcripciones(self):
@@ -545,13 +581,13 @@ class PantallaCarga(PantallaInicial):
 
     def crear_interfaz(self):
 
-        self.load_label = customtkinter.CTkLabel(self.frame, text="Buscando y verificando sondas, por favor espere...", text_color="#000000")
+        self.load_label = ctk.CTkLabel(self.frame, text="Buscando y verificando sondas, por favor espere...", text_color="#000000")
         self.load_label.pack(padx=10, pady=10)
         self.progress_bar = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
         self.progress_bar.pack(padx=10, pady=10)
         
         if self.dict_params['multiplex']:
-            #multiplex_label = customtkinter.CTkLabel(self.frame, text="Multiplexando sondas, por favor espere...", text_color="#000000")
+            #multiplex_label = ctk.CTkLabel(self.frame, text="Multiplexando sondas, por favor espere...", text_color="#000000")
             #multiplex_label.pack(padx=10, pady=10)
             
             self.progress_multiplex = ttk.Progressbar(self.frame, mode="determinate", maximum=100, length=300)
@@ -565,7 +601,7 @@ class PantallaCarga(PantallaInicial):
         actualizar_progreso_thread = threading.Thread(target=self.actualizar_progreso, args=(progreso_queue,tarea_thread,self.dict_params['multiplex'],))
         actualizar_progreso_thread.start()
 
-        #reporte_label = customtkinter.CTkLabel(self.frame, text="Generando reporte e imagen, por favor espere...", text_color="#000000")
+        #reporte_label = ctk.CTkLabel(self.frame, text="Generando reporte e imagen, por favor espere...", text_color="#000000")
         #reporte_label.pack(padx=10, pady=10)
 
         self.root.geometry("600x300")
@@ -625,8 +661,12 @@ class PantallaCarga(PantallaInicial):
         folderpath = os.path.join(os.getcwd(),'sondas',filename)
 
         shutil.copy(self.filepath, folderpath)
+
+        #df1 = pd.read_excel(os.path.join(folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Resumen', header=None)
+        #df2 = pd.read_excel(os.path.join(folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Parámetros iniciales', header=None)
+        #df3 = pd.read_excel(os.path.join(folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Grupos', header=None)
         
-        app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath, folderpath=folderpath)
+        app.mostrar_pantalla(nombre="final", seqrecord=self.seqrecord, transcripciones=self.transcripciones, df=df, dict_params=self.dict_params, filepath=self.filepath, folderpath=folderpath)#, df1=df1, df2=df2, df3=df3)
         
     
     def actualizar_progreso(self, progreso_queue, tarea_thread, multiplex):
@@ -656,13 +696,16 @@ class PantallaCarga(PantallaInicial):
 
 
 class PantallaFinal(PantallaInicial):
-    def __init__(self, root, seqrecord, transcripciones, df, dict_params, filepath, folderpath):
+    def __init__(self, root, seqrecord, transcripciones, df, dict_params, filepath, folderpath, df1, df2, df3):
         self.seqrecord = seqrecord
         self.transcripciones = transcripciones
         self.df = df
         self.dict_params = dict_params
         self.filepath = filepath
         self.folderpath = folderpath
+        self.df1 = df1
+        self.df2 = df2
+        self.df3 = df3
         super().__init__(root)
 
     def crear_interfaz(self):
@@ -677,9 +720,9 @@ class PantallaFinal(PantallaInicial):
 
         #fuente_negrita = font.Font(weight="bold")
         #resultado_label = tk.Label(self.frame, text=f"El diseño se ejecutó con éxito. Número de sondas: {len(sondas)}", font=fuente_negrita)
-        fuente_negrita = customtkinter.CTkFont(family='Helvetica', weight='bold')
-        resultado_label = customtkinter.CTkLabel(self.frame, text=f"Se ejecutó con éxito el diseño para {str(diseno.get_all_genes(self.seqrecord))[1:-1]}\nNúmero de sondas diferentes: {df_resumen.shape[0]}", text_color="#000000", font=fuente_negrita)
-        resultado_label.pack(padx=20, pady=30)
+        fuente_negrita = ctk.CTkFont(family='Helvetica', weight='bold')
+        resultado_label = ctk.CTkLabel(self.frame, text=f"Sondas diseñadas para {str(diseno.get_all_genes(self.seqrecord))[1:-1]}", text_color="#000000", font=fuente_negrita)
+        resultado_label.grid(row=0, column=0, columnspan=2, padx=20, pady=20)
 
         # img = Image.open(os.path.join(folderpath,self.seqrecord.id+".png"))
         # tkimg = ImageTk.PhotoImage(img)
@@ -688,16 +731,217 @@ class PantallaFinal(PantallaInicial):
         # label_imagen.pack(padx=10, pady=10)
 
         #carpeta_label = tk.Label(self.frame, text=f"El reporte y la imagen se almacenaron en\n" + folderpath)
-        carpeta_label = customtkinter.CTkLabel(self.frame, text=f"El reporte, la imagen y el archivo GenBank se almacenaron en\n" + self.folderpath, text_color="#000000")
-        carpeta_label.pack(padx=20, pady=10)
+        carpeta_label = ctk.CTkLabel(self.frame, text=f"El reporte, la imagen y el archivo GenBank se almacenaron en\n" + self.folderpath, text_color="#000000")
+        carpeta_label.grid(row=1, column=0, columnspan=2, padx=20, pady=20)
+
+        print('xd1')
+
+        img_frame = ttk.Frame(self.frame, width=500, height=500)
+        img_frame.grid(row=2, column=0, padx=10, pady=20)
+        Zoom_Advanced(mainframe=img_frame, path=os.path.join(self.folderpath, self.seqrecord.id+'.png'))
+        #ScrollView(img_frame)
+
+        print('xd2')
+
+        #tabview = ttk.Notebook(self.frame, width=50, height=50)
+        #tab1 = ttk.Frame(tabview)
+        #tab2 = ttk.Frame(tabview)
+        #tab3 = ttk.Frame(tabview)
+        #tabview.add(tab1, text='Resumen')
+        #tabview.add(tab2, text='Parámetros')
+        #tabview.add(tab3, text='Grupos')
+        
+        tabview_frame = ttk.Frame(self.frame, width=500, height=500)
+        tabview = ctk.CTkTabview(tabview_frame)
+        tabview.configure(height=600)
+        tab1 = tabview.add('Resumen')
+        tab2 = tabview.add('Parámetros')
+        tab3 = tabview.add('Grupos')
+        tabview.grid(row=2, column=1, padx=10, pady=20)
+
+
+
+        #wb_reporte = openpyxl.load_workbook(os.path.join(self.folderpath, self.seqrecord.id+'.xlsx'), read_only=True)
+
+        print('xd3')
+
+        def load_data():
+            df1 = pd.read_excel(os.path.join(self.folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Resumen', header=None)
+            df2 = pd.read_excel(os.path.join(self.folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Parámetros iniciales', header=None)
+            df3 = pd.read_excel(os.path.join(self.folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Grupos', header=None)
+            return df1, df2, df3
+
+        print('xd4')
+
+        def on_load_data():
+            df1, df2, df3 = self.df1, self.df2, self.df3
+            ###### Inicio Tab 1: Resumen #########
+
+            #hoja = wb_reporte['Resumen']
+
+            #ctk.CTkLabel(tab1, text=hoja['A1'].value, text_color="#000000").grid(row=0, column=0)
+            ctk.CTkLabel(tab1, text=df1.iat[0,0], text_color="#000000").grid(row=0, column=0, padx=5, sticky='e')
+
+            tab1.grid_rowconfigure(1, minsize=10)
+
+            ctk.CTkLabel(tab1, text=df1.iat[2,0], text_color="#000000").grid(row=2, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[2,1], text_color="#000000").grid(row=2, column=1, sticky='w')
+
+            ctk.CTkLabel(tab1, text=df1.iat[3,0], text_color="#000000").grid(row=3, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[3,1], text_color="#000000").grid(row=3, column=1, sticky='w')
+
+            ctk.CTkLabel(tab1, text=df1.iat[4,0], text_color="#000000").grid(row=4, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[4,1], text_color="#000000").grid(row=4, column=1, sticky='w')
+
+            tab1.grid_rowconfigure(5, minsize=10)
+
+            ctk.CTkLabel(tab1, text=df1.iat[6,0], text_color="#000000").grid(row=6, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[6,1], text_color="#000000").grid(row=6, column=1, sticky='w')
+
+            ctk.CTkLabel(tab1, text=df1.iat[7,0], text_color="#000000").grid(row=7, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[7,1], text_color="#000000").grid(row=7, column=1, sticky='w')
+
+            ctk.CTkLabel(tab1, text=df1.iat[8,0], text_color="#000000").grid(row=8, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[8,1], text_color="#000000").grid(row=8, column=1, sticky='w')
+
+            tab1.grid_rowconfigure(9, minsize=10)
+
+            ctk.CTkLabel(tab1, text=df1.iat[10,0], text_color="#000000").grid(row=10, column=0, sticky='e')
+            ctk.CTkLabel(tab1, text=df1.iat[10,1], text_color="#000000").grid(row=10, column=1, sticky='w')
+
+            if not pd.isna(df1.iat[10,1]):
+                tab1.grid_rowconfigure(11, minsize=10)
+
+                ctk.CTkLabel(tab1, text=df1.iat[12,0], text_color="#000000").grid(row=12, column=0, sticky='e')
+                ctk.CTkLabel(tab1, text=df1.iat[12,1], text_color="#000000").grid(row=12, column=1, sticky='w')
+                
+
+            ###### Fin Tab 1: Resumen #########
+            print('xd4.1')
+            ###### Inicio Tab 2: Parámetros #########
+
+            #hoja = wb_reporte['Parámetros iniciales']
+
+            ctk.CTkLabel(tab2, text=df2.iat[2,0], text_color="#000000").grid(row=0, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[2,1], text_color="#000000").grid(row=0, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[3,0], text_color="#000000").grid(row=1, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[3,1], text_color="#000000").grid(row=1, column=1, sticky='e')
+
+            tab2.grid_rowconfigure(2, minsize=10)
+
+            ctk.CTkLabel(tab2, text=df2.iat[5,0], text_color="#000000").grid(row=3, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[5,1], text_color="#000000").grid(row=3, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[6,0], text_color="#000000").grid(row=4, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[6,1], text_color="#000000").grid(row=4, column=1, sticky='e')
+
+            tab2.grid_rowconfigure(5, minsize=10)
+
+            ctk.CTkLabel(tab2, text=df2.iat[8,0], text_color="#000000").grid(row=6, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[8,1], text_color="#000000").grid(row=6, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[9,0], text_color="#000000").grid(row=7, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[9,1], text_color="#000000").grid(row=7, column=1, sticky='e')
+
+            tab2.grid_rowconfigure(8, minsize=10)
+
+            ctk.CTkLabel(tab2, text=df2.iat[11,0], text_color="#000000").grid(row=9, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[11,1], text_color="#000000").grid(row=9, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[12,0], text_color="#000000").grid(row=10, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[12,1], text_color="#000000").grid(row=10, column=1, sticky='e')
+
+            tab2.grid_rowconfigure(11, minsize=10)
+
+            ctk.CTkLabel(tab2, text=df2.iat[14,0], text_color="#000000").grid(row=12, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[14,1], text_color="#000000").grid(row=12, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[15,0], text_color="#000000").grid(row=13, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[15,1], text_color="#000000").grid(row=13, column=1, sticky='e')
+
+            tab2.grid_rowconfigure(14, minsize=10)
+
+            ctk.CTkLabel(tab2, text=df2.iat[17,0], text_color="#000000").grid(row=15, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[17,1], text_color="#000000").grid(row=15, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[18,0], text_color="#000000").grid(row=16, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[18,1], text_color="#000000").grid(row=16, column=1, sticky='e')
+
+            tab2.grid_rowconfigure(17, minsize=10)
+
+            ctk.CTkLabel(tab2, text=df2.iat[20,0], text_color="#000000").grid(row=18, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[20,1], text_color="#000000").grid(row=18, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[21,0], text_color="#000000").grid(row=19, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[21,1], text_color="#000000").grid(row=19, column=1, sticky='e')
+
+            ctk.CTkLabel(tab2, text=df2.iat[22,0], text_color="#000000").grid(row=20, column=0, sticky='e')
+            ctk.CTkLabel(tab2, text=df2.iat[22,1], text_color="#000000").grid(row=20, column=1, sticky='e')
+
+            #if len(hoja['A25'].value) > 2:
+            if not pd.isna(df2.iat[24,0]):
+
+                tab2.grid_rowconfigure(21, minsize=10)
+
+                ctk.CTkLabel(tab2, text=df2.iat[24,0], text_color="#000000").grid(row=22, column=0, sticky='e')
+
+                tab2.grid_rowconfigure(23, minsize=10)
+
+                ctk.CTkLabel(tab2, text=df2.iat[26,0], text_color="#000000").grid(row=24, column=0, sticky='e')
+                ctk.CTkLabel(tab2, text=df2.iat[26,1], text_color="#000000").grid(row=24, column=1, sticky='e')
+
+                ctk.CTkLabel(tab2, text=df2.iat[27,0], text_color="#000000").grid(row=25, column=0, sticky='e')
+                ctk.CTkLabel(tab2, text=df2.iat[27,1], text_color="#000000").grid(row=25, column=1, sticky='e')
+
+            ###### Fin Tab 2: Parámetros #########
+            print('xd4.2')
+            ###### Inicio Tab 3: Grupos #########
+
+            #hoja = wb_reporte['Resumen']
+
+            #if len(hoja['D1'].value) > 2:
+            if not pd.isna(df3.iat[0,0]):
+
+                # ctk.CTkLabel(tab3, text=df3.iat[0,0], text_color="#000000").grid(row=0, column=0)
+                # ctk.CTkLabel(tab3, text=df3.iat[0,1], text_color="#000000").grid(row=0, column=1)
+                # ctk.CTkLabel(tab3, text=df3.iat[0,2], text_color="#000000").grid(row=0, column=2)
+                # ctk.CTkLabel(tab3, text=df3.iat[0,3], text_color="#000000").grid(row=0, column=3)
+                # ctk.CTkLabel(tab3, text=df3.iat[0,4], text_color="#000000").grid(row=0, column=4)
+                ctk.CTkLabel(tab3, text="Grupo", text_color="#000000").grid(row=0, column=0)
+                ctk.CTkLabel(tab3, text="N° sondas", text_color="#000000").grid(row=0, column=1, padx=5)
+                ctk.CTkLabel(tab3, text="Tm", text_color="#000000").grid(row=0, column=2)
+                ctk.CTkLabel(tab3, text="%GC", text_color="#000000").grid(row=0, column=3, padx=5)
+                ctk.CTkLabel(tab3, text="Largo", text_color="#000000").grid(row=0, column=4)
+                continua = True
+                i = 1
+                while continua:
+                    ctk.CTkLabel(tab3, text=df3.iat[i,0], text_color="#000000").grid(row=i, column=0)
+                    ctk.CTkLabel(tab3, text=df3.iat[i,1], text_color="#000000").grid(row=i, column=1)
+                    ctk.CTkLabel(tab3, text=df3.iat[i,2], text_color="#000000").grid(row=i, column=2)
+                    ctk.CTkLabel(tab3, text=df3.iat[i,3], text_color="#000000").grid(row=i, column=3)
+                    ctk.CTkLabel(tab3, text=df3.iat[i,4], text_color="#000000").grid(row=i, column=4)
+                    #if hoja['D'+str(i+1)].value is None:
+                    #if pd.isna(df3.iat[i+1,0]):
+                    if len(df3) < i:
+                        continua = False
+                    i += 1
+
+                    
+            ###### Fin Tab 3: Parámetros #########
+
+        
+        threading.Thread(target=on_load_data).start()
+
+        print('xd5')
 
         def abrir_imagen():
             ventana = tk.Toplevel(root)
             ventana.geometry("700x400")
             Zoom_Advanced(ventana, path=os.path.join(self.folderpath, self.seqrecord.id+'.png'))
 
-        boton_imagen = customtkinter.CTkButton(self.frame, text="Visualizar transcritos", corner_radius=30, fg_color="#404040", command=abrir_imagen)
-        boton_imagen.pack(pady=20)
+        #boton_imagen = ctk.CTkButton(self.frame, text="Visualizar transcritos", corner_radius=30, fg_color="#404040", command=abrir_imagen)
+        #boton_imagen.grid(pady=20)
 
         def abrir_carpeta():
             sistema_operativo = platform.system()
@@ -708,8 +952,21 @@ class PantallaFinal(PantallaInicial):
             elif sistema_operativo == 'Linux':
                 os.system(f'xdg-open "{self.folderpath}"')
 
-        boton_carpeta = customtkinter.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
-        boton_carpeta.pack(pady=20)
+        #boton_carpeta = ctk.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
+        #boton_carpeta.pack(pady=20)
+
+        def guardar_xlsx():
+            opciones = {
+                'defaultextension': '.xlsx',  # Extensión predeterminada del archivo
+                'filetypes': [('Archivos Excel', '.xlsx')],  # Tipos de archivos permitidos
+                'initialfile': 'reporte_'+self.seqrecord.id+'.xlsx',  # Nombre predeterminado del archivo
+                'title': 'Guardar reporte de diseño',  # Título del diálogo
+            }
+            ruta_archivo = filedialog.asksaveasfilename(**opciones)
+
+            if ruta_archivo:
+                archivo_a_copiar = os.path.join(self.folderpath,self.seqrecord.id+".xlsx")
+                shutil.copy(archivo_a_copiar, ruta_archivo)
 
         def abrir_registro():
             self.ventana = tk.Toplevel(root)
@@ -719,15 +976,14 @@ class PantallaFinal(PantallaInicial):
             descripcion_label = tk.Label(self.ventana, text="Descripción del diseño:")
             descripcion_label.grid(row=1, column=0, padx=10, pady=10)
 
-            descripcion_entry = ttk.Entry(self.ventana)
+            descripcion_entry = ttk.Entry(self.ventana, width=40)
             descripcion_entry.grid(row=1, column=1, padx=10, pady=10)
             
-            boton_registrar = customtkinter.CTkButton(self.ventana, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=lambda: registrar_diseno(descripcion_entry.get()))
+            boton_registrar = ctk.CTkButton(self.ventana, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=lambda: registrar_diseno(descripcion_entry.get()))
             boton_registrar.grid(row=2, column=0, padx=20, pady=20)
 
-            boton_cancelar = customtkinter.CTkButton(self.ventana, text="Cancelar", corner_radius=30, fg_color="#7a7a7a", command=cancelar)
+            boton_cancelar = ctk.CTkButton(self.ventana, text="Cancelar", corner_radius=30, fg_color="#7a7a7a", command=cancelar)
             boton_cancelar.grid(row=2, column=1, padx=20, pady=20)
-
 
 
         def registrar_diseno(descripcion):
@@ -750,13 +1006,16 @@ class PantallaFinal(PantallaInicial):
         def cancelar():
             self.ventana.destroy()
 
-        boton_registrar = customtkinter.CTkButton(self.frame, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=abrir_registro)
-        boton_registrar.pack(pady=20)
+        frame_botones = ctk.CTkFrame(master=self.frame, bg_color="transparent")
+        frame_botones.grid(row=3, column=0, columnspan=2)
 
         #boton_volver = tk.Button(self.frame, text="Volver al inicio", command=self.volver_a_inicio)
-        boton_volver = customtkinter.CTkButton(self.frame, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio)
-        boton_volver.pack(pady=20)
+        ctk.CTkButton(frame_botones, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio).grid(row=0, column=0, padx=10)
 
+        ctk.CTkButton(frame_botones, text="Exportar a XLSX", corner_radius=30, fg_color="#7a7a7a", command=guardar_xlsx).grid(row=0, column=1, padx=10)
+
+        ctk.CTkButton(frame_botones, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=abrir_registro).grid(row=0, column=2, padx=10)
+        print('xd6')
         self.root.geometry("800x540")
 
     
@@ -764,11 +1023,15 @@ class PantallaFinal(PantallaInicial):
         app.mostrar_pantalla('inicial')
 
 
+
+
 class PantallaHistorial(PantallaInicial):
     def __init__(self, root):
         super().__init__(root)
 
     def crear_interfaz(self):
+        if not os.path.exists(os.path.join(os.getcwd(),'databases')):
+            os.makedirs(os.path.join(os.getcwd(),'databases'))
         conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
         cursor = conexion.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
@@ -817,19 +1080,19 @@ class PantallaHistorial(PantallaInicial):
         
         #fuente_titulo = font.Font(weight="bold", size=16)
         #historial_label = tk.Label(self.frame, text=f"Historial de paneles de sondas", font=fuente_titulo)
-        fuente_titulo = customtkinter.CTkFont(family='Helvetica', size=20, weight='bold')
-        historial_label = customtkinter.CTkLabel(self.frame, text=f"Historial de paneles de sondas", text_color="#000000", font=fuente_titulo)
+        fuente_titulo = ctk.CTkFont(family='Helvetica', size=20, weight='bold')
+        historial_label = ctk.CTkLabel(self.frame, text=f"Historial de paneles de sondas", text_color="#000000", font=fuente_titulo)
         historial_label.grid(row=0, column=0, padx=20, pady=20)
 
         #combobox_filtro = ttk.Combobox(self.frame, values=genes, state="readonly", width=maxlen(genes))
-        combobox_filtro = customtkinter.CTkComboBox(self.frame, values=genes, width=100, command=filtrar_descripcion)
+        combobox_filtro = ctk.CTkComboBox(self.frame, values=genes, width=100, command=filtrar_descripcion)
         combobox_filtro.grid(row=1, column=0, padx=20, pady=20)
 
         #boton_filtro = tk.Button(self.frame, text="Filtrar", command=filtrar_descripcion)
         #boton_filtro.grid(row=1, column=1, padx=20, pady=20)
 
         #texto_registros = tk.Text(self.frame, wrap=tk.WORD, width=100, height=20)
-        texto_registros = customtkinter.CTkTextbox(self.frame, width=600, text_color="#000000")
+        texto_registros = ctk.CTkTextbox(self.frame, width=600, text_color="#000000")
         texto_registros.grid(row=2, column=0, padx=20, pady=20)
 
         for registro in registros:
@@ -843,7 +1106,7 @@ class PantallaHistorial(PantallaInicial):
         texto_registros.configure(state="disabled")
 
         #boton_volver = tk.Button(self.frame, text="Volver", command=self.volver_a_seleccion)
-        boton_volver = customtkinter.CTkButton(self.frame, text="Volver", corner_radius=30, fg_color="#404040", command=self.volver_a_seleccion)
+        boton_volver = ctk.CTkButton(self.frame, text="Volver", corner_radius=30, fg_color="#404040", command=self.volver_a_seleccion)
         boton_volver.grid(row=3, column=0,columnspan=2, pady=20)
 
         self.root.geometry("800x600")
@@ -866,7 +1129,7 @@ class ControladorApp:
         }
         self.mostrar_pantalla("inicial")
 
-    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None, folderpath=None):
+    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None, folderpath=None, df1=None, df2=None, df3=None):
         # Ocultar pantalla actual
         if hasattr(self, "pantalla_actual"):
             self.pantalla_actual.frame.pack_forget()
@@ -883,7 +1146,7 @@ class ControladorApp:
             self.pantalla_actual.frame.pack(padx=50, pady=50)
             #self.root.after(200, lambda: self.disenar_sondas(seqrecord, transcripciones, dict_params, filepath))
         elif nombre == "final":
-            self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params, filepath, folderpath)
+            self.pantalla_actual = PantallaFinal(self.root, seqrecord, transcripciones, df, dict_params, filepath, folderpath, df1, df2, df3)
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "historial":
             self.pantalla_actual = PantallaHistorial(self.root)
@@ -928,7 +1191,7 @@ class ToolTip:
             self.tooltip = None
 
 
-class IntegerSelector(customtkinter.CTkFrame):
+class IntegerSelector(ctk.CTkFrame):
     def __init__(self, master, default_value=0, min_value=None, max_value=None, increment=1, **kwargs):
         super().__init__(master, **kwargs)
         
@@ -940,7 +1203,7 @@ class IntegerSelector(customtkinter.CTkFrame):
         self.valor.set(default_value)
         
         #self.btn_disminuir = tk.Button(self, text="-", command=self.disminuir)
-        self.btn_disminuir = customtkinter.CTkButton(master=self, text="-", fg_color="#404040", corner_radius=30, width=10, height=10,command=self.disminuir)
+        self.btn_disminuir = ctk.CTkButton(master=self, text="-", fg_color="#404040", corner_radius=30, width=10, height=10,command=self.disminuir)
         self.btn_disminuir.pack(side="left")
 
         self.entry = tk.Entry(self, textvariable=self.valor, validate="key", validatecommand=(self.register(self.validar), "%P"), width=15, justify='center')
@@ -948,8 +1211,13 @@ class IntegerSelector(customtkinter.CTkFrame):
         self.entry.pack(side="left", padx=5)
         
         #self.btn_aumentar = tk.Button(self, text="+", command=self.aumentar)
-        self.btn_aumentar = customtkinter.CTkButton(master=self, text="+", fg_color="#404040", corner_radius=30, width=15, height=10,command=self.aumentar)
+        self.btn_aumentar = ctk.CTkButton(master=self, text="+", fg_color="#404040", corner_radius=30, width=15, height=10,command=self.aumentar)
         self.btn_aumentar.pack(side="left")
+
+        self.entry.bind("<Up>", lambda event: self.aumentar())
+        self.entry.bind("<Down>", lambda event: self.disminuir())
+        self.entry.bind("<Right>", lambda event: self.aumentar())
+        self.entry.bind("<Left>", lambda event: self.disminuir())
     
     def validar(self, nuevo_valor):
         if nuevo_valor == "" or nuevo_valor.isdigit():
@@ -993,7 +1261,7 @@ class Zoom_Advanced(ttk.Frame):
     def __init__(self, mainframe, path):
         ''' Initialize the main Frame '''
         ttk.Frame.__init__(self, master=mainframe)
-        self.master.title('Visualizador de transcritos')
+        #self.master.title('Visualizador de transcritos')
         # Vertical and horizontal scrollbars for canvas
         vbar = AutoScrollbar(self.master, orient='vertical')
         hbar = AutoScrollbar(self.master, orient='horizontal')
@@ -1097,11 +1365,11 @@ class Zoom_Advanced(ttk.Frame):
             self.canvas.lower(imageid)  # set image into background
             self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
 
-
 if __name__ == "__main__":
-    customtkinter.set_appearance_mode("light")
+    ctk.set_appearance_mode("light")
     #root = tk.Tk()
-    root = customtkinter.CTk()
+    root = ctk.CTk()
+    root.state("zoomed")
     app = ControladorApp(root)
     root.iconbitmap(os.path.join("images", "gemini2.ico"))
     #root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file=os.path.join('images','gemini2.png')))

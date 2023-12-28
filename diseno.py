@@ -58,17 +58,17 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     #dg_hairpin = primer3.calcHairpin(str(seq)).dg
     if largo <= 60:
         if primer3.calcHairpin(str(seq)).dg < dgmin_hairpin:
-            print('Delta G hairpin')
+            #print('Delta G hairpin')
             return False
         if primer3.calcHomodimer(str(seq)).dg < dgmin_homodim:
-            print('Delta G homodim')
+            #print('Delta G homodim')
             return False
     else:
         if primer3.calcHairpin(str(seq[:60])).dg < dgmin_hairpin or primer3.calcHairpin(str(seq[60:])).dg < dgmin_hairpin:
-            print('Delta G hairpin')
+            #print('Delta G hairpin')
             return False
         if primer3.calcHomodimer(str(seq[:60])).dg < dgmin_homodim or primer3.calcHomodimer(str(seq[60:])).dg < dgmin_homodim:
-            print('Delta G homodim')
+            #print('Delta G homodim')
             return False
 
     
@@ -76,7 +76,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     bases = ['A', 'C', 'G', 'T']
     for b in bases:
         if b * (maxhomopol_simple + 1) in seq:
-            print('Homopolimero de 1 nucleotido')
+            #print('Homopolimero de 1 nucleotido')
             return False
         
     # Chequear homopolimeros de 2 bases
@@ -85,7 +85,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
         subseq = str(seq[i:i+2])
         if subseq not in checked:
             if subseq * (maxhomopol_double + 1) in seq:
-                print('Homopolimero de 2 nucleotidos')
+                #print('Homopolimero de 2 nucleotidos')
                 return False
             checked.append(subseq)
 
@@ -95,7 +95,7 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
         subseq = str(seq[i:i+3])
         if subseq not in checked:
             if subseq * (maxhomopol_triple + 1) in seq:
-                print('Homopolimero de 3 nucleotidos')
+                #print('Homopolimero de 3 nucleotidos')
                 return False
             checked.append(subseq)
     
@@ -609,71 +609,51 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     :param tiempo_diseno: Tiempo que demoró la ejecución en segundos
     :return: Nombre del archivo XLSX generado
     """
-    
+    if not os.path.exists(os.path.join(os.getcwd(),'sondas')):
+        os.makedirs(os.path.join(os.getcwd(),'sondas'))
+        
     wb = Workbook()
 
+    df_resumen = df.drop_duplicates(subset='sonda')
+    df_resumen = df_resumen[df_resumen['sonda'] != "AAA"]
+
     sheet1 = wb.active
-    sheet1.title = 'Parámetros iniciales'
+    sheet1.title = 'Resumen'
 
     sheet1.cell(row=1, column=1).value = 'Genes: '+str(genes)
 
-    sheet1.cell(row=3, column=1).value = 'Largo de sonda mínimo'
-    sheet1.cell(row=3, column=2).value = minlen
+    sheet1.cell(row=3, column=1).value = 'Número deseable de sondas'
+    sheet1.cell(row=3, column=2).value = df.shape[0]
 
-    sheet1.cell(row=4, column=1).value = 'Largo de sonda máximo'
-    sheet1.cell(row=4, column=2).value = maxlen
+    sheet1.cell(row=4, column=1).value = 'Número de sondas válidas'
+    sheet1.cell(row=4, column=2).value = df[df['sonda'] != "AAA"].shape[0]
 
-    sheet1.cell(row=6, column=1).value = 'Temp Melting mínima'
-    sheet1.cell(row=6, column=2).value = tmmin
+    sheet1.cell(row=5, column=1).value = 'Número de sondas diferentes'
+    sheet1.cell(row=5, column=2).value = df_resumen.shape[0]
 
-    sheet1.cell(row=7, column=1).value = 'Temp Melting máxima'
-    sheet1.cell(row=7, column=2).value = tmmax
+    sheet1.cell(row=7, column=1).value = 'Tm promedio'
+    sheet1.cell(row=7, column=2).value = str("{:.1f}").format(df_resumen['tm'].mean())+'°'
 
-    sheet1.cell(row=9, column=1).value = '%GC mínimo'
-    sheet1.cell(row=9, column=2).value = gcmin
+    sheet1.cell(row=8, column=1).value = '%GC promedio'
+    sheet1.cell(row=8, column=2).value = str("{:.1f}").format(df_resumen['gc'].mean())+'%'
 
-    sheet1.cell(row=10, column=1).value = '%GC máximo'
-    sheet1.cell(row=10, column=2).value = gcmax
-
-    sheet1.cell(row=12, column=1).value = 'Dist mínima al borde del exón'
-    sheet1.cell(row=12, column=2).value = mindist
-    
-    sheet1.cell(row=13, column=1).value = 'Dist máxima al borde del exón'
-    sheet1.cell(row=13, column=2).value = maxdist
-
-    sheet1.cell(row=15, column=1).value = 'Sobrelape mínimo'
-    sheet1.cell(row=15, column=2).value = minoverlap
-
-    sheet1.cell(row=16, column=1).value = 'Sobrelape máximo'
-    sheet1.cell(row=16, column=2).value = maxoverlap
-
-    sheet1.cell(row=18, column=1).value = 'Delta G hairpin mínimo permitido'
-    sheet1.cell(row=18, column=2).value = dgmin_hairpin
-
-    sheet1.cell(row=19, column=1).value = 'Delta G homodimero mínimo permitido'
-    sheet1.cell(row=19, column=2).value = dgmin_homodim
-
-    sheet1.cell(row=21, column=1).value = 'Máximo homopolímeros simples permitidos'
-    sheet1.cell(row=21, column=2).value = maxhomopol_simple
-
-    sheet1.cell(row=22, column=1).value = 'Máximo homopolímeros dobles permitidos'
-    sheet1.cell(row=22, column=2).value = maxhomopol_double
-
-    sheet1.cell(row=23, column=1).value = 'Máximo homopolímeros triples permitidos'
-    sheet1.cell(row=23, column=2).value = maxhomopol_triple
+    sheet1.cell(row=9, column=1).value = 'Largo promedio'
+    sheet1.cell(row=9, column=2).value = str("{:.1f}").format(df_resumen['largo'].mean())+' nt'
 
     if multiplex:
-        sheet1.cell(row=25, column=1).value = 'Criterios de multiplexación'
-        sheet1.cell(row=27, column=1).value = 'Diferencia máxima de Temp Melting'
-        sheet1.cell(row=27, column=2).value = maxdt
+        sheet1.cell(row=13, column=1).value = 'Número de grupos (multiplex)'
+        sheet1.cell(row=13, column=2).value = int(df_resumen['grupo'].max())
 
-        sheet1.cell(row=28, column=1).value = 'Mínimo delta G heterodimerización'
-        sheet1.cell(row=28, column=2).value = mindg
+
+    h1, m1, s1 = segundos_a_hms(tiempo_diseno)
+    sheet1.cell(row=11, column=1).value = 'Tiempo de ejecución'
+    sheet1.cell(row=11, column=2).value = str(h1)+':'+str(m1)+':'+str(s1)
 
     for cell in sheet1['A']:
         cell.style = 'Pandas'
     for cell in sheet1['B']:
         cell.style = 'Pandas'
+
 
     for column_cells in sheet1.columns:
         max_length = 2
@@ -687,110 +667,69 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
         adjusted_width = (max_length + 2) * 1.2
         sheet1.column_dimensions[column].width = adjusted_width
 
+    sheet2 = wb.create_sheet("Parámetros iniciales")
 
-    sheet2 = wb.create_sheet("Sondas")
-    for r in dataframe_to_rows(df, index=False, header=True):
-        sheet2.append(r)
+    sheet2.cell(row=1, column=1).value = 'Parámetros iniciales'
 
-    for cell in sheet2['A'] + sheet2[1]:
+    sheet2.cell(row=3, column=1).value = 'Largo de sonda mínimo'
+    sheet2.cell(row=3, column=2).value = minlen
+
+    sheet2.cell(row=4, column=1).value = 'Largo de sonda máximo'
+    sheet2.cell(row=4, column=2).value = maxlen
+
+    sheet2.cell(row=6, column=1).value = 'Temp Melting mínima'
+    sheet2.cell(row=6, column=2).value = tmmin
+
+    sheet2.cell(row=7, column=1).value = 'Temp Melting máxima'
+    sheet2.cell(row=7, column=2).value = tmmax
+
+    sheet2.cell(row=9, column=1).value = '%GC mínimo'
+    sheet2.cell(row=9, column=2).value = gcmin
+
+    sheet2.cell(row=10, column=1).value = '%GC máximo'
+    sheet2.cell(row=10, column=2).value = gcmax
+
+    sheet2.cell(row=12, column=1).value = 'Dist mínima al borde del exón'
+    sheet2.cell(row=12, column=2).value = mindist
+    
+    sheet2.cell(row=13, column=1).value = 'Dist máxima al borde del exón'
+    sheet2.cell(row=13, column=2).value = maxdist
+
+    sheet2.cell(row=15, column=1).value = 'Sobrelape mínimo'
+    sheet2.cell(row=15, column=2).value = minoverlap
+
+    sheet2.cell(row=16, column=1).value = 'Sobrelape máximo'
+    sheet2.cell(row=16, column=2).value = maxoverlap
+
+    sheet2.cell(row=18, column=1).value = 'Delta G hairpin mínimo permitido'
+    sheet2.cell(row=18, column=2).value = dgmin_hairpin
+
+    sheet2.cell(row=19, column=1).value = 'Delta G homodimero mínimo permitido'
+    sheet2.cell(row=19, column=2).value = dgmin_homodim
+
+    sheet2.cell(row=21, column=1).value = 'Máximo homopolímeros simples permitidos'
+    sheet2.cell(row=21, column=2).value = maxhomopol_simple
+
+    sheet2.cell(row=22, column=1).value = 'Máximo homopolímeros dobles permitidos'
+    sheet2.cell(row=22, column=2).value = maxhomopol_double
+
+    sheet2.cell(row=23, column=1).value = 'Máximo homopolímeros triples permitidos'
+    sheet2.cell(row=23, column=2).value = maxhomopol_triple
+
+    if multiplex:
+        sheet2.cell(row=25, column=1).value = 'Criterios de multiplexación'
+        sheet2.cell(row=27, column=1).value = 'Diferencia máxima de Temp Melting'
+        sheet2.cell(row=27, column=2).value = maxdt
+
+        sheet2.cell(row=28, column=1).value = 'Mínimo delta G heterodimerización'
+        sheet2.cell(row=28, column=2).value = mindg
+
+    for cell in sheet2['A']:
+        cell.style = 'Pandas'
+    for cell in sheet2['B']:
         cell.style = 'Pandas'
 
-    #Ajustar ancho de columnas
     for column_cells in sheet2.columns:
-        max_length = 2
-        column = column_cells[0].column_letter
-        for cell in column_cells:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(cell.value)
-            except:
-                pass
-        adjusted_width = (max_length + 2) * 1.2
-        sheet2.column_dimensions[column].width = adjusted_width
-
-
-    df_resumen = df.drop_duplicates(subset='sonda')
-    df_resumen = df_resumen[df_resumen['sonda'] != "AAA"]
-    sheet3 = wb.create_sheet("Resumen")
-    for r in dataframe_to_rows(df_resumen, index=False, header=True):
-        sheet3.append(r)
-
-    for cell in sheet3['A'] + sheet3[1]:
-        cell.style = 'Pandas'
-
-    #Ajustar ancho de columnas
-    for column_cells in sheet3.columns:
-        max_length = 2
-        column = column_cells[0].column_letter
-        for cell in column_cells:
-            try:
-                if len(str(cell.value)) > max_length:
-                    max_length = len(cell.value)
-            except:
-                pass
-        adjusted_width = (max_length + 2) * 1.2
-        sheet3.column_dimensions[column].width = adjusted_width
-
-    sheet4 = wb.create_sheet("Información")
-
-    sheet4.cell(row=1, column=1).value = 'Número deseable de sondas'
-    sheet4.cell(row=1, column=2).value = df.shape[0]
-
-    sheet4.cell(row=2, column=1).value = 'Número de sondas válidas'
-    sheet4.cell(row=2, column=2).value = df[df['sonda'] != "AAA"].shape[0]
-
-    sheet4.cell(row=3, column=1).value = 'Número de sondas diferentes'
-    sheet4.cell(row=3, column=2).value = df_resumen.shape[0]
-
-    sheet4.cell(row=5, column=1).value = 'Tm promedio'
-    sheet4.cell(row=5, column=2).value = str("{:.1f}").format(df_resumen['tm'].mean())+'°'
-
-    sheet4.cell(row=6, column=1).value = '%GC promedio'
-    sheet4.cell(row=6, column=2).value = str("{:.1f}").format(df_resumen['gc'].mean())+'%'
-
-    sheet4.cell(row=7, column=1).value = 'Largo promedio'
-    sheet4.cell(row=7, column=2).value = str("{:.1f}").format(df_resumen['largo'].mean())+' nt'
-
-    if multiplex:
-        sheet4.cell(row=8, column=1).value = 'Número de grupos (multiplex)'
-        sheet4.cell(row=8, column=2).value = int(df_resumen['grupo'].max())
-
-        sheet4.cell(row=1, column=4).value = 'GRUPO'  
-        sheet4.cell(row=1, column=5).value = 'Cantidad de sondas'
-        sheet4.cell(row=1, column=6).value = 'Tm promedio'
-        sheet4.cell(row=1, column=7).value = '%GC promedio'
-        sheet4.cell(row=1, column=8).value = 'Largo promedio'
-
-        for i in range(int(df_resumen['grupo'].max())):
-            grupo = i+1
-            sheet4.cell(row=1+grupo, column=4).value = grupo
-            sheet4.cell(row=1+grupo, column=5).value = df_resumen[df_resumen['grupo'] == grupo]['grupo'].count()
-            sheet4.cell(row=1+grupo, column=6).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['tm'].mean())
-            sheet4.cell(row=1+grupo, column=7).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['gc'].mean())
-            sheet4.cell(row=1+grupo, column=8).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['largo'].mean())
-
-
-    h1, m1, s1 = segundos_a_hms(tiempo_diseno)
-    sheet4.cell(row=10, column=1).value = 'Tiempo de ejecución'
-    sheet4.cell(row=10, column=2).value = str(h1)+':'+str(m1)+':'+str(s1)
-
-    for cell in sheet4['A']:
-        cell.style = 'Pandas'
-    for cell in sheet4['B']:
-        cell.style = 'Pandas'
-    if multiplex:
-        for cell in sheet4['D']:
-            cell.style = 'Pandas'
-        for cell in sheet4['E']:
-            cell.style = 'Pandas'
-        for cell in sheet4['F']:
-            cell.style = 'Pandas'
-        for cell in sheet4['G']:
-            cell.style = 'Pandas'
-        for cell in sheet4['H']:
-            cell.style = 'Pandas'
-
-    for column_cells in sheet4.columns:
         max_length = 2
         column = column_cells[0].column_letter
         for cell in column_cells:
@@ -800,7 +739,88 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
             except:
                 pass
         adjusted_width = (max_length + 2) * 1.2
+        sheet2.column_dimensions[column].width = adjusted_width
+
+
+    sheet3 = wb.create_sheet("Grupos")
+
+    sheet3.cell(row=1, column=1).value = 'GRUPO'  
+    sheet3.cell(row=1, column=2).value = 'Cantidad de sondas'
+    sheet3.cell(row=1, column=3).value = 'Tm promedio'
+    sheet3.cell(row=1, column=4).value = '%GC promedio'
+    sheet3.cell(row=1, column=5).value = 'Largo promedio'
+
+    for i in range(int(df_resumen['grupo'].max())):
+        grupo = i+1
+        sheet3.cell(row=1+grupo, column=1).value = grupo
+        sheet3.cell(row=1+grupo, column=2).value = df_resumen[df_resumen['grupo'] == grupo]['grupo'].count()
+        sheet3.cell(row=1+grupo, column=3).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['tm'].mean())
+        sheet3.cell(row=1+grupo, column=4).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['gc'].mean())
+        sheet3.cell(row=1+grupo, column=5).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['largo'].mean())
+
+    for cell in sheet3['A']:
+        cell.style = 'Pandas'
+    for cell in sheet3['B']:
+        cell.style = 'Pandas'
+    for cell in sheet3['C']:
+        cell.style = 'Pandas'
+    for cell in sheet3['D']:
+        cell.style = 'Pandas'
+    for cell in sheet3['E']:
+        cell.style = 'Pandas'
+
+    for column_cells in sheet3.columns:
+        max_length = 2
+        column = column_cells[0].column_letter
+        for cell in column_cells:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        sheet3.column_dimensions[column].width = adjusted_width
+
+    sheet4 = wb.create_sheet("Sondas")
+    for r in dataframe_to_rows(df, index=False, header=True):
+        sheet4.append(r)
+
+    for cell in sheet4['A'] + sheet4[1]:
+        cell.style = 'Pandas'
+
+    #Ajustar ancho de columnas
+    for column_cells in sheet4.columns:
+        max_length = 2
+        column = column_cells[0].column_letter
+        for cell in column_cells:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
         sheet4.column_dimensions[column].width = adjusted_width
+
+
+    sheet5 = wb.create_sheet("Sondas filtradas")
+    for r in dataframe_to_rows(df_resumen, index=False, header=True):
+        sheet5.append(r)
+
+    for cell in sheet5['A'] + sheet5[1]:
+        cell.style = 'Pandas'
+
+    #Ajustar ancho de columnas
+    for column_cells in sheet5.columns:
+        max_length = 2
+        column = column_cells[0].column_letter
+        for cell in column_cells:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        sheet5.column_dimensions[column].width = adjusted_width
 
     now = datetime.now()
     filename = name+'_'+now.strftime("%Y%m%d_%H%M%S")
