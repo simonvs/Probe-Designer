@@ -83,7 +83,7 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
         exones = row['exones']
         empalmes = row['empalmes']
         for start, end in exones:
-            ax.add_patch(plt.Rectangle((start, idx-0.15), end - start, 0.3, color='gray'))
+            ax.add_patch(plt.Rectangle((start, idx-0.15), end - start, 0.2, color='gray'))
             xmin = min(xmin, start)
             xmax = max(xmax, end)
 
@@ -92,12 +92,12 @@ def plot_isoforms(record, transcripts, empalmes_array, foldername):
             mitad = (line_end+line_start)/2
             ax.plot([line_start, mitad], [idx, idx+0.1], color='red')
             ax.plot([mitad, line_end], [idx+0.1, idx], color='red')
-            ax.text(mitad, idx + 0.15, id_empalme, fontsize=7 ,ha='center', va='bottom', color='red')
+            ax.text(mitad, idx + 0.15, id_empalme, fontsize=9 ,ha='center', va='bottom', color='red')
         
         
 
     ax.set_xlim(xmin-500, xmax+500)
-    ax.set_ylim(-0.7, len(transcripts))
+    ax.set_ylim(-0.6, len(transcripts)-0.5)
     ax.set_yticks(yticks)
     ax.set_yticklabels(yticklabels)
     ax.set_xlabel('Posición')
@@ -111,7 +111,7 @@ def plot_show():
     plt.show()
 
 if __name__ == "__main__":
-    sequence_data = descarga.parse_file_to_seqrecord('files/tp53.gb')
+    sequence_data = descarga.parse_file_to_seqrecord('files/NG_008604.gbk')
     plot_isoforms(sequence_data, get_all_transcripts(sequence_data), get_splicings(sequence_data, get_all_transcripts(sequence_data)),"images")
 
 
