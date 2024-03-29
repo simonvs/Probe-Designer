@@ -1084,14 +1084,15 @@ class PantallaFinal(PantallaInicial):
             conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
             cursor = conn.cursor()
             cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
-                                id INTEGER PRIMARY KEY,
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                accnum TEXT,
                                 descripcion TEXT,
                                 secuencia TEXT,
                                 genes TEXT,
                                 fecha_hora DATETIME,
                                 carpeta TEXT)''')
             
-            cursor.execute("INSERT INTO sondas (genes, descripcion, fecha_hora, secuencia,    carpeta) VALUES (?,?,?,?,?)", (str(self.seqrecord.id)+" | "+str(self.seqrecord.description), descripcion, str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now(), self.folderpath))
+            cursor.execute("INSERT INTO sondas (accnum, secuencia, descripcion, genes, fecha_hora, carpeta) VALUES (?,?,?,?,?,?)", (str(self.seqrecord.id), str(self.seqrecord.description), descripcion, str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.folderpath))
             conn.commit()
             conn.close()
             self.ventana.destroy()
@@ -1127,12 +1128,13 @@ class PantallaHistorial(PantallaInicial):
         conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
         cursor = conexion.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            descripcion TEXT,
-                            secuencia TEXT,
-                            genes TEXT,
-                            fecha_hora DATETIME,
-                            carpeta TEXT)''')
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                accnum TEXT,
+                                descripcion TEXT,
+                                secuencia TEXT,
+                                genes TEXT,
+                                fecha_hora DATETIME,
+                                carpeta TEXT)''')
         cursor.execute("SELECT * FROM sondas ORDER BY id DESC")
         registros = cursor.fetchall()
         #conexion.close()
@@ -1158,16 +1160,16 @@ class PantallaHistorial(PantallaInicial):
             registros = cursor.fetchall()
             conexion.close()
 
-            texto_registros.configure(state="normal")
-            texto_registros.delete("0.0", "end")
-            for registro in registros:
-                texto_registros.insert("end", f"ID: {registro[0]}\n")
-                texto_registros.insert("end", f"Descripción: {registro[1]}\n")
-                texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
-                texto_registros.insert("end", f"Genes: {registro[3]}\n")
-                texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
-                texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
-            texto_registros.configure(state="disabled")
+            # texto_registros.configure(state="normal")
+            # texto_registros.delete("0.0", "end")
+            # for registro in registros:
+            #     texto_registros.insert("end", f"ID: {registro[0]}\n")
+            #     texto_registros.insert("end", f"Descripción: {registro[1]}\n")
+            #     texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
+            #     texto_registros.insert("end", f"Genes: {registro[3]}\n")
+            #     texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
+            #     texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
+            # texto_registros.configure(state="disabled")
 
         
         #fuente_titulo = font.Font(weight="bold", size=16)
@@ -1187,23 +1189,32 @@ class PantallaHistorial(PantallaInicial):
             print(f"ID: {id}")
 
         def actualizar_tabla():
-            # Limpiar la tabla antes de volver a cargar los datos
-            for row in tree.get_children():
-                tree.delete(row)
 
             # Obtener los datos de la base de datos y mostrarlos en la tabla
             cursor.execute("SELECT * FROM sondas ORDER BY id DESC")
             for row in cursor.fetchall():
                 # Para cada registro, agregar una fila en la tabla con dos botones
-                index = tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5]))
+                
+                button_label = ttk.Button(tree, text="Ver", command=lambda row_id=row[0]: mostrar_id(row_id))
+                #button_label = ttk.Label(tree, text="Ver", cursor="hand2")
+                #button_label.bind("<Button-1>", lambda event: mostrar_id(row[0]))
+                #tree.window_create("", window=button_label, anchor="w", tags=("button",))
+                
+                button_label2 = ttk.Button(tree, text="Eliminar", command=lambda row_id=row[0]: eliminar_registro(row_id))
+                #button_label2 = ttk.Label(tree, text="Eliminar", cursor="hand2")
+                #button_label2.bind("<Button-1>", lambda event: eliminar_registro(row[0]))
+                #tree.window_create("", window=button_label, anchor="w", tags=("button",))
+
+                tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5], button_label, button_label2))
+
                 # Botón para mostrar la edad
-                btn_mostrar = tk.Button(root, text="Ver", command=lambda id=row[0]: mostrar_id(id))
-                btn_mostrar.grid(row=tree.index(index), column=3)
+                #btn_mostrar = tk.Button(self.frame, text="Ver", command=lambda id=row[0]: mostrar_id(id))
+                #btn_mostrar.grid(row=tree.index(index), column=3)
                 # Botón para eliminar el registro
-                btn_eliminar = tk.Button(root, text="X", command=lambda id_registro=row[0]: eliminar_registro(id_registro))
-                btn_eliminar.grid(row=tree.index(index), column=4)
+                #btn_eliminar = tk.Button(self.frame, text="X", command=lambda id_registro=row[0]: eliminar_registro(id_registro))
+                #btn_eliminar.grid(row=tree.index(index), column=4)
             for col in tree["columns"]:
-                tree.column(col, width=80)
+                tree.column(col, width=120)
             
         # Función para eliminar un registro
         def eliminar_registro(id_registro):
@@ -1212,45 +1223,64 @@ class PantallaHistorial(PantallaInicial):
             actualizar_tabla()
 
         tree = ttk.Treeview(self.frame, columns=("ID", "Genes", "Fecha y hora", "Descripción", "Transcritos", "N° Grupos", "Acciones"), show="headings")
-        tree.heading("ID", text="ID")
-        tree.heading("Genes", text="Genes")
-        tree.heading("Descripción", text="Descripción")
-        tree.heading("Fecha y hora", text="Fecha y hora")        
-        tree.heading("Transcritos", text="Transcritos")
-        tree.heading("N° Grupos", text="N° Grupos")
-        tree.grid(row=2,column=0,padx=10,pady=10)
-
-        cursor.execute("SELECT * FROM sondas ORDER BY id DESC")
-        for row in cursor.fetchall():
-            # Para cada registro, agregar una fila en la tabla con dos botones
-            index = tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5]))
-
-            btn_mostrar = tk.Button(self.frame, text="Ver", command=lambda id=row[0]: mostrar_id(id))
-            btn_mostrar.grid(row=tree.index(index), column=3)
-
-            btn_eliminar = tk.Button(root, text="X", command=lambda id_registro=row[0]: eliminar_registro(id_registro))
-            btn_eliminar.grid(row=tree.index(index), column=4)
-        for col in tree["columns"]:
-            tree.column(col, width=80)
+        # tree.heading("ID", text="ID")
+        # tree.heading("Genes", text="Genes")
+        # tree.heading("Descripción", text="Descripción")
+        # tree.heading("Fecha y hora", text="Fecha y hora")        
+        # tree.heading("Transcritos", text="Transcritos")
+        # tree.heading("N° Grupos", text="N° Grupos")
+        # tree.grid(row=2,column=0,padx=10,pady=10)
 
 
-        #texto_registros = tk.Text(self.frame, wrap=tk.WORD, width=100, height=20)
-        texto_registros = ctk.CTkTextbox(self.frame, width=600, text_color="#000000")
-        #texto_registros.grid(row=2, column=0, padx=20, pady=20)
+        data_table = DataTable(self.frame)
+        data_table.grid(row=2,column=0)
+
+            #row_id = tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5]))
+
+            #button_frame = ttk.Frame(tree)
+            #button = ttk.Button(button_frame, text="Editar", command=lambda row_id=row_id: mostrar_id(row_id))
+            #button.pack(fill="both", expand=True)
+            #tree.attach_widget(row_id, "#0", button_frame)
+
+            #button_label = ttk.Button(tree, text="Ver", command=lambda row_id=row[0]: mostrar_id(row_id))
+            #button_label.bind("<Button-1>", lambda event: mostrar_id(row[0]))
+            #tree.window_create("", window=button_label, anchor="w", tags=("button",))
+            #tree.insert(index, "end", values=(None, None, None, None, None, None, button_label))
+
+            #button_label2 = ttk.Button(tree, text="Eliminar", command=lambda row_id=row[0]: eliminar_registro(row_id))
+            #button_label2.bind("<Button-1>", lambda event: eliminar_registro(row[0]))
+            #tree.window_create("", window=button_label, anchor="w", tags=("button",))
+            #tree.insert(index, "end", values=(None, None, None, None, None, None, None, button_label2))
+
+            #tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5], button_label, button_label2))
+
+            #btn_mostrar = tk.Button(self.frame, text="Ver", command=lambda id=row[0]: mostrar_id(id))
+            #btn_mostrar.grid(row=tree.index(index), column=3)
+
+            #btn_eliminar = tk.Button(self.frame, text="X", command=lambda id_registro=row[0]: eliminar_registro(id_registro))
+            #btn_eliminar.grid(row=tree.index(index), column=4)
+
+        #for col in tree["columns"]:
+            #tree.column(col, width=120, stretch=False)
+
+
+        # #texto_registros = tk.Text(self.frame, wrap=tk.WORD, width=100, height=20)
+        # texto_registros = ctk.CTkTextbox(self.frame, width=600, text_color="#000000")
+        # #texto_registros.grid(row=2, column=0, padx=20, pady=20)
     
-        for registro in registros:
-            texto_registros.insert("end", f"ID: {registro[0]}\n")
-            texto_registros.insert("end", f"Descripción: {registro[1]}\n")
-            texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
-            texto_registros.insert("end", f"Genes: {registro[3]}\n")
-            texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
-            texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
+        # for registro in registros:
+        #     texto_registros.insert("end", f"ID: {registro[0]}\n")
+        #     texto_registros.insert("end", f"Descripción: {registro[1]}\n")
+        #     texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
+        #     texto_registros.insert("end", f"Genes: {registro[3]}\n")
+        #     texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
+        #     texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
         
-        texto_registros.configure(state="disabled")
+        # texto_registros.configure(state="disabled")
 
         #boton_volver = tk.Button(self.frame, text="Volver", command=self.volver_a_seleccion)
         boton_volver = ctk.CTkButton(self.frame, text="Volver", corner_radius=30, fg_color="#404040", command=self.volver_a_seleccion)
-        boton_volver.grid(row=3, column=0,columnspan=2, pady=20)
+        boton_volver.grid(row=4, column=0,columnspan=2, pady=20)
 
         self.root.geometry("800x600")
 
@@ -1258,6 +1288,165 @@ class PantallaHistorial(PantallaInicial):
     def volver_a_seleccion(self):
         app.mostrar_pantalla("inicial")
 
+class PantallaRegistro(PantallaInicial):
+    def __init__(self, root, folderpath, genes, accnum):
+        self.folderpath = folderpath
+        self.genes = genes
+        self.accnum = accnum
+        super().__init__(root)
+
+    def crear_interfaz(self):
+        fuente_negrita = ctk.CTkFont(family='Helvetica', weight='bold')
+        resultado_label = ctk.CTkLabel(self.frame, text=f"Sondas diseñadas para {self.genes}", text_color="#000000", font=fuente_negrita)
+        resultado_label.grid(row=0, column=0, columnspan=2, padx=20, pady=20)
+
+        carpeta_label = ctk.CTkLabel(self.frame, text=f"El reporte, la imagen y el archivo GenBank se almacenaron en\n" + self.folderpath, text_color="#000000")
+        carpeta_label.grid(row=1, column=0, columnspan=2, padx=20, pady=20)
+
+        img_frame = ttk.Frame(self.frame, width=1300, height=700)
+        img_frame.grid(row=2, column=0, padx=10, pady=20)
+        Zoom_Advanced(mainframe=img_frame, path=os.path.join(self.folderpath, self.accnum+'.png'))
+
+        tabview = ttk.Notebook(self.frame, width=400, height=400)
+        tab1 = ttk.Frame(tabview)
+        tab2 = ttk.Frame(tabview)
+        tabview.add(tab1, text='Resumen')
+        tabview.add(tab2, text='Parámetros')
+        tabview.grid(row=2, column=1, padx=10, pady=20)
+
+        xls = pd.ExcelFile(os.path.join(self.folderpath, self.accnum+'.xlsx'))
+        hojas_excel = {}
+        for nombre_hoja in xls.sheet_names:
+            hojas_excel[nombre_hoja] = pd.read_excel(os.path.join(self.folderpath, self.accnum+'.xlsx'), sheet_name=nombre_hoja)
+
+        #wb_reporte = openpyxl.load_workbook(os.path.join(self.folderpath, self.accnum+'.xlsx'), read_only=True)
+        #hoja = wb_reporte['Resumen']
+            
+        def on_load_data():
+            canvas1 = tk.Canvas(tab1)
+            y_scrollbar = tk.Scrollbar(tab1, orient='vertical', command=canvas1.yview)
+            y_scrollbar.pack(side='right', fill='y')
+            canvas1.configure(yscrollcommand=y_scrollbar.set)
+            canvas1.pack(side='left', fill='both', expand=True)
+
+            ###### Inicio Tab 1: Resumen #########
+
+            a=[1,2,3,5,6,7,9]
+
+            tk.Label(canvas1,text=hojas_excel["Resumen"].columns[0]).grid(row=0, column=0, sticky='e')
+
+            for i in a:
+                tk.Label(canvas1,text=hojas_excel["Resumen"].iat[i,0]).grid(row=i+1, column=0, sticky='e')
+                tk.Label(canvas1,text=hojas_excel["Resumen"].iat[i,1]).grid(row=i+1, column=1, sticky='w', padx=10)
+
+            canvas1.grid_rowconfigure(1, minsize=10)
+            canvas1.grid_rowconfigure(5, minsize=10)
+            canvas1.grid_rowconfigure(9, minsize=10)
+
+            multiplex = not hojas_excel["Grupos"].empty
+            
+            if multiplex:
+                canvas1.grid_rowconfigure(11, minsize=10)
+                tk.Label(canvas1,text=hojas_excel["Resumen"].iat[11,0]).grid(row=12, column=0, sticky='e')
+                tk.Label(canvas1,text=hojas_excel["Resumen"].iat[11,1]).grid(row=12, column=1, sticky='w', padx=10)
+
+            ###### Inicio Tab 2: Parámetros #########
+                
+            canvas2 = tk.Canvas(tab2)
+            y_scrollbar = tk.Scrollbar(tab2, orient='vertical', command=canvas2.yview)
+            y_scrollbar.pack(side='right', fill='y')
+            canvas2.configure(yscrollcommand=y_scrollbar.set)
+            canvas2.pack(side='left', fill='both', expand=True)
+                
+            a=[1,2,4,5,7,8,10,11,13,14,16,17,19,20,21]
+
+            for i in a:
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[i,0]).grid(row=i+1, column=0, sticky='e')
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[i,1]).grid(row=i+1, column=1, sticky='w', padx=10)
+
+            canvas2.grid_rowconfigure(4, minsize=10)
+            canvas2.grid_rowconfigure(7, minsize=10)
+            canvas2.grid_rowconfigure(10, minsize=10)
+            canvas2.grid_rowconfigure(13, minsize=10)
+            canvas2.grid_rowconfigure(16, minsize=10)
+            canvas2.grid_rowconfigure(19, minsize=10)
+            canvas2.grid_rowconfigure(23, minsize=10)
+            
+            if multiplex:
+                canvas2.grid_rowconfigure(25, minsize=10)
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[23,0]).grid(row=24, column=0, sticky='e')
+                
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[25,0]).grid(row=26, column=0, sticky='w', padx=10)
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[25,1]).grid(row=26, column=1, sticky='w', padx=10)
+
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[26,0]).grid(row=27, column=0, sticky='w', padx=10)
+                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[26,1]).grid(row=27, column=1, sticky='w', padx=10)
+
+            ###### Inicio Tab 3: Grupos #########
+            if multiplex:
+                tab3 = ttk.Frame(tabview)
+                tabview.add(tab3, text='Grupos')
+                canvas3 = tk.Canvas(tab3)
+                y_scrollbar = tk.Scrollbar(tab3, orient='vertical', command=canvas3.yview)
+                y_scrollbar.pack(side='right', fill='y')
+                canvas3.configure(yscrollcommand=y_scrollbar.set)
+                canvas3.pack(side='left', fill='both', expand=True)
+
+                tk.Label(canvas3,text='Grupo').grid(row=0, column=0, padx=20, pady=20)
+                tk.Label(canvas3,text='N° Sondas').grid(row=0, column=1, padx=20, pady=20)
+                tk.Label(canvas3,text='Tm').grid(row=0, column=2, padx=20, pady=20)
+                tk.Label(canvas3,text='%GC').grid(row=0, column=3, padx=20, pady=20)
+                tk.Label(canvas3,text='Largo').grid(row=0, column=4, padx=20, pady=20)
+
+                for i in range(int(hojas_excel["Grupos"]['GRUPO'].max())):
+                    grupo = i+1
+                    tk.Label(canvas3,text=hojas_excel["Grupos"].iat[i,0]).grid(row=1+grupo, column=0)
+                    tk.Label(canvas3,text=hojas_excel["Grupos"].iat[i,1]).grid(row=1+grupo, column=1)
+                    tk.Label(canvas3,text=hojas_excel["Grupos"].iat[i,2]).grid(row=1+grupo, column=2)
+                    tk.Label(canvas3,text=hojas_excel["Grupos"].iat[i,3]).grid(row=1+grupo, column=3)
+                    tk.Label(canvas3,text=hojas_excel["Grupos"].iat[i,4]).grid(row=1+grupo, column=4)
+            
+        def guardar_xlsx():
+            opciones = {
+                'defaultextension': '.xlsx',  # Extensión predeterminada del archivo
+                'filetypes': [('Archivos Excel', '.xlsx')],  # Tipos de archivos permitidos
+                'initialfile': 'reporte_'+self.accnum+'.xlsx',  # Nombre predeterminado del archivo
+                'title': 'Guardar reporte de diseño',  # Título del diálogo
+            }
+            ruta_archivo = filedialog.asksaveasfilename(**opciones)
+
+            if ruta_archivo:
+                archivo_a_copiar = os.path.join(self.folderpath,self.accnum+".xlsx")
+                shutil.copy(archivo_a_copiar, ruta_archivo)
+        
+        self.root.geometry("800x540")
+        threading.Thread(target=on_load_data).start()
+
+        def abrir_carpeta():
+            sistema_operativo = platform.system()
+            if sistema_operativo == 'Windows':
+                os.system(f'explorer "{self.folderpath}"')
+            elif sistema_operativo == 'Darwin':  # macOS
+                os.system(f'open "{self.folderpath}"')
+            elif sistema_operativo == 'Linux':
+                os.system(f'xdg-open "{self.folderpath}"')
+
+        frame_botones = ctk.CTkFrame(master=self.frame, bg_color="transparent")
+        frame_botones.grid(row=3, column=0, columnspan=2)
+        
+        ctk.CTkButton(frame_botones, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio).grid(row=0, column=0, padx=10)
+
+        ctk.CTkButton(frame_botones, text="Exportar a XLSX", corner_radius=30, fg_color="#7a7a7a", command=guardar_xlsx).grid(row=0, column=1, padx=10)
+
+        ctk.CTkButton(frame_botones, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta).grid(row=0, column=2, padx=10)
+
+
+        
+
+    def volver_a_inicio(self):
+            app.mostrar_pantalla('historial')
+
+        
 
 class ControladorApp:
     def __init__(self, root):
@@ -1268,11 +1457,12 @@ class ControladorApp:
             "parametros": None,
             "carga": None,
             "historial": None,
-            "final": None
+            "final": None,
+            "registro": None
         }
         self.mostrar_pantalla("inicial")
 
-    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None, folderpath=None, df1=None, df2=None, df3=None):
+    def mostrar_pantalla(self, nombre, seqrecord=None, transcripciones=None, dict_params=None, df=None, filepath=None, folderpath=None, df1=None, df2=None, df3=None, genes=None, accnum=None):
         # Ocultar pantalla actual
         if hasattr(self, "pantalla_actual"):
             self.pantalla_actual.frame.pack_forget()
@@ -1293,9 +1483,11 @@ class ControladorApp:
             self.pantalla_actual.frame.pack(padx=50, pady=50)
         elif nombre == "historial":
             self.pantalla_actual = PantallaHistorial(self.root)
-            #self.pantalla_actual.frame.pack(padx=50, pady=50)
-            self.pantalla_actual.frame.grid(row=0,column=0,padx=50, pady=50)
-
+            self.pantalla_actual.frame.pack(padx=50, pady=50)
+            #self.pantalla_actual.frame.grid(row=0,column=0,padx=50, pady=50)
+        elif nombre == "registro":
+            self.pantalla_actual = PantallaRegistro(self.root, folderpath, genes, accnum)
+            self.pantalla_actual.frame.pack(padx=50, pady=50)
         else:
             self.pantalla_actual = self.pantallas[nombre]
             self.pantalla_actual.frame.pack(padx=50, pady=50)
@@ -1509,6 +1701,91 @@ class Zoom_Advanced(ttk.Frame):
                                                anchor='nw', image=imagetk)
             self.canvas.lower(imageid)  # set image into background
             self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
+
+class DataTable(tk.Frame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.table_frames = []
+        self.create_table()
+
+    def create_table(self):
+
+        self.conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
+        self.cursor = self.conexion.cursor()
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                accnum TEXT,
+                                descripcion TEXT,
+                                secuencia TEXT,
+                                genes TEXT,
+                                fecha_hora DATETIME,
+                                carpeta TEXT)''')
+        data=[]
+        data.append(['ID', 'Accession Num', 'Descripción', 'Secuencia', 'Genes', 'Fecha y hora'])
+        
+        self.cursor.execute("SELECT id, accnum, descripcion, secuencia, genes, fecha_hora FROM sondas ORDER BY id DESC")
+        for row in self.cursor.fetchall():
+            data.append([row[0], row[1], row[2], row[3], row[4], row[5]])
+
+        self.data = data
+
+        # Destruir todos los widgets de la tabla actual
+        for frame in self.table_frames:
+            frame.destroy()
+        
+        # Limpiar la lista de frames
+        self.table_frames.clear()
+
+        # Crear una nueva tabla con los datos actualizados
+        column_widths = []
+        for col in zip(*self.data):
+            column_widths.append(max(len(str(cell)) for cell in col))
+
+        for row_index, row_data in enumerate(self.data):
+            row_frame = tk.Frame(self)
+            row_frame.grid(row=row_index, column=0, sticky="ew")
+            self.table_frames.append(row_frame)
+
+            for col_index, cell_data in enumerate(row_data):
+                cell_label = tk.Label(row_frame, text=str(cell_data), padx=5, pady=2, borderwidth=1, relief="solid", width=column_widths[col_index])
+                cell_label.grid(row=0, column=col_index, sticky="ew")
+
+            if row_index > 0 :
+                ver_button = tk.Button(row_frame, text="Ver", command=lambda row=row_index: self.on_button_click_1(row))
+                ver_button.grid(row=0, column=len(row_data), padx=5, pady=2, sticky="e")
+
+                delete_button = tk.Button(row_frame, text="Eliminar", command=lambda row=row_index: self.on_button_click_2(row))
+                delete_button.grid(row=0, column=len(row_data)+1, padx=5, pady=2, sticky="e")
+
+            row_frame.columnconfigure(len(row_data), weight=1)
+
+    def on_button_click_1(self, row):
+        id_registro = self.data[row][0]
+        self.cursor.execute("SELECT accnum, carpeta, genes FROM sondas WHERE id=?", (id_registro,))
+        registro = self.cursor.fetchone()
+        print(registro[0])
+        print(registro[1])
+        print(registro[2])
+        print(f"Botón clickeado en la fila {row}")
+        app.mostrar_pantalla("registro", folderpath=registro[1], genes=registro[2], accnum=registro[0])
+
+
+    def on_button_click_2(self, row):
+        id_registro = self.data[row][0]
+        self.cursor.execute("SELECT carpeta FROM sondas WHERE id=?", (id_registro,))
+        carpeta = self.cursor.fetchone()
+        self.cursor.execute("DELETE FROM sondas WHERE carpeta=?", (carpeta[0],))
+        self.conexion.commit()
+        respuesta = messagebox.askyesno("Confirmación", "¿Estás seguro(a) que quieres eliminar este diseño? Se eliminará la carpeta {carpeta}")
+        if respuesta:
+            try:
+                shutil.rmtree(carpeta[0])
+            except OSError as error:
+                print("No se pudo eliminar la carpeta: {error}")
+            # Eliminar la fila correspondiente de los datos
+            del self.data[row]
+            # Actualizar la tabla con los datos actualizados
+            self.create_table()
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("light")

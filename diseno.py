@@ -750,13 +750,14 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     sheet3.cell(row=1, column=4).value = '%GC promedio'
     sheet3.cell(row=1, column=5).value = 'Largo promedio'
 
-    for i in range(int(df_resumen['grupo'].max())):
-        grupo = i+1
-        sheet3.cell(row=1+grupo, column=1).value = grupo
-        sheet3.cell(row=1+grupo, column=2).value = df_resumen[df_resumen['grupo'] == grupo]['grupo'].count()
-        sheet3.cell(row=1+grupo, column=3).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['tm'].mean())
-        sheet3.cell(row=1+grupo, column=4).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['gc'].mean())
-        sheet3.cell(row=1+grupo, column=5).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['largo'].mean())
+    if multiplex:
+        for i in range(int(df_resumen['grupo'].max())):
+            grupo = i+1
+            sheet3.cell(row=1+grupo, column=1).value = grupo
+            sheet3.cell(row=1+grupo, column=2).value = df_resumen[df_resumen['grupo'] == grupo]['grupo'].count()
+            sheet3.cell(row=1+grupo, column=3).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['tm'].mean())
+            sheet3.cell(row=1+grupo, column=4).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['gc'].mean())
+            sheet3.cell(row=1+grupo, column=5).value = str("{:.1f}").format(df_resumen[df_resumen['grupo'] == grupo]['largo'].mean())
 
     for cell in sheet3['A']:
         cell.style = 'Pandas'
