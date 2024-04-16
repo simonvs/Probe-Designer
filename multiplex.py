@@ -65,7 +65,7 @@ def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
         for j, seq2 in enumerate(sequences):
             if i < j and not are_sequences_compatible(seq1, seq2, mindg, maxdt):
                 G.add_edge(seq1, seq2)        
-        progreso_actual += 100 / (len(sequences))
+        progreso_actual += 95 / (len(sequences))
         if (progress_queue):
             progress_queue.put(progreso_actual)
         #print(progreso_actual)
@@ -73,6 +73,8 @@ def multiplex_sequences(sequences, progress_queue, mindg=-13627, maxdt=5):
 
     # Colorea el grafo para encontrar grupos.
     color_map = nx.coloring.greedy_color(G, strategy="largest_first")
+    if (progress_queue):
+            progress_queue.put(200)
 
     # Crea un diccionario que asocie cada secuencia con su grupo.
     sequence_to_group = {sequence: color + 1 for sequence, color in color_map.items()}

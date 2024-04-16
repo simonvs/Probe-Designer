@@ -27,14 +27,17 @@ class PantallaInicial:
         #self.frame = tk.Frame(root)
         self.frame = ctk.CTkFrame(master=root)
         self.frame.place(in_=root, relx=0.5, rely=0.5, anchor='c')
+        for widget in self.frame.winfo_children():
+                widget.destroy()
+        self.root.state("zoomed")
         #self.frame.pack(padx=100, pady=200)
         self.crear_interfaz()
         #self.root.minsize(800,450)
-        ancho_pantalla = self.root.winfo_screenwidth()
-        alto_pantalla = self.root.winfo_screenheight()
+        #ancho_pantalla = self.root.winfo_screenwidth()
+        #alto_pantalla = self.root.winfo_screenheight()
         #self.root.minsize(ancho_pantalla,alto_pantalla)
         #print(ancho_pantalla, alto_pantalla)
-        self.root.state("zoomed")
+        
         #self.root.geometry("800x450")
         #self.root.attributes("-alpha", True)
         #self.root.geometry(f"{ancho_pantalla}x{alto_pantalla}")
@@ -740,8 +743,20 @@ class PantallaFinal(PantallaInicial):
         carpeta_label = ctk.CTkLabel(self.frame, text=f"El reporte, la imagen y el archivo GenBank se almacenaron en\n" + self.folderpath, text_color="#000000")
         carpeta_label.grid(row=1, column=0, columnspan=2, padx=20, pady=20)
 
+        def abrir_carpeta():
+            sistema_operativo = platform.system()
+            if sistema_operativo == 'Windows':
+                os.system(f'explorer "{self.folderpath}"')
+            elif sistema_operativo == 'Darwin':  # macOS
+                os.system(f'open "{self.folderpath}"')
+            elif sistema_operativo == 'Linux':
+                os.system(f'xdg-open "{self.folderpath}"')
+
+        boton_carpeta = ctk.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
+        boton_carpeta.grid(row=2, column=0, columnspan=2, padx=20, pady=20)
+
         img_frame = ttk.Frame(self.frame, width=900, height=700)
-        img_frame.grid(row=2, column=0, padx=10, pady=20)
+        img_frame.grid(row=3, column=0, padx=10, pady=20)
         Zoom_Advanced(mainframe=img_frame, path=os.path.join(self.folderpath, self.seqrecord.id+'.png'))
         #ScrollView(img_frame)
 
@@ -750,7 +765,7 @@ class PantallaFinal(PantallaInicial):
         tab2 = ttk.Frame(tabview)
         tabview.add(tab1, text='Resumen')
         tabview.add(tab2, text='Parámetros')
-        tabview.grid(row=2, column=1, padx=10, pady=20)
+        tabview.grid(row=3, column=1, padx=10, pady=20)
         
         #tabview_frame = ttk.Frame(self.frame, width=500, height=500)
         #tabview = ctk.CTkTabview(tabview_frame)
@@ -850,120 +865,139 @@ class PantallaFinal(PantallaInicial):
 
             #hoja = wb_reporte['Parámetros iniciales']
             
+            def on_configure(event):
+                canvas2.configure(scrollregion=canvas2.bbox('all'))
+                canvas_height = frame.winfo_reqheight()
+                if canvas_height != canvas2.winfo_height():
+                    canvas2.config(height=canvas_height)
+                    scrollbar.config(command=canvas2.yview)
+            
+            scrollbar = tk.Scrollbar(tab2)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
             canvas2 = tk.Canvas(tab2)
-            y_scrollbar = tk.Scrollbar(tab2, orient='vertical', command=canvas2.yview)
-            y_scrollbar.pack(side='right', fill='y')
-            canvas2.configure(yscrollcommand=y_scrollbar.set)
             canvas2.pack(side='left', fill='both', expand=True)
+            #canvas2.grid(row=0,column=0)
+            scrollbar.config(command=canvas2.yview)
+
+            def scroll(event):
+                canvas2.yview_scroll(-1*(event.delta//120), "units")
+            canvas2.bind_all("<MouseWheel>", scroll)
+
+            frame = tk.Frame(canvas2)
+            canvas2.create_window((0, 0), window=frame, anchor='nw')
+
+
+            frame.bind("<Configure>", on_configure)
+
 
             #ctk.CTkLabel(tab2, text=df2.iat[2,0], text_color="#000000").grid(row=0, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[2,1], text_color="#000000").grid(row=0, column=1, sticky='e')
-            tk.Label(canvas2,text='Largo de sonda mínimo').grid(row=0, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['minlen']).grid(row=0, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Largo de sonda mínimo').grid(row=0, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['minlen']).grid(row=0, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[3,0], text_color="#000000").grid(row=1, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[3,1], text_color="#000000").grid(row=1, column=1, sticky='e')
-            tk.Label(canvas2,text='Largo de sonda máximo').grid(row=1, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['maxlen']).grid(row=1, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Largo de sonda máximo').grid(row=1, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['maxlen']).grid(row=1, column=1, sticky='w', padx=10)
 
-            canvas2.grid_rowconfigure(2, minsize=10)
+            frame.grid_rowconfigure(2, minsize=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[5,0], text_color="#000000").grid(row=3, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[5,1], text_color="#000000").grid(row=3, column=1, sticky='e')
-            tk.Label(canvas2,text='Temp melting mínima').grid(row=3, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['tmmin']).grid(row=3, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Temp melting mínima').grid(row=3, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['tmmin']).grid(row=3, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[6,0], text_color="#000000").grid(row=4, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[6,1], text_color="#000000").grid(row=4, column=1, sticky='e')
-            tk.Label(canvas2,text='Temp melting máxima').grid(row=4, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['tmmax']).grid(row=4, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Temp melting máxima').grid(row=4, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['tmmax']).grid(row=4, column=1, sticky='w', padx=10)
 
-            canvas2.grid_rowconfigure(5, minsize=10)
+            frame.grid_rowconfigure(5, minsize=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[8,0], text_color="#000000").grid(row=6, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[8,1], text_color="#000000").grid(row=6, column=1, sticky='e')
-            tk.Label(canvas2,text='%GC mínimo').grid(row=6, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['gcmin']).grid(row=6, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='%GC mínimo').grid(row=6, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['gcmin']).grid(row=6, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[9,0], text_color="#000000").grid(row=7, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[9,1], text_color="#000000").grid(row=7, column=1, sticky='e')
-            tk.Label(canvas2,text='%GC máximo').grid(row=7, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['gcmax']).grid(row=7, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='%GC máximo').grid(row=7, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['gcmax']).grid(row=7, column=1, sticky='w', padx=10)
 
-            canvas2.grid_rowconfigure(8, minsize=10)
+            frame.grid_rowconfigure(8, minsize=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[11,0], text_color="#000000").grid(row=9, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[11,1], text_color="#000000").grid(row=9, column=1, sticky='e')
-            tk.Label(canvas2,text='Dist mínima al borde del exón').grid(row=9, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['mindist']).grid(row=9, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Dist mínima al borde del exón').grid(row=9, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['mindist']).grid(row=9, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[12,0], text_color="#000000").grid(row=10, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[12,1], text_color="#000000").grid(row=10, column=1, sticky='e')
-            tk.Label(canvas2,text='Dist máxima al borde del exón').grid(row=10, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['maxdist']).grid(row=10, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Dist máxima al borde del exón').grid(row=10, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['maxdist']).grid(row=10, column=1, sticky='w', padx=10)
 
-            canvas2.grid_rowconfigure(11, minsize=10)
+            frame.grid_rowconfigure(11, minsize=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[14,0], text_color="#000000").grid(row=12, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[14,1], text_color="#000000").grid(row=12, column=1, sticky='e')
-            tk.Label(canvas2,text='Sobrelape mínimo').grid(row=12, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['minoverlap']).grid(row=12, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Sobrelape mínimo').grid(row=12, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['minoverlap']).grid(row=12, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[15,0], text_color="#000000").grid(row=13, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[15,1], text_color="#000000").grid(row=13, column=1, sticky='e')
-            tk.Label(canvas2,text='Sobrelape máximo').grid(row=13, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['maxoverlap']).grid(row=13, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Sobrelape máximo').grid(row=13, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['maxoverlap']).grid(row=13, column=1, sticky='w', padx=10)
 
-            canvas2.grid_rowconfigure(14, minsize=10)
+            frame.grid_rowconfigure(14, minsize=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[17,0], text_color="#000000").grid(row=15, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[17,1], text_color="#000000").grid(row=15, column=1, sticky='e')
-            tk.Label(canvas2,text='Delta G hairpin mínimo permitido').grid(row=15, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['dgmin_hairpin']).grid(row=15, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Delta G hairpin mínimo permitido').grid(row=15, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['dgmin_hairpin']).grid(row=15, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[18,0], text_color="#000000").grid(row=16, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[18,1], text_color="#000000").grid(row=16, column=1, sticky='e')
-            tk.Label(canvas2,text='Delta G homodimero mínimo permitido').grid(row=16, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['dgmin_homodim']).grid(row=16, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Delta G homodimero mínimo permitido').grid(row=16, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['dgmin_homodim']).grid(row=16, column=1, sticky='w', padx=10)
 
 
-            canvas2.grid_rowconfigure(17, minsize=10)
+            frame.grid_rowconfigure(17, minsize=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[20,0], text_color="#000000").grid(row=18, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[20,1], text_color="#000000").grid(row=18, column=1, sticky='e')
-            tk.Label(canvas2,text='Máximo homopolímeros simples permitidos').grid(row=18, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['maxhomopol_simple']).grid(row=18, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Máximo homopolímeros simples permitidos').grid(row=18, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['maxhomopol_simple']).grid(row=18, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[21,0], text_color="#000000").grid(row=19, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[21,1], text_color="#000000").grid(row=19, column=1, sticky='e')
-            tk.Label(canvas2,text='Máximo homopolímeros dobles permitidos').grid(row=19, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['maxhomopol_double']).grid(row=19, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Máximo homopolímeros dobles permitidos').grid(row=19, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['maxhomopol_double']).grid(row=19, column=1, sticky='w', padx=10)
 
             #ctk.CTkLabel(tab2, text=df2.iat[22,0], text_color="#000000").grid(row=20, column=0, sticky='e')
             #ctk.CTkLabel(tab2, text=df2.iat[22,1], text_color="#000000").grid(row=20, column=1, sticky='e')
-            tk.Label(canvas2,text='Máximo homopolímeros triples permitidos').grid(row=20, column=0, sticky='e')
-            tk.Label(canvas2,text=self.dict_params['maxhomopol_triple']).grid(row=20, column=1, sticky='w', padx=10)
+            tk.Label(frame,text='Máximo homopolímeros triples permitidos').grid(row=20, column=0, sticky='e')
+            tk.Label(frame,text=self.dict_params['maxhomopol_triple']).grid(row=20, column=1, sticky='w', padx=10)
 
             #if len(hoja['A25'].value) > 2:
             #if not pd.isna(df2.iat[24,0]):
             if self.dict_params['multiplex']:
 
-                canvas2.grid_rowconfigure(21, minsize=10)
+                frame.grid_rowconfigure(21, minsize=10)
 
                 #ctk.CTkLabel(tab2, text=df2.iat[24,0], text_color="#000000").grid(row=22, column=0, sticky='e')
-                tk.Label(canvas2,text='Criterios de multiplexación').grid(row=22, column=0, sticky='e')
+                tk.Label(frame,text='Criterios de multiplexación').grid(row=22, column=0, sticky='e')
 
-                canvas2.grid_rowconfigure(23, minsize=10)
+                frame.grid_rowconfigure(23, minsize=10)
 
                 #ctk.CTkLabel(tab2, text=df2.iat[26,0], text_color="#000000").grid(row=24, column=0, sticky='e')
                 #ctk.CTkLabel(tab2, text=df2.iat[26,1], text_color="#000000").grid(row=24, column=1, sticky='e')
-                tk.Label(canvas2,text='Diferencia máxima de Temp Melting').grid(row=24, column=0, sticky='e')
-                tk.Label(canvas2,text=self.dict_params['maxdt']).grid(row=24, column=1, sticky='w', padx=10)
+                tk.Label(frame,text='Diferencia máxima de Temp Melting').grid(row=24, column=0, sticky='e')
+                tk.Label(frame,text=self.dict_params['maxdt']).grid(row=24, column=1, sticky='w', padx=10)
 
                 #ctk.CTkLabel(tab2, text=df2.iat[27,0], text_color="#000000").grid(row=25, column=0, sticky='e')
                 #ctk.CTkLabel(tab2, text=df2.iat[27,1], text_color="#000000").grid(row=25, column=1, sticky='e')
-                tk.Label(canvas2,text='Mínimo delta G heterodimerización').grid(row=24, column=0, sticky='e')
-                tk.Label(canvas2,text=self.dict_params['mindg']).grid(row=24, column=1, sticky='w', padx=10)
+                tk.Label(frame,text='Mínimo delta G heterodimerización').grid(row=25, column=0, sticky='e')
+                tk.Label(frame,text=self.dict_params['mindg']).grid(row=25, column=1, sticky='w', padx=10)
                 
 
             ###### Fin Tab 2: Parámetros #########
@@ -1037,18 +1071,6 @@ class PantallaFinal(PantallaInicial):
         #boton_imagen = ctk.CTkButton(self.frame, text="Visualizar transcritos", corner_radius=30, fg_color="#404040", command=abrir_imagen)
         #boton_imagen.grid(pady=20)
 
-        def abrir_carpeta():
-            sistema_operativo = platform.system()
-            if sistema_operativo == 'Windows':
-                os.system(f'explorer "{self.folderpath}"')
-            elif sistema_operativo == 'Darwin':  # macOS
-                os.system(f'open "{self.folderpath}"')
-            elif sistema_operativo == 'Linux':
-                os.system(f'xdg-open "{self.folderpath}"')
-
-        #boton_carpeta = ctk.CTkButton(self.frame, text="Abrir carpeta", corner_radius=30, fg_color="#404040", command=abrir_carpeta)
-        #boton_carpeta.pack(pady=20)
-
         def guardar_xlsx():
             opciones = {
                 'defaultextension': '.xlsx',  # Extensión predeterminada del archivo
@@ -1070,7 +1092,16 @@ class PantallaFinal(PantallaInicial):
             descripcion_label = tk.Label(self.ventana, text="Descripción del diseño:")
             descripcion_label.grid(row=1, column=0, padx=10, pady=10)
 
+            def limitar_caracteres(text):
+                if len(text) > max_caracteres:
+                    return False
+                return True
+
+            max_caracteres = 70
+
             descripcion_entry = ttk.Entry(self.ventana, width=40)
+            validation = root.register(limitar_caracteres)
+            descripcion_entry.config(validate="key", validatecommand=(validation, "%P"))
             descripcion_entry.grid(row=1, column=1, padx=10, pady=10)
             
             boton_registrar = ctk.CTkButton(self.ventana, text="Registrar diseño", corner_radius=30, fg_color="#404040", command=lambda: registrar_diseno(descripcion_entry.get()))
@@ -1081,28 +1112,31 @@ class PantallaFinal(PantallaInicial):
 
 
         def registrar_diseno(descripcion):
-            conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
-            cursor = conn.cursor()
-            cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                accnum TEXT,
-                                descripcion TEXT,
-                                secuencia TEXT,
-                                genes TEXT,
-                                fecha_hora DATETIME,
-                                carpeta TEXT)''')
-            
-            cursor.execute("INSERT INTO sondas (accnum, secuencia, descripcion, genes, fecha_hora, carpeta) VALUES (?,?,?,?,?,?)", (str(self.seqrecord.id), str(self.seqrecord.description), descripcion, str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.folderpath))
-            conn.commit()
-            conn.close()
-            self.ventana.destroy()
-            messagebox.showinfo("Registro completado", "Se registró correctamente el diseño de las sondas para " + str(diseno.get_all_genes(self.seqrecord))[1:-1])
+            try:
+                conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
+                cursor = conn.cursor()
+                cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    accnum TEXT,
+                                    descripcion TEXT,
+                                    secuencia TEXT,
+                                    genes TEXT,
+                                    fecha_hora DATETIME,
+                                    carpeta TEXT)''')
+                
+                cursor.execute("INSERT INTO sondas (accnum, secuencia, descripcion, genes, fecha_hora, carpeta) VALUES (?,?,?,?,?,?)", (str(self.seqrecord.id), str(self.seqrecord.description), descripcion, str(diseno.get_all_genes(self.seqrecord))[1:-1], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), self.folderpath))
+                conn.commit()
+                conn.close()
+                self.ventana.destroy()
+                messagebox.showinfo("Registro completado", "Se registró correctamente el diseño de las sondas para " + str(diseno.get_all_genes(self.seqrecord))[1:-1])
+            except Exception as e:
+                messagebox.showinfo("Registro no completado", "No se pudo guardar el diseño de las sondas para " + str(diseno.get_all_genes(self.seqrecord))[1:-1] + ": "+e)
 
         def cancelar():
             self.ventana.destroy()
 
         frame_botones = ctk.CTkFrame(master=self.frame, bg_color="transparent")
-        frame_botones.grid(row=3, column=0, columnspan=2)
+        frame_botones.grid(row=4, column=0, columnspan=2)
 
         #boton_volver = tk.Button(self.frame, text="Volver al inicio", command=self.volver_a_inicio)
         ctk.CTkButton(frame_botones, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio).grid(row=0, column=0, padx=10)
@@ -1139,38 +1173,10 @@ class PantallaHistorial(PantallaInicial):
         registros = cursor.fetchall()
         #conexion.close()
 
-
         genes = []
         for registro in registros:
-            if registro[3] not in genes:
-                genes.append(registro[3])
-
-        def maxlen(a):
-            maximo = 0
-            for i in a:
-                length = len(i)
-                if length > maximo:
-                    maximo = length
-            return maximo
-        
-        def filtrar_descripcion(value):
-            conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
-            cursor = conexion.cursor()
-            cursor.execute("SELECT * FROM sondas WHERE genes = (?) ORDER BY id DESC",(value,))
-            registros = cursor.fetchall()
-            conexion.close()
-
-            # texto_registros.configure(state="normal")
-            # texto_registros.delete("0.0", "end")
-            # for registro in registros:
-            #     texto_registros.insert("end", f"ID: {registro[0]}\n")
-            #     texto_registros.insert("end", f"Descripción: {registro[1]}\n")
-            #     texto_registros.insert("end", f"Secuencia: {registro[2]}\n")
-            #     texto_registros.insert("end", f"Genes: {registro[3]}\n")
-            #     texto_registros.insert("end", f"Fecha y Hora: {registro[4]}\n")
-            #     texto_registros.insert("end", f"Carpeta: {registro[5]}\n\n")
-            # texto_registros.configure(state="disabled")
-
+            if registro[4] not in genes:
+                genes.append(registro[4])
         
         #fuente_titulo = font.Font(weight="bold", size=16)
         #historial_label = tk.Label(self.frame, text=f"Historial de paneles de sondas", font=fuente_titulo)
@@ -1178,51 +1184,28 @@ class PantallaHistorial(PantallaInicial):
         historial_label = ctk.CTkLabel(self.frame, text=f"Historial de paneles de sondas", text_color="#000000", font=fuente_titulo)
         historial_label.grid(row=0, column=0, padx=20, pady=20)
 
+
+        #tabla_frame = ttk.Frame(self.frame)
+        #tabla_frame.grid(row=2,column=0, sticky="nsew")
+
+        #data_table = DataTable(tabla_frame)
+        #data_table.pack()
+        #data_table = DataTable(self.frame)
+        #data_table.grid(row=2,column=0)
+        scrollable_frame = ScrollableFrame(self.frame)
+        scrollable_frame.grid(row=2, column=0, sticky="nsew")
+        data_table = DataTable(scrollable_frame.frame)
+        data_table.pack()
+
+
         #combobox_filtro = ttk.Combobox(self.frame, values=genes, state="readonly", width=maxlen(genes))
-        combobox_filtro = ctk.CTkComboBox(self.frame, values=genes, width=100, command=filtrar_descripcion)
+        combobox_filtro = ctk.CTkComboBox(self.frame, values=genes, width=100, command=data_table.mostrar_gen)
         combobox_filtro.grid(row=1, column=0, padx=20, pady=20)
 
         #boton_filtro = tk.Button(self.frame, text="Filtrar", command=filtrar_descripcion)
         #boton_filtro.grid(row=1, column=1, padx=20, pady=20)
 
-        def mostrar_id(id):
-            print(f"ID: {id}")
-
-        def actualizar_tabla():
-
-            # Obtener los datos de la base de datos y mostrarlos en la tabla
-            cursor.execute("SELECT * FROM sondas ORDER BY id DESC")
-            for row in cursor.fetchall():
-                # Para cada registro, agregar una fila en la tabla con dos botones
-                
-                button_label = ttk.Button(tree, text="Ver", command=lambda row_id=row[0]: mostrar_id(row_id))
-                #button_label = ttk.Label(tree, text="Ver", cursor="hand2")
-                #button_label.bind("<Button-1>", lambda event: mostrar_id(row[0]))
-                #tree.window_create("", window=button_label, anchor="w", tags=("button",))
-                
-                button_label2 = ttk.Button(tree, text="Eliminar", command=lambda row_id=row[0]: eliminar_registro(row_id))
-                #button_label2 = ttk.Label(tree, text="Eliminar", cursor="hand2")
-                #button_label2.bind("<Button-1>", lambda event: eliminar_registro(row[0]))
-                #tree.window_create("", window=button_label, anchor="w", tags=("button",))
-
-                tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5], button_label, button_label2))
-
-                # Botón para mostrar la edad
-                #btn_mostrar = tk.Button(self.frame, text="Ver", command=lambda id=row[0]: mostrar_id(id))
-                #btn_mostrar.grid(row=tree.index(index), column=3)
-                # Botón para eliminar el registro
-                #btn_eliminar = tk.Button(self.frame, text="X", command=lambda id_registro=row[0]: eliminar_registro(id_registro))
-                #btn_eliminar.grid(row=tree.index(index), column=4)
-            for col in tree["columns"]:
-                tree.column(col, width=120)
-            
-        # Función para eliminar un registro
-        def eliminar_registro(id_registro):
-            cursor.execute("DELETE FROM sondas WHERE id=?", (id_registro,))
-            conexion.commit()
-            actualizar_tabla()
-
-        tree = ttk.Treeview(self.frame, columns=("ID", "Genes", "Fecha y hora", "Descripción", "Transcritos", "N° Grupos", "Acciones"), show="headings")
+        #tree = ttk.Treeview(self.frame, columns=("ID", "Genes", "Fecha y hora", "Descripción", "Transcritos", "N° Grupos", "Acciones"), show="headings")
         # tree.heading("ID", text="ID")
         # tree.heading("Genes", text="Genes")
         # tree.heading("Descripción", text="Descripción")
@@ -1231,9 +1214,7 @@ class PantallaHistorial(PantallaInicial):
         # tree.heading("N° Grupos", text="N° Grupos")
         # tree.grid(row=2,column=0,padx=10,pady=10)
 
-
-        data_table = DataTable(self.frame)
-        data_table.grid(row=2,column=0)
+        
 
             #row_id = tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4], row[5]))
 
@@ -1324,10 +1305,10 @@ class PantallaRegistro(PantallaInicial):
             
         def on_load_data():
             canvas1 = tk.Canvas(tab1)
-            y_scrollbar = tk.Scrollbar(tab1, orient='vertical', command=canvas1.yview)
-            y_scrollbar.pack(side='right', fill='y')
-            canvas1.configure(yscrollcommand=y_scrollbar.set)
-            canvas1.pack(side='left', fill='both', expand=True)
+            #y_scrollbar = tk.Scrollbar(tab1, orient='vertical', command=canvas1.yview)
+            #y_scrollbar.pack(side='right', fill='y')
+            #canvas1.configure(yscrollcommand=y_scrollbar.set)
+            canvas1.grid(row=0,column=0)
 
             ###### Inicio Tab 1: Resumen #########
 
@@ -1352,45 +1333,68 @@ class PantallaRegistro(PantallaInicial):
 
             ###### Inicio Tab 2: Parámetros #########
                 
+            
+            #y_scrollbar = tk.Scrollbar(tab2, orient='vertical', command=canvas2.yview)
+            #y_scrollbar.grid(row=0,column=1)
+            
+            def on_configure(event):
+                canvas2.configure(scrollregion=canvas2.bbox('all'))
+                canvas_height = frame.winfo_reqheight()
+                if canvas_height != canvas2.winfo_height():
+                    canvas2.config(height=canvas_height)
+                    scrollbar.config(command=canvas2.yview)
+            
+            scrollbar = tk.Scrollbar(tab2)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
             canvas2 = tk.Canvas(tab2)
-            y_scrollbar = tk.Scrollbar(tab2, orient='vertical', command=canvas2.yview)
-            y_scrollbar.pack(side='right', fill='y')
-            canvas2.configure(yscrollcommand=y_scrollbar.set)
             canvas2.pack(side='left', fill='both', expand=True)
-                
+            #canvas2.grid(row=0,column=0)
+            scrollbar.config(command=canvas2.yview)
+
+            def scroll(event):
+                canvas2.yview_scroll(-1*(event.delta//120), "units")
+            canvas2.bind_all("<MouseWheel>", scroll)
+
+            frame = tk.Frame(canvas2)
+            canvas2.create_window((0, 0), window=frame, anchor='nw')
+
+
+            frame.bind("<Configure>", on_configure)
+
             a=[1,2,4,5,7,8,10,11,13,14,16,17,19,20,21]
 
             for i in a:
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[i,0]).grid(row=i+1, column=0, sticky='e')
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[i,1]).grid(row=i+1, column=1, sticky='w', padx=10)
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[i,0]).grid(row=i+1, column=0, sticky='e')
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[i,1]).grid(row=i+1, column=1, sticky='w', padx=10)
 
-            canvas2.grid_rowconfigure(4, minsize=10)
-            canvas2.grid_rowconfigure(7, minsize=10)
-            canvas2.grid_rowconfigure(10, minsize=10)
-            canvas2.grid_rowconfigure(13, minsize=10)
-            canvas2.grid_rowconfigure(16, minsize=10)
-            canvas2.grid_rowconfigure(19, minsize=10)
-            canvas2.grid_rowconfigure(23, minsize=10)
+            frame.grid_rowconfigure(4, minsize=10)
+            frame.grid_rowconfigure(7, minsize=10)
+            frame.grid_rowconfigure(10, minsize=10)
+            frame.grid_rowconfigure(13, minsize=10)
+            frame.grid_rowconfigure(16, minsize=10)
+            frame.grid_rowconfigure(19, minsize=10)
+            frame.grid_rowconfigure(23, minsize=10)
             
             if multiplex:
-                canvas2.grid_rowconfigure(25, minsize=10)
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[23,0]).grid(row=24, column=0, sticky='e')
+                frame.grid_rowconfigure(25, minsize=10)
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[23,0]).grid(row=24, column=0, sticky='e')
                 
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[25,0]).grid(row=26, column=0, sticky='w', padx=10)
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[25,1]).grid(row=26, column=1, sticky='w', padx=10)
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[25,0]).grid(row=26, column=0, sticky='w', padx=10)
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[25,1]).grid(row=26, column=1, sticky='w', padx=10)
 
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[26,0]).grid(row=27, column=0, sticky='w', padx=10)
-                tk.Label(canvas2,text=hojas_excel["Parámetros iniciales"].iat[26,1]).grid(row=27, column=1, sticky='w', padx=10)
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[26,0]).grid(row=27, column=0, sticky='w', padx=10)
+                tk.Label(frame,text=hojas_excel["Parámetros iniciales"].iat[26,1]).grid(row=27, column=1, sticky='w', padx=10)
 
             ###### Inicio Tab 3: Grupos #########
             if multiplex:
                 tab3 = ttk.Frame(tabview)
                 tabview.add(tab3, text='Grupos')
                 canvas3 = tk.Canvas(tab3)
-                y_scrollbar = tk.Scrollbar(tab3, orient='vertical', command=canvas3.yview)
-                y_scrollbar.pack(side='right', fill='y')
-                canvas3.configure(yscrollcommand=y_scrollbar.set)
-                canvas3.pack(side='left', fill='both', expand=True)
+                #y_scrollbar = tk.Scrollbar(tab3, orient='vertical', command=canvas3.yview)
+                #y_scrollbar.pack(side='right', fill='y')
+                #canvas3.configure(yscrollcommand=y_scrollbar.set)
+                #canvas3.grid(row=0,column=0,side='left', fill='both', expand=True)
+                canvas3.grid(row=0,column=0)
 
                 tk.Label(canvas3,text='Grupo').grid(row=0, column=0, padx=20, pady=20)
                 tk.Label(canvas3,text='N° Sondas').grid(row=0, column=1, padx=20, pady=20)
@@ -1434,7 +1438,7 @@ class PantallaRegistro(PantallaInicial):
         frame_botones = ctk.CTkFrame(master=self.frame, bg_color="transparent")
         frame_botones.grid(row=3, column=0, columnspan=2)
         
-        ctk.CTkButton(frame_botones, text="Volver al inicio", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio).grid(row=0, column=0, padx=10)
+        ctk.CTkButton(frame_botones, text="Volver a historial", corner_radius=30, fg_color="#7a7a7a", command=self.volver_a_inicio).grid(row=0, column=0, padx=10)
 
         ctk.CTkButton(frame_botones, text="Exportar a XLSX", corner_radius=30, fg_color="#7a7a7a", command=guardar_xlsx).grid(row=0, column=1, padx=10)
 
@@ -1702,6 +1706,36 @@ class Zoom_Advanced(ttk.Frame):
             self.canvas.lower(imageid)  # set image into background
             self.canvas.imagetk = imagetk  # keep an extra reference to prevent garbage-collection
 
+class ScrollableFrame(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
+
+        # Configurar el canvas para hacer el frame scrollable
+        self.canvas = tk.Canvas(self)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.canvas.yview)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        # Crear un frame dentro del canvas para colocar el contenido
+        self.frame = tk.Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.frame, anchor='nw')
+
+        # Asegurar que el canvas se ajuste al contenido cuando cambie el tamaño
+        self.frame.bind("<Configure>", self.resize_canvas)
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+    
+    def _on_mousewheel(self, event):
+        self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+        # Evitar el desplazamiento de la ventana principal en Windows
+        return "break"
+
+    def resize_canvas(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+        canvas_height = min(self.frame.winfo_reqheight(), 600)  # Establecer el alto máximo
+        self.canvas.config(height=canvas_height,width=self.frame.winfo_reqwidth())
+
 class DataTable(tk.Frame):
     def __init__(self, master):
         super().__init__(master)
@@ -1721,11 +1755,11 @@ class DataTable(tk.Frame):
                                 fecha_hora DATETIME,
                                 carpeta TEXT)''')
         data=[]
-        data.append(['ID', 'Accession Num', 'Descripción', 'Secuencia', 'Genes', 'Fecha y hora'])
+        data.append(['ID', 'Descripción', 'Accession Num', 'Secuencia', 'Genes', 'Fecha y hora'])
         
         self.cursor.execute("SELECT id, accnum, descripcion, secuencia, genes, fecha_hora FROM sondas ORDER BY id DESC")
         for row in self.cursor.fetchall():
-            data.append([row[0], row[1], row[2], row[3], row[4], row[5]])
+            data.append([row[0], row[2], row[1], row[3], row[4], row[5]])
 
         self.data = data
 
@@ -1739,7 +1773,7 @@ class DataTable(tk.Frame):
         # Crear una nueva tabla con los datos actualizados
         column_widths = []
         for col in zip(*self.data):
-            column_widths.append(max(len(str(cell)) for cell in col))
+            column_widths.append(max(len(str(cell))-1 for cell in col))
 
         for row_index, row_data in enumerate(self.data):
             row_frame = tk.Frame(self)
@@ -1774,11 +1808,11 @@ class DataTable(tk.Frame):
         id_registro = self.data[row][0]
         self.cursor.execute("SELECT carpeta FROM sondas WHERE id=?", (id_registro,))
         carpeta = self.cursor.fetchone()
-        self.cursor.execute("DELETE FROM sondas WHERE carpeta=?", (carpeta[0],))
-        self.conexion.commit()
-        respuesta = messagebox.askyesno("Confirmación", "¿Estás seguro(a) que quieres eliminar este diseño? Se eliminará la carpeta {carpeta}")
+        respuesta = messagebox.askyesno("Confirmación", "¿Estás seguro(a) que quieres eliminar este diseño? Se eliminará la carpeta "+carpeta[0])
         if respuesta:
             try:
+                self.cursor.execute("DELETE FROM sondas WHERE carpeta=?", (carpeta[0],))
+                self.conexion.commit()
                 shutil.rmtree(carpeta[0])
             except OSError as error:
                 print("No se pudo eliminar la carpeta: {error}")
@@ -1786,6 +1820,47 @@ class DataTable(tk.Frame):
             del self.data[row]
             # Actualizar la tabla con los datos actualizados
             self.create_table()
+
+    def mostrar_gen(self, gen):
+        data=[]
+        data.append(['ID', 'Accession Num', 'Descripción', 'Secuencia', 'Genes', 'Fecha y hora'])
+        
+        self.cursor.execute("SELECT id, accnum, descripcion, secuencia, genes, fecha_hora FROM sondas WHERE genes = (?) ORDER BY id DESC",(gen,))
+        for row in self.cursor.fetchall():
+            data.append([row[0], row[1], row[2], row[3], row[4], row[5]])
+
+        self.data = data
+
+        # Destruir todos los widgets de la tabla actual
+        for frame in self.table_frames:
+            frame.destroy()
+        
+        # Limpiar la lista de frames
+        self.table_frames.clear()
+
+        # Crear una nueva tabla con los datos actualizados
+        column_widths = []
+        for col in zip(*self.data):
+            column_widths.append(max(len(str(cell)) for cell in col))
+
+        for row_index, row_data in enumerate(self.data):
+            row_frame = tk.Frame(self)
+            row_frame.grid(row=row_index, column=0, sticky="ew")
+            self.table_frames.append(row_frame)
+
+            for col_index, cell_data in enumerate(row_data):
+                cell_label = tk.Label(row_frame, text=str(cell_data), padx=2, pady=2, borderwidth=1, relief="solid", width=column_widths[col_index])
+                cell_label.grid(row=0, column=col_index, sticky="ew")
+
+            if row_index > 0 :
+                ver_button = tk.Button(row_frame, text="Ver", command=lambda row=row_index: self.on_button_click_1(row))
+                ver_button.grid(row=0, column=len(row_data), padx=5, pady=2, sticky="e")
+
+                delete_button = tk.Button(row_frame, text="Eliminar", command=lambda row=row_index: self.on_button_click_2(row))
+                delete_button.grid(row=0, column=len(row_data)+1, padx=5, pady=2, sticky="e")
+
+            row_frame.columnconfigure(len(row_data), weight=1)
+
 
 if __name__ == "__main__":
     ctk.set_appearance_mode("light")
