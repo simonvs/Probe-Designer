@@ -1,5 +1,5 @@
 import networkx as nx
-import primer3
+from primer3 import calc_heterodimer
 import queue
 from Bio.SeqUtils import MeltingTemp
 
@@ -21,20 +21,20 @@ def are_sequences_compatible(seq1, seq2, mindg, maxdt):
         return False
     
     if len(seq1)<=60 or len(seq2)<=60:
-        if primer3.calc_heterodimer(seq1,seq2).dg < mindg:
+        if calc_heterodimer(seq1,seq2).dg < mindg:
             #print('dg')
             return False
     else:
-        if primer3.calc_heterodimer(seq1[:60],seq2[:60]).dg < mindg:
+        if calc_heterodimer(seq1[:60],seq2[:60]).dg < mindg:
             #print('dg')
             return False
-        if primer3.calc_heterodimer(seq1[:60],seq2[60:]).dg < mindg:
+        if calc_heterodimer(seq1[:60],seq2[60:]).dg < mindg:
             #print('dg')
             return False
-        if primer3.calc_heterodimer(seq1[60:],seq2[:60]).dg < mindg:
+        if calc_heterodimer(seq1[60:],seq2[:60]).dg < mindg:
             #print('dg')
             return False
-        if primer3.calc_heterodimer(seq1[60:],seq2[60:]).dg < mindg:
+        if calc_heterodimer(seq1[60:],seq2[60:]).dg < mindg:
             #print('dg')
             return False
         

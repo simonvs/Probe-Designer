@@ -6,18 +6,49 @@
 
   \bigletter A
   \item \spxentry{accnum\_to\_seqrecord()}\spxextra{en el módulo descarga}, \hyperpage{1}
+  \item \spxentry{actualizar\_progreso()}\spxextra{método de probeDesignerUI.PantallaCarga}, 
+		\hyperpage{8}
   \item \spxentry{are\_sequences\_compatible()}\spxextra{en el módulo multiplex}, \hyperpage{6}
+  \item \spxentry{aumentar()}\spxextra{método de probeDesignerUI.IntegerSelector}, \hyperpage{8}
+  \item \spxentry{AutoScrollbar}\spxextra{clase en probeDesignerUI}, \hyperpage{7}
 
   \indexspace
   \bigletter C
   \item \spxentry{check\_probe()}\spxextra{en el módulo diseno}, \hyperpage{2}
+  \item \spxentry{ControladorApp}\spxextra{clase en probeDesignerUI}, \hyperpage{7}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaCarga}, 
+		\hyperpage{8}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaFinal}, 
+		\hyperpage{8}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaHistorial}, 
+		\hyperpage{8}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaInicial}, 
+		\hyperpage{8}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaParametros}, 
+		\hyperpage{8}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaRegistro}, 
+		\hyperpage{8}
+  \item \spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}, 
+		\hyperpage{9}
+  \item \spxentry{create\_table()}\spxextra{método de probeDesignerUI.DataTable}, \hyperpage{7}
 
   \indexspace
   \bigletter D
+  \item \spxentry{DataTable}\spxextra{clase en probeDesignerUI}, \hyperpage{7}
   \item \spxentry{descarga}
     \subitem \spxentry{module}, \hyperpage{1}
   \item \spxentry{diseno}
     \subitem \spxentry{module}, \hyperpage{2}
+  \item \spxentry{disminuir()}\spxextra{método de probeDesignerUI.IntegerSelector}, \hyperpage{8}
+
+  \indexspace
+  \bigletter E
+  \item \spxentry{ejecutar\_diseno()}\spxextra{método de probeDesignerUI.PantallaCarga}, 
+		\hyperpage{8}
+  \item \spxentry{eliminar()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}, 
+		\hyperpage{9}
+  \item \spxentry{eliminar\_todo()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}, 
+		\hyperpage{9}
 
   \indexspace
   \bigletter G
@@ -29,6 +60,10 @@
   \item \spxentry{get\_splicings()}\spxextra{en el módulo diseno}, \hyperpage{5}
 
   \indexspace
+  \bigletter I
+  \item \spxentry{IntegerSelector}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+
+  \indexspace
   \bigletter M
   \item \spxentry{main()}\spxextra{en el módulo descarga}, \hyperpage{1}
   \item \spxentry{main()}\spxextra{en el módulo diseno}, \hyperpage{5}
@@ -36,21 +71,88 @@
     \subitem \spxentry{descarga}, \hyperpage{1}
     \subitem \spxentry{diseno}, \hyperpage{2}
     \subitem \spxentry{multiplex}, \hyperpage{6}
+    \subitem \spxentry{probeDesignerUI}, \hyperpage{7}
+  \item \spxentry{mostrar\_gen()}\spxextra{método de probeDesignerUI.DataTable}, \hyperpage{8}
+  \item \spxentry{mostrar\_pantalla()}\spxextra{método de probeDesignerUI.ControladorApp}, 
+		\hyperpage{7}
+  \item \spxentry{mostrar\_tooltip()}\spxextra{método de probeDesignerUI.ToolTip}, \hyperpage{9}
+  \item \spxentry{move\_from()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}, \hyperpage{9}
+  \item \spxentry{move\_to()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}, \hyperpage{9}
   \item \spxentry{multiplex}
     \subitem \spxentry{module}, \hyperpage{6}
   \item \spxentry{multiplex\_sequences()}\spxextra{en el módulo multiplex}, \hyperpage{6}
 
   \indexspace
+  \bigletter O
+  \item \spxentry{ocultar\_tooltip()}\spxextra{método de probeDesignerUI.ToolTip}, \hyperpage{9}
+  \item \spxentry{on\_button\_click\_1()}\spxextra{método de probeDesignerUI.DataTable}, 
+		\hyperpage{8}
+  \item \spxentry{on\_button\_click\_2()}\spxextra{método de probeDesignerUI.DataTable}, 
+		\hyperpage{8}
+
+  \indexspace
   \bigletter P
+  \item \spxentry{pack()}\spxextra{método de probeDesignerUI.AutoScrollbar}, \hyperpage{7}
+  \item \spxentry{PantallaCarga}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+  \item \spxentry{PantallaFinal}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+  \item \spxentry{PantallaHistorial}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+  \item \spxentry{PantallaInicial}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+  \item \spxentry{PantallaParametros}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+  \item \spxentry{PantallaRegistro}\spxextra{clase en probeDesignerUI}, \hyperpage{8}
+  \item \spxentry{PantallaTranscripciones}\spxextra{clase en probeDesignerUI}, \hyperpage{9}
   \item \spxentry{parse\_file\_to\_seqrecord()}\spxextra{en el módulo descarga}, \hyperpage{2}
+  \item \spxentry{place()}\spxextra{método de probeDesignerUI.AutoScrollbar}, \hyperpage{7}
   \item \spxentry{probe\_designer()}\spxextra{en el módulo diseno}, \hyperpage{5}
+  \item \spxentry{probeDesignerUI}
+    \subitem \spxentry{module}, \hyperpage{7}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{resize\_canvas()}\spxextra{método de probeDesignerUI.ScrollableFrame}, 
+		\hyperpage{9}
 
   \indexspace
   \bigletter S
+  \item \spxentry{scroll\_x()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}, \hyperpage{9}
+  \item \spxentry{scroll\_y()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}, \hyperpage{9}
+  \item \spxentry{ScrollableFrame}\spxextra{clase en probeDesignerUI}, \hyperpage{9}
   \item \spxentry{segundos\_a\_hms()}\spxextra{en el módulo diseno}, \hyperpage{6}
+  \item \spxentry{seleccionar()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}, 
+		\hyperpage{9}
+  \item \spxentry{seleccionar\_archivo()}\spxextra{método de probeDesignerUI.PantallaInicial}, 
+		\hyperpage{8}
+  \item \spxentry{seleccionar\_todo()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}, 
+		\hyperpage{9}
+  \item \spxentry{set()}\spxextra{método de probeDesignerUI.AutoScrollbar}, \hyperpage{7}
+  \item \spxentry{show\_image()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}, \hyperpage{9}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{ToolTip}\spxextra{clase en probeDesignerUI}, \hyperpage{9}
 
   \indexspace
   \bigletter V
+  \item \spxentry{validar()}\spxextra{método de probeDesignerUI.IntegerSelector}, \hyperpage{8}
+  \item \spxentry{ver\_historial()}\spxextra{método de probeDesignerUI.PantallaInicial}, 
+		\hyperpage{8}
   \item \spxentry{verify\_specificity()}\spxextra{en el módulo diseno}, \hyperpage{6}
+  \item \spxentry{volver\_a\_inicio()}\spxextra{método de probeDesignerUI.PantallaFinal}, 
+		\hyperpage{8}
+  \item \spxentry{volver\_a\_inicio()}\spxextra{método de probeDesignerUI.PantallaRegistro}, 
+		\hyperpage{9}
+  \item \spxentry{volver\_a\_seleccion()}\spxextra{método de probeDesignerUI.PantallaHistorial}, 
+		\hyperpage{8}
+  \item \spxentry{volver\_a\_seleccion()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}, 
+		\hyperpage{9}
+  \item \spxentry{volver\_a\_transcripciones()}\spxextra{método de probeDesignerUI.PantallaParametros}, 
+		\hyperpage{8}
+
+  \indexspace
+  \bigletter W
+  \item \spxentry{wheel()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}, \hyperpage{9}
+
+  \indexspace
+  \bigletter Z
+  \item \spxentry{Zoom\_Advanced}\spxextra{clase en probeDesignerUI}, \hyperpage{9}
 
 \end{sphinxtheindex}

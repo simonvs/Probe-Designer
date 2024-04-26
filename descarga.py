@@ -2,9 +2,18 @@ import os
 import argparse
 import shutil
 import gzip
-import filecmp
-from Bio import Entrez, SeqIO
-from BCBio import GFF
+#import filecmp
+from Bio import SeqIO, Entrez
+import Bio
+import sys
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS2
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def accnum_to_seqrecord(accesion_number):
     """
@@ -16,7 +25,8 @@ def accnum_to_seqrecord(accesion_number):
     :return: La secuencia en formato SeqRecord con todas sus anotaciones.
     """
     #Si la carpeta de secuencias no existe, la crea
-    folder_path = os.path.join(os.getcwd(), "files")
+    #folder_path = os.path.join(os.getcwd(), "files")
+    folder_path = resource_path("files")
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
 
@@ -27,14 +37,14 @@ def accnum_to_seqrecord(accesion_number):
         try:
             #Descargar la secuencia y escribirla en un archivo
             #Entrez.mail = "simonvergaraswett@hotmail.com"
-            with Entrez.efetch(db="nucleotide", id=accesion_number, rettype="gb", retmode="text") as handle:
+            with Bio.Entrez.efetch(db="nucleotide", id=accesion_number, rettype="gb", retmode="text") as handle:
                 with open(filepath, "w") as out_handle:
                     out_handle.write(handle.read())
-        except:
-            print("Error al descargar el archivo.")
+        except Exception as e:
+            print("Error al descargar el archivo: " + str(e))
     
     #Lee el archivo descargado y lo parsea a SeqRecord
-    record = SeqIO.read(filepath, "genbank")
+    record = Bio.SeqIO.read(filepath, "genbank")
     return record
 
 def parse_file_to_seqrecord(filepath):
@@ -47,7 +57,8 @@ def parse_file_to_seqrecord(filepath):
     :return: La secuencia en formato SeqRecord con todas sus anotaciones.
     """
     currentpath = os.path.abspath(filepath)
-    folder_path = os.path.join(os.getcwd(), "files")
+    folder_path = resource_path("files")
+    #folder_path = os.path.join(os.getcwd(), "files")
 
     #Si la carpeta de secuencias no existe, la crea
     if not os.path.exists(folder_path):
@@ -55,7 +66,7 @@ def parse_file_to_seqrecord(filepath):
 
     #Se genera una copia del archivo selecionado en la carpeta de secuencias (si es que no existe)
     newpath = os.path.join(folder_path, os.path.split(currentpath)[1])
-    if not os.path.isfile(newpath) or not filecmp.cmp(currentpath, newpath):
+    if not os.path.isfile(newpath):# or not filecmp.cmp(currentpath, newpath):
         shutil.copy(currentpath, newpath)
 
     try:
@@ -67,18 +78,13 @@ def parse_file_to_seqrecord(filepath):
 
         #Parseo para GenBank
         if os.path.splitext(newpath)[1] == '.gbk' or os.path.splitext(newpath)[1] == '.gb':
+            #print(newpath)
             record = SeqIO.read(newpath, 'genbank')
-
-        #Parseo para GFF3
-        elif os.path.splitext(newpath)[1] == '.gff':
-            with open(newpath) as in_handle:
-                records = GFF.parse(in_handle)
-                record = records[0]
         else:
             raise TypeError
         return record
-    except:
-        print("Error al parsear el archivo.")
+    except Exception as e:
+        print("Error al parsear el archivo: "+str(e))
 
 
 def main():

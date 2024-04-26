@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.24)  27 NOV 2023 15:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.5) (preloaded format=pdflatex 2023.5.24)  16 APR 2024 21:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -892,54 +892,268 @@ LaTeX Font Info:    Font shape `T1/txtt/b/n' in size <10> not available
 LaTeX Info: Redefining \. on input line 270.
 LaTeX Info: Redefining \% on input line 270.
  [2]
-LaTeX Info: Redefining \. on input line 404.
-LaTeX Info: Redefining \% on input line 404.
+LaTeX Info: Redefining \. on input line 405.
+LaTeX Info: Redefining \% on input line 405.
  [3]
-LaTeX Info: Redefining \. on input line 525.
-LaTeX Info: Redefining \% on input line 525.
+LaTeX Info: Redefining \. on input line 526.
+LaTeX Info: Redefining \% on input line 526.
  [4]
-LaTeX Info: Redefining \. on input line 659.
-LaTeX Info: Redefining \% on input line 659.
+LaTeX Info: Redefining \. on input line 660.
+LaTeX Info: Redefining \% on input line 660.
  [5]
-LaTeX Info: Redefining \. on input line 785.
-LaTeX Info: Redefining \% on input line 785.
+LaTeX Info: Redefining \. on input line 788.
+LaTeX Info: Redefining \% on input line 788.
  [6]
-Cap\'{\i }tulo 2.
-[7
+LaTeX Info: Redefining \. on input line 949.
+LaTeX Info: Redefining \% on input line 949.
+ [7]
+LaTeX Font Info:    Font shape `T1/txtt/m/it' in size <10> not available
+(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 1019.
+
+LaTeX Info: Redefining \. on input line 1203.
+LaTeX Info: Redefining \% on input line 1203.
+ [8]
+LaTeX Info: Redefining \. on input line 1415.
+LaTeX Info: Redefining \% on input line 1415.
+ [9]
+LaTeX Info: Redefining \. on input line 1415.
+LaTeX Info: Redefining \% on input line 1415.
+ [10
 
 ]
-LaTeX Info: Redefining \. on input line 803.
-LaTeX Info: Redefining \% on input line 803.
- [8
+Cap\'{\i }tulo 2.
+[11]
+LaTeX Info: Redefining \. on input line 1433.
+LaTeX Info: Redefining \% on input line 1433.
+ [12
 
-] [9
+] [13
 
 
 ] (diseadordesondasdehibridacin.ind
 LaTeX Info: Redefining \. on input line 1.
 LaTeX Info: Redefining \% on input line 1.
- [10
+ [14
 
 
-] [11
+]
+Underfull \hbox (badness 10000) in paragraph at lines 12--13
+[]\T1/txtt/m/n/10 aumentar() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-be
+-De-sig-ne-
+ []
 
-])
-(diseadordesondasdehibridacin.aux
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--21
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--23
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 23--25
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 25--27
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 27--29
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--31
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--33
+[]\T1/txtt/m/n/10 crear_interfaz() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de 
+pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--34
+[]\T1/txtt/m/n/10 create_table() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pr
+o-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 42--43
+[]\T1/txtt/m/n/10 disminuir() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-b
+e-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 46--48
+[]\T1/txtt/m/n/10 ejecutar_diseno() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de
+ pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 48--50
+[]\T1/txtt/m/n/10 eliminar() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-be
+-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 50--52
+[]\T1/txtt/m/n/10 eliminar_todo() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de p
+ro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--76
+[]\T1/txtt/m/n/10 mostrar_gen() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro
+-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--78
+[]\T1/txtt/m/n/10 mostrar_pantalla() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do d
+e pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 78--79
+[]\T1/txtt/m/n/10 mostrar_tooltip() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de
+ pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 79--80
+[]\T1/txtt/m/n/10 move_from() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-b
+e-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 80--81
+[]\T1/txtt/m/n/10 move_to() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-be-
+De-sig-ne-
+ []
+
+[15
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 87--88
+[]\T1/txtt/m/n/10 ocultar_tooltip() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de
+ pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 88--90
+[]\T1/txtt/m/n/10 on_button_click_1() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do 
+de pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 90--92
+[]\T1/txtt/m/n/10 on_button_click_2() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do 
+de pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 111--113
+[]\T1/txtt/m/n/10 resize_canvas() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de p
+ro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 116--117
+[]\T1/txtt/m/n/10 scroll_x() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-be
+-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 117--118
+[]\T1/txtt/m/n/10 scroll_y() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-be
+-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 120--122
+[]\T1/txtt/m/n/10 seleccionar() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro
+-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 124--126
+[]\T1/txtt/m/n/10 seleccionar_todo() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do d
+e pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 127--128
+[]\T1/txtt/m/n/10 show_image() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-
+be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 135--136
+[]\T1/txtt/m/n/10 validar() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de pro-be-
+De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 136--138
+[]\T1/txtt/m/n/10 ver_historial() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de p
+ro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 139--141
+[]\T1/txtt/m/n/10 volver_a_inicio() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de
+ pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 141--143
+[]\T1/txtt/m/n/10 volver_a_inicio() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do de
+ pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 8113) in paragraph at lines 143--145
+[]\T1/txtt/m/n/10 volver_a_seleccion() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do
+ de pro-be-De-sig-ne-
+ []
+
+
+Underfull \hbox (badness 8113) in paragraph at lines 145--147
+[]\T1/txtt/m/n/10 volver_a_seleccion() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 mé-to-do
+ de pro-be-De-sig-ne-
+ []
+
+LaTeX Info: Redefining \. on input line 158.
+LaTeX Info: Redefining \% on input line 158.
+[16]) (diseadordesondasdehibridacin.aux
 LaTeX Info: Redefining \. on input line 22.
 LaTeX Info: Redefining \% on input line 22.
 )
 Package rerunfilecheck Info: File `diseadordesondasdehibridacin.out' has not ch
 anged.
-(rerunfilecheck)             Checksum: 063E4B24807C32FC6370500F577265CE;894.
+(rerunfilecheck)             Checksum: 497FC436E5D9B046CC322477F886FA7A;1061.
  ) 
 Here is how much of TeX's memory you used:
- 16903 strings out of 476410
- 288365 string characters out of 5789113
- 1867845 words of memory out of 5000000
- 36829 multiletter control sequences out of 15000+600000
- 563093 words of font info for 70 fonts, out of 8000000 for 9000
+ 17026 strings out of 476410
+ 292353 string characters out of 5789113
+ 1875845 words of memory out of 5000000
+ 36889 multiletter control sequences out of 15000+600000
+ 563475 words of font info for 71 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 72i,11n,76p,2113b,746s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,12n,76p,2113b,746s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre/qhv
 b.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-gyre
 /qhvr.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/tex-
@@ -947,10 +1161,11 @@ gyre/qtmb.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/public/
 tex-gyre/qtmr.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type1/pub
 lic/tex-gyre/qtmri.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts/type
 1/public/txfonts/t1xbtt.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/txfonts/t1xtt.pfb>
-Output written on diseadordesondasdehibridacin.pdf (15 pages, 183236 bytes).
+/type1/public/txfonts/t1xtt.pfb><C:/Users/simon/AppData/Local/Programs/MiKTeX/f
+onts/type1/public/txfonts/t1xtt.pfb>
+Output written on diseadordesondasdehibridacin.pdf (20 pages, 223461 bytes).
 PDF statistics:
- 199 PDF objects out of 1000 (max. 8388607)
- 42 named destinations out of 1000 (max. 500000)
- 77 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 359 PDF objects out of 1000 (max. 8388607)
+ 103 named destinations out of 1000 (max. 500000)
+ 85 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -7,3 +7,4 @@ Probe-Designer
    descarga
    diseno
    multiplex
+   probeDesignerUI

@@ -1,17 +1,42 @@
-import descarga
-import multiplex
+#import descarga
+#import multiplex
 import os
 import argparse
 import pandas as pd
-import primer3
+#import primer3
 import subprocess
 import queue
-from Bio.SeqUtils import GC, MeltingTemp
+import Bio
+try:
+    from Bio.SeqUtils import gc_fraction
+    def GC(sequence):
+        return 100 * gc_fraction(sequence, ambiguous="ignore")
+except ImportError:
+    from Bio.SeqUtils import GC
+from Bio.SeqUtils import MeltingTemp
 from Bio.Seq import Seq
 from Bio import SearchIO
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from datetime import datetime
+import importlib.util
+import sys
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS2
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+sys.path.append(resource_path('site-packages'))
+from primer3 import calcHairpin, calcHomodimer
+
+spec1 = importlib.util.spec_from_file_location("multiplex", resource_path(os.path.join("modulos", "multiplex.py")))
+multiplex = importlib.util.module_from_spec(spec1)
+sys.modules["multiplex"] = multiplex
+spec1.loader.exec_module(multiplex)
 
 
 def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmin_homodim, dgmin_hairpin, maxhomopol_simple, maxhomopol_double, maxhomopol_triple):
@@ -57,17 +82,17 @@ def check_probe(seq, iscentral, minlen, maxlen, tmmin, tmmax, gcmin, gcmax, dgmi
     #Chequear hetero - homodimeros - horquilla
     #dg_hairpin = primer3.calcHairpin(str(seq)).dg
     if largo <= 60:
-        if primer3.calcHairpin(str(seq)).dg < dgmin_hairpin:
+        if calcHairpin(str(seq)).dg < dgmin_hairpin:
             #print('Delta G hairpin')
             return False
-        if primer3.calcHomodimer(str(seq)).dg < dgmin_homodim:
+        if calcHomodimer(str(seq)).dg < dgmin_homodim:
             #print('Delta G homodim')
             return False
     else:
-        if primer3.calcHairpin(str(seq[:60])).dg < dgmin_hairpin or primer3.calcHairpin(str(seq[60:])).dg < dgmin_hairpin:
+        if calcHairpin(str(seq[:60])).dg < dgmin_hairpin or calcHairpin(str(seq[60:])).dg < dgmin_hairpin:
             #print('Delta G hairpin')
             return False
-        if primer3.calcHomodimer(str(seq[:60])).dg < dgmin_homodim or primer3.calcHomodimer(str(seq[60:])).dg < dgmin_homodim:
+        if calcHomodimer(str(seq[:60])).dg < dgmin_homodim or calcHomodimer(str(seq[60:])).dg < dgmin_homodim:
             #print('Delta G homodim')
             return False
 
@@ -279,7 +304,9 @@ def get_splicing_pairs(locations):
 
     empalmes = []
     for i in range(len(positions)-1):
-        empalmes.append((positions[i][1].position, positions[i+1][0].position))
+        #empalmes.append((positions[i][1].position, positions[i+1][0].position))
+        empalmes.append((int(positions[i][1]), int(positions[i+1][0])))
+
     return empalmes
 
 def get_splicings(seqrecord, transcripts):
@@ -609,9 +636,10 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
     :param tiempo_diseno: Tiempo que demoró la ejecución en segundos
     :return: Nombre del archivo XLSX generado
     """
-    if not os.path.exists(os.path.join(os.getcwd(),'sondas')):
-        os.makedirs(os.path.join(os.getcwd(),'sondas'))
-        
+    #if not os.path.exists(os.path.join(os.getcwd(),'sondas')):
+    #    os.makedirs(os.path.join(os.getcwd(),'sondas'))
+    if not os.path.exists(resource_path('sondas')):
+        os.makedirs(resource_path('sondas'))
     wb = Workbook()
 
     df_resumen = df.drop_duplicates(subset='sonda')
@@ -825,9 +853,9 @@ def generate_xlsx(df, name, genes, minlen=60, maxlen=120, tmmin=65, tmmax=80, gc
 
     now = datetime.now()
     filename = name+'_'+now.strftime("%Y%m%d_%H%M%S")
-    filepath = os.path.join(os.getcwd(),'sondas', filename, name+'.xlsx')
+    filepath = resource_path(os.path.join('sondas', filename, name+'.xlsx'))
 
-    folder_path = os.path.join(os.getcwd(), "sondas", filename)
+    folder_path = resource_path(os.path.join("sondas", filename))
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
 
@@ -889,9 +917,9 @@ def main():
 
     args = parser.parse_args()
     dargs = vars(args)
-    rec = descarga.parse_file_to_seqrecord('C:/Users/simon/Downloads/tp53.gb')
+    #rec = descarga.parse_file_to_seqrecord('C:/Users/simon/Downloads/tp53.gb')
     #rec = descarga.accnum_to_seqrecord(dargs["accessionnumber"])
-    df = probe_designer(record=rec, transcripts=get_all_transcripts(rec))
+    #df = probe_designer(record=rec, transcripts=get_all_transcripts(rec))
                         # ,
                         # minlen=dargs["minimumlength"],
                         # maxlen=dargs["maximumlength"],
@@ -904,7 +932,7 @@ def main():
                         # maxoverlap=dargs["deltaghairpin"],
                         # maxoverlap=dargs["deltaghomodimer"])
     
-    generate_xlsx(df=df, name='sondas', genes=get_all_genes(rec))
+    #generate_xlsx(df=df, name='sondas', genes=get_all_genes(rec))
                 #   minlen=dargs["minimumlength"],
                 #   maxlen=dargs["maximumlength"],
                 #   tmmin=dargs["mintempmelting"],

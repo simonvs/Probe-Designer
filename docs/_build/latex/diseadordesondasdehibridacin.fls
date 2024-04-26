@@ -545,6 +545,7 @@ INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\tex\latex\txfonts\t1txtt.fd
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\tfm\public\txfonts\t1xtt.tfm
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\tfm\public\txfonts\t1xbtt.tfm
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\tfm\public\tex-gyre\ec-qtmri.tfm
+INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\tfm\public\txfonts\t1xttsl.tfm
 INPUT .\diseadordesondasdehibridacin.ind
 INPUT diseadordesondasdehibridacin.ind
 INPUT .\diseadordesondasdehibridacin.ind
@@ -564,5 +565,7 @@ INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\tex-gyre\q
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\tex-gyre\qtmri.pfb
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\txfonts\t1xbtt.pfb
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\txfonts\t1xbtt.pfb
+INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\txfonts\t1xtt.pfb
+INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\txfonts\t1xtt.pfb
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\txfonts\t1xtt.pfb
 INPUT C:\Users\simon\AppData\Local\Programs\MiKTeX\fonts\type1\public\txfonts\t1xtt.pfb

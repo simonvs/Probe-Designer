@@ -1,10 +1,11 @@
-import descarga
-import diseno
-import imagen
+#import modulos.descarga  as descarga
+#import modulos.diseno as diseno
+#import modulos.imagen as imagen
 import tkinter as tk
 import pandas as pd
 import customtkinter as ctk
 import os
+import sys
 import sqlite3
 import datetime
 import platform
@@ -17,13 +18,38 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 from PIL import Image, ImageTk
+import importlib.util
 
+print(sys.version)
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS2
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+spec1 = importlib.util.spec_from_file_location("descarga", resource_path(os.path.join("modulos", "descarga.py")))
+spec2 = importlib.util.spec_from_file_location("diseno", resource_path(os.path.join("modulos", "diseno.py")))
+spec3 = importlib.util.spec_from_file_location("imagen", resource_path(os.path.join("modulos", "imagen.py")))
+
+descarga = importlib.util.module_from_spec(spec1)
+diseno = importlib.util.module_from_spec(spec2)
+imagen = importlib.util.module_from_spec(spec3)
+sys.modules["descarga"] = descarga
+sys.modules["diseno"] = descarga
+sys.modules["imagen"] = descarga
+
+spec1.loader.exec_module(descarga)
+spec2.loader.exec_module(diseno)
+spec3.loader.exec_module(imagen)
 
 class PantallaInicial:
     def __init__(self, root):
         self.root = root
         self.root.title("GEMINi - Diseñador de sondas de hibridación para ARN mensajero")
-        self.root.iconbitmap(os.path.join("images", "gemini2.ico"))
+        self.root.iconbitmap(resource_path(os.path.join("images", "gemini2.ico")))
         #self.frame = tk.Frame(root)
         self.frame = ctk.CTkFrame(master=root)
         self.frame.place(in_=root, relx=0.5, rely=0.5, anchor='c')
@@ -45,10 +71,15 @@ class PantallaInicial:
 
     def crear_interfaz(self):
 
-        if not os.path.exists(os.path.join(os.getcwd(),'databases')):
-            os.makedirs(os.path.join(os.getcwd(),'databases'))
-        if not os.path.exists(os.path.join(os.getcwd(),'sondas')):
-            os.makedirs(os.path.join(os.getcwd(),'sondas'))
+        if not os.path.exists(resource_path('databases')):
+            os.makedirs(resource_path('databases'))
+        if not os.path.exists(resource_path('sondas')):
+            os.makedirs(resource_path('sondas'))
+
+        # if not os.path.exists(os.path.join(os.getcwd(),'databases')):
+        #     os.makedirs(os.path.join(os.getcwd(),'databases'))
+        # if not os.path.exists(os.path.join(os.getcwd(),'sondas')):
+        #     os.makedirs(os.path.join(os.getcwd(),'sondas'))
 
         # Crear widgets de la pantalla de inicio
         #fuente_titulo = font.Font(weight="bold", size=16)
@@ -76,7 +107,8 @@ class PantallaInicial:
                     self.seqrecord = descarga.accnum_to_seqrecord(accnum)
                     self.continuar_button.configure(state='normal')
                     self.file_label.configure(text='Archivo seleccionado: '+accnum+".gbk")
-                    self.archivo = os.path.join(os.getcwd(), 'files', accnum+".gbk")
+                    #self.archivo = os.path.join(os.getcwd(), 'files', accnum+".gbk")
+                    self.archivo = resource_path(os.path.join('files', accnum+".gbk"))
                     #app.mostrar_pantalla("transcripciones", seqrecord, filepath=self.archivo)
                 except:
                     messagebox.showinfo("Error", "Error al descargar la secuencia")
@@ -91,7 +123,8 @@ class PantallaInicial:
         historial_button.grid(row=4, column=0, rowspan=2, pady=25)
 
         def continuar():
-            app.mostrar_pantalla("transcripciones", self.seqrecord, filepath=self.archivo)
+            if self.seqrecord:
+                app.mostrar_pantalla("transcripciones", self.seqrecord, filepath=self.archivo)
 
         self.file_label = ctk.CTkLabel(self.frame, text="", text_color="#000000")
         self.file_label.grid(row=4, column=2, pady=5)
@@ -329,8 +362,8 @@ class PantallaParametros(PantallaInicial):
         #maxlen_spinbox.insert(0, "120")
 
         texto_largo = "Largo de las sondas: Corresponde a la longitud en\nnucleótidos de la sonda a diseñar. Se prioriza\nel diseño de sondas de menor tamaño."
-        tooltip_minlen = ToolTip(minlen_label, texto_largo, os.path.join("images","largo.png"))
-        tooltip_maxlen = ToolTip(maxlen_label, texto_largo, os.path.join("images","largo.png"))
+        tooltip_minlen = ToolTip(minlen_label, texto_largo, resource_path(os.path.join("images","largo.png")))
+        tooltip_maxlen = ToolTip(maxlen_label, texto_largo, resource_path(os.path.join("images","largo.png")))
 
         #TM mínima
         #tmmin_label = tk.Label(self.frame, text="Temp melting mínima (°C)")
@@ -410,8 +443,8 @@ class PantallaParametros(PantallaInicial):
         #maxdist_spinbox.insert(0, "100")
 
         texto_dist = "La distancia al borde del exón se refiere a la cantidad de nucleótidos que hay entre\nel punto de empalme y las sondas internas donor y acceptor.\n(No aplica para sondas centrales)"
-        tooltip_mindist = ToolTip(mindist_label, texto_dist, os.path.join("images","distancia.png"))
-        tooltip_maxdist = ToolTip(maxdist_label, texto_dist, os.path.join("images","distancia.png"))
+        tooltip_mindist = ToolTip(mindist_label, texto_dist, resource_path(os.path.join("images","distancia.png")))
+        tooltip_maxdist = ToolTip(maxdist_label, texto_dist, resource_path(os.path.join("images","distancia.png")))
 
 
         #Sobrelape mínimo
@@ -438,8 +471,8 @@ class PantallaParametros(PantallaInicial):
         #maxoverlap_spinbox.insert(0, "50")
 
         texto_overlap = "El sobrelape u overlap es el porcentaje de la\nsonda interior que es compartido con las sondas\nexteriores, solo aplica para donor y acceptor."
-        tooltip_minoverlap = ToolTip(minoverlap_label, texto_overlap, os.path.join("images","sobrelape.png"))
-        tooltip_maxoverlap = ToolTip(maxoverlap_label, texto_overlap, os.path.join("images","sobrelape.png"))
+        tooltip_minoverlap = ToolTip(minoverlap_label, texto_overlap, resource_path(os.path.join("images","sobrelape.png")))
+        tooltip_maxoverlap = ToolTip(maxoverlap_label, texto_overlap, resource_path(os.path.join("images","sobrelape.png")))
 
         #Delta G mínimo homodimerización
         #dgmin_homodim_label = tk.Label(self.frame, text="Delta G mínimo homodimerización")
@@ -667,8 +700,9 @@ class PantallaCarga(PantallaInicial):
                              imagen.get_splicings(self.seqrecord, self.transcripciones),
                              filename)
         
-        folderpath = os.path.join(os.getcwd(),'sondas',filename)
-
+        #folderpath = os.path.join(os.getcwd(),'sondas',filename)
+        folderpath = resource_path(os.path.join('sondas',filename))
+        
         shutil.copy(self.filepath, folderpath)
 
         #df1 = pd.read_excel(os.path.join(folderpath, self.seqrecord.id+'.xlsx'), sheet_name='Resumen', header=None)
@@ -1113,7 +1147,8 @@ class PantallaFinal(PantallaInicial):
 
         def registrar_diseno(descripcion):
             try:
-                conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
+                #conn = sqlite3.connect(os.path.join(os.getcwd(), 'databases', 'probesdb.db'))
+                conn = sqlite3.connect(resource_path(os.path.join('databases', 'probesdb.db')))
                 cursor = conn.cursor()
                 cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1157,9 +1192,12 @@ class PantallaHistorial(PantallaInicial):
         super().__init__(root)
 
     def crear_interfaz(self):
-        if not os.path.exists(os.path.join(os.getcwd(),'databases')):
-            os.makedirs(os.path.join(os.getcwd(),'databases'))
-        conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
+        # if not os.path.exists(os.path.join(os.getcwd(),'databases')):
+        #     os.makedirs(os.path.join(os.getcwd(),'databases'))
+        if not os.path.exists(resource_path('databases')):
+            os.makedirs(resource_path('databases'))
+        #conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
+        conexion = sqlite3.connect(resource_path(os.path.join("databases", "probesdb.db")))  
         cursor = conexion.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1199,7 +1237,7 @@ class PantallaHistorial(PantallaInicial):
 
 
         #combobox_filtro = ttk.Combobox(self.frame, values=genes, state="readonly", width=maxlen(genes))
-        combobox_filtro = ctk.CTkComboBox(self.frame, values=genes, width=100, command=data_table.mostrar_gen)
+        combobox_filtro = ctk.CTkComboBox(self.frame, values=[""]+genes, width=100, command=data_table.mostrar_gen)
         combobox_filtro.grid(row=1, column=0, padx=20, pady=20)
 
         #boton_filtro = tk.Button(self.frame, text="Filtrar", command=filtrar_descripcion)
@@ -1744,7 +1782,9 @@ class DataTable(tk.Frame):
 
     def create_table(self):
 
-        self.conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
+        #self.conexion = sqlite3.connect(os.path.join(os.getcwd(),"databases", "probesdb.db"))
+        self.conexion = sqlite3.connect(resource_path(os.path.join("databases", "probesdb.db")))
+        
         self.cursor = self.conexion.cursor()
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS sondas (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -1755,11 +1795,11 @@ class DataTable(tk.Frame):
                                 fecha_hora DATETIME,
                                 carpeta TEXT)''')
         data=[]
-        data.append(['ID', 'Descripción', 'Accession Num', 'Secuencia', 'Genes', 'Fecha y hora'])
+        data.append(['ID', 'Descripción', 'Accession Num', 'Genes', 'Fecha y hora'])
         
         self.cursor.execute("SELECT id, accnum, descripcion, secuencia, genes, fecha_hora FROM sondas ORDER BY id DESC")
         for row in self.cursor.fetchall():
-            data.append([row[0], row[2], row[1], row[3], row[4], row[5]])
+            data.append([row[0], row[2], row[1], row[4], row[5]])
 
         self.data = data
 
@@ -1797,10 +1837,10 @@ class DataTable(tk.Frame):
         id_registro = self.data[row][0]
         self.cursor.execute("SELECT accnum, carpeta, genes FROM sondas WHERE id=?", (id_registro,))
         registro = self.cursor.fetchone()
-        print(registro[0])
-        print(registro[1])
-        print(registro[2])
-        print(f"Botón clickeado en la fila {row}")
+        #print(registro[0])
+        #print(registro[1])
+        #print(registro[2])
+        #print(f"Botón clickeado en la fila {row}")
         app.mostrar_pantalla("registro", folderpath=registro[1], genes=registro[2], accnum=registro[0])
 
 
@@ -1822,44 +1862,45 @@ class DataTable(tk.Frame):
             self.create_table()
 
     def mostrar_gen(self, gen):
-        data=[]
-        data.append(['ID', 'Accession Num', 'Descripción', 'Secuencia', 'Genes', 'Fecha y hora'])
-        
-        self.cursor.execute("SELECT id, accnum, descripcion, secuencia, genes, fecha_hora FROM sondas WHERE genes = (?) ORDER BY id DESC",(gen,))
-        for row in self.cursor.fetchall():
-            data.append([row[0], row[1], row[2], row[3], row[4], row[5]])
+        if len(gen)>1:
+            data=[]
+            data.append(['ID', 'Accession Num', 'Descripción', 'Genes', 'Fecha y hora'])
+            
+            self.cursor.execute("SELECT id, accnum, descripcion, secuencia, genes, fecha_hora FROM sondas WHERE genes = (?) ORDER BY id DESC",(gen,))
+            for row in self.cursor.fetchall():
+                data.append([row[0], row[1], row[2], row[4], row[5]])
 
-        self.data = data
+            self.data = data
 
-        # Destruir todos los widgets de la tabla actual
-        for frame in self.table_frames:
-            frame.destroy()
-        
-        # Limpiar la lista de frames
-        self.table_frames.clear()
+            # Destruir todos los widgets de la tabla actual
+            for frame in self.table_frames:
+                frame.destroy()
+            
+            # Limpiar la lista de frames
+            self.table_frames.clear()
 
-        # Crear una nueva tabla con los datos actualizados
-        column_widths = []
-        for col in zip(*self.data):
-            column_widths.append(max(len(str(cell)) for cell in col))
+            # Crear una nueva tabla con los datos actualizados
+            column_widths = []
+            for col in zip(*self.data):
+                column_widths.append(max(len(str(cell)) for cell in col))
 
-        for row_index, row_data in enumerate(self.data):
-            row_frame = tk.Frame(self)
-            row_frame.grid(row=row_index, column=0, sticky="ew")
-            self.table_frames.append(row_frame)
+            for row_index, row_data in enumerate(self.data):
+                row_frame = tk.Frame(self)
+                row_frame.grid(row=row_index, column=0, sticky="ew")
+                self.table_frames.append(row_frame)
 
-            for col_index, cell_data in enumerate(row_data):
-                cell_label = tk.Label(row_frame, text=str(cell_data), padx=2, pady=2, borderwidth=1, relief="solid", width=column_widths[col_index])
-                cell_label.grid(row=0, column=col_index, sticky="ew")
+                for col_index, cell_data in enumerate(row_data):
+                    cell_label = tk.Label(row_frame, text=str(cell_data), padx=2, pady=2, borderwidth=1, relief="solid", width=column_widths[col_index])
+                    cell_label.grid(row=0, column=col_index, sticky="ew")
 
-            if row_index > 0 :
-                ver_button = tk.Button(row_frame, text="Ver", command=lambda row=row_index: self.on_button_click_1(row))
-                ver_button.grid(row=0, column=len(row_data), padx=5, pady=2, sticky="e")
+                if row_index > 0 :
+                    ver_button = tk.Button(row_frame, text="Ver", command=lambda row=row_index: self.on_button_click_1(row))
+                    ver_button.grid(row=0, column=len(row_data), padx=5, pady=2, sticky="e")
 
-                delete_button = tk.Button(row_frame, text="Eliminar", command=lambda row=row_index: self.on_button_click_2(row))
-                delete_button.grid(row=0, column=len(row_data)+1, padx=5, pady=2, sticky="e")
+                    delete_button = tk.Button(row_frame, text="Eliminar", command=lambda row=row_index: self.on_button_click_2(row))
+                    delete_button.grid(row=0, column=len(row_data)+1, padx=5, pady=2, sticky="e")
 
-            row_frame.columnconfigure(len(row_data), weight=1)
+                row_frame.columnconfigure(len(row_data), weight=1)
 
 
 if __name__ == "__main__":
@@ -1868,6 +1909,6 @@ if __name__ == "__main__":
     root = ctk.CTk()
     root.state("zoomed")
     app = ControladorApp(root)
-    root.iconbitmap(os.path.join("images", "gemini2.ico"))
+    root.iconbitmap(resource_path(os.path.join("images", "gemini2.ico")))
     #root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file=os.path.join('images','gemini2.png')))
     root.mainloop()

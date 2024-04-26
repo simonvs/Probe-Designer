@@ -41,7 +41,9 @@ def get_splicing_pairs(locations):
 
     empalmes = []
     for i in range(len(positions)-1):
-        empalmes.append((positions[i][1].position, positions[i+1][0].position))
+        #empalmes.append((positions[i][1].position, positions[i+1][0].position))
+        empalmes.append((int(positions[i][1]), int(positions[i+1][0])))
+
 
     return empalmes
 

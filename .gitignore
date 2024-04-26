@@ -1,9 +1,14 @@
 __pycache__/
 .ipynb_checkpoints/
 sondas/
+docs/
+dist/
+build/
+_build/
 probesdb.db
 Pruebas.ipynb
 resultados.xml
 db*
 *.gb
 *.gbk
+*.spec

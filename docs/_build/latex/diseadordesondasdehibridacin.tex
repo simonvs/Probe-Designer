@@ -66,7 +66,7 @@
 
 
 \title{Diseñador de sondas de hibridación}
-\date{27 de noviembre de 2023}
+\date{16 de abril de 2024}
 \release{}
 \author{Simón Vergara}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -270,6 +270,7 @@ Booleano que determina la validez de la secuencia
 \pysigstopsignatures
 \sphinxAtStartPar
 Función que genera un reporte excel que contiene todas las sondas generadas y sus características. Además muestra las restricciones iniciales y los grupos de multiplexación.
+Almacena el reporte en la carpeta “sondas”
 \begin{quote}\begin{description}
 \sphinxlineitem{Parámetros}\begin{itemize}
 \item {} 
@@ -570,7 +571,7 @@ Lista con pares de posiciones en una tupla: el fin de un exón y el inicio del s
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{diseno:diseno.probe_designer}}
 \pysigstartsignatures
-\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{probe\_designer}}}{\sphinxparam{\DUrole{n}{record}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripts}}\sphinxparamcomma \sphinxparam{\DUrole{n}{progreso\_queue}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minlen}\DUrole{o}{=}\DUrole{default_value}{60}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxlen}\DUrole{o}{=}\DUrole{default_value}{120}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmin}\DUrole{o}{=}\DUrole{default_value}{65}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmax}\DUrole{o}{=}\DUrole{default_value}{80}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmin}\DUrole{o}{=}\DUrole{default_value}{30}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmax}\DUrole{o}{=}\DUrole{default_value}{70}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindist}\DUrole{o}{=}\DUrole{default_value}{0}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdist}\DUrole{o}{=}\DUrole{default_value}{200}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minoverlap}\DUrole{o}{=}\DUrole{default_value}{25}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxoverlap}\DUrole{o}{=}\DUrole{default_value}{50}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_homodim}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_hairpin}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_simple}\DUrole{o}{=}\DUrole{default_value}{6}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_double}\DUrole{o}{=}\DUrole{default_value}{5}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_triple}\DUrole{o}{=}\DUrole{default_value}{4}}\sphinxparamcomma \sphinxparam{\DUrole{n}{multiplex}\DUrole{o}{=}\DUrole{default_value}{True}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindg}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}13627}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdt}\DUrole{o}{=}\DUrole{default_value}{5}}}{}
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{diseno.}}\sphinxbfcode{\sphinxupquote{probe\_designer}}}{\sphinxparam{\DUrole{n}{record}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripts}}\sphinxparamcomma \sphinxparam{\DUrole{n}{progreso\_queue}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minlen}\DUrole{o}{=}\DUrole{default_value}{60}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxlen}\DUrole{o}{=}\DUrole{default_value}{120}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmin}\DUrole{o}{=}\DUrole{default_value}{65}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tmmax}\DUrole{o}{=}\DUrole{default_value}{80}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmin}\DUrole{o}{=}\DUrole{default_value}{30}}\sphinxparamcomma \sphinxparam{\DUrole{n}{gcmax}\DUrole{o}{=}\DUrole{default_value}{70}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindist}\DUrole{o}{=}\DUrole{default_value}{0}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdist}\DUrole{o}{=}\DUrole{default_value}{200}}\sphinxparamcomma \sphinxparam{\DUrole{n}{minoverlap}\DUrole{o}{=}\DUrole{default_value}{25}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxoverlap}\DUrole{o}{=}\DUrole{default_value}{50}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_homodim}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dgmin\_hairpin}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}10000}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_simple}\DUrole{o}{=}\DUrole{default_value}{6}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_double}\DUrole{o}{=}\DUrole{default_value}{5}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxhomopol\_triple}\DUrole{o}{=}\DUrole{default_value}{4}}\sphinxparamcomma \sphinxparam{\DUrole{n}{ismultiplex}\DUrole{o}{=}\DUrole{default_value}{True}}\sphinxparamcomma \sphinxparam{\DUrole{n}{mindg}\DUrole{o}{=}\DUrole{default_value}{\sphinxhyphen{}13627}}\sphinxparamcomma \sphinxparam{\DUrole{n}{maxdt}\DUrole{o}{=}\DUrole{default_value}{5}}}{}
 \pysigstopsignatures
 \sphinxAtStartPar
 Función principal diseñadora de sondas. De la secuencia anotada se obtiene una serie de sondas como subsecuencias de ésta, que cumplen varias restricciones ajustadas por los parámetros.
@@ -646,7 +647,7 @@ Función principal diseñadora de sondas. De la secuencia anotada se obtiene una
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{multiplex}} \textendash{} Booleano que indica si el diseño considera multiplexación
+\sphinxstyleliteralstrong{\sphinxupquote{ismultiplex}} \textendash{} Booleano que indica si el diseño considera multiplexación
 
 \item {} 
 \sphinxAtStartPar
@@ -781,6 +782,635 @@ True si son compatibles, False en caso contrario.
 \end{fulllineitems}
 
 
+\sphinxstepscope
+
+
+\section{probeDesignerUI module}
+\label{\detokenize{probeDesignerUI:probedesignerui-module}}\label{\detokenize{probeDesignerUI::doc}}
+\sphinxAtStartPar
+El módulo probeDesignerUI despliega la interfaz de usuario para utilizar el diseñador de sondas.
+\index{module@\spxentry{module}!probeDesignerUI@\spxentry{probeDesignerUI}}\index{probeDesignerUI@\spxentry{probeDesignerUI}!module@\spxentry{module}}\index{AutoScrollbar (clase en probeDesignerUI)@\spxentry{AutoScrollbar}\spxextra{clase en probeDesignerUI}}\phantomsection\label{\detokenize{probeDesignerUI:module-probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.AutoScrollbar}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{AutoScrollbar}}}{\sphinxparam{\DUrole{n}{master}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{o}{**}\DUrole{n}{kw}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{Scrollbar}}
+
+\sphinxAtStartPar
+A scrollbar that hides itself if it’s not needed.
+Works only if you use the grid geometry manager
+\index{pack() (método de probeDesignerUI.AutoScrollbar)@\spxentry{pack()}\spxextra{método de probeDesignerUI.AutoScrollbar}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.AutoScrollbar.pack}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{pack}}}{\sphinxparam{\DUrole{o}{**}\DUrole{n}{kw}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Pack a widget in the parent widget. Use as options:
+after=widget \sphinxhyphen{} pack it after you have packed widget
+anchor=NSEW (or subset) \sphinxhyphen{} position widget according to
+\begin{quote}
+
+\sphinxAtStartPar
+given direction
+\end{quote}
+
+\sphinxAtStartPar
+before=widget \sphinxhyphen{} pack it before you will pack widget
+expand=bool \sphinxhyphen{} expand widget if parent size grows
+fill=NONE or X or Y or BOTH \sphinxhyphen{} fill widget if widget grows
+in=master \sphinxhyphen{} use master to contain this widget
+in\_=master \sphinxhyphen{} see “in” option description
+ipadx=amount \sphinxhyphen{} add internal padding in x direction
+ipady=amount \sphinxhyphen{} add internal padding in y direction
+padx=amount \sphinxhyphen{} add padding in x direction
+pady=amount \sphinxhyphen{} add padding in y direction
+side=TOP or BOTTOM or LEFT or RIGHT \sphinxhyphen{}  where to add this widget.
+
+\end{fulllineitems}
+
+\index{place() (método de probeDesignerUI.AutoScrollbar)@\spxentry{place()}\spxextra{método de probeDesignerUI.AutoScrollbar}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.AutoScrollbar.place}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{place}}}{\sphinxparam{\DUrole{o}{**}\DUrole{n}{kw}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Place a widget in the parent widget. Use as options:
+in=master \sphinxhyphen{} master relative to which the widget is placed
+in\_=master \sphinxhyphen{} see “in” option description
+x=amount \sphinxhyphen{} locate anchor of this widget at position x of master
+y=amount \sphinxhyphen{} locate anchor of this widget at position y of master
+relx=amount \sphinxhyphen{} locate anchor of this widget between 0.0 and 1.0
+\begin{quote}
+
+\sphinxAtStartPar
+relative to width of master (1.0 is right edge)
+\end{quote}
+\begin{description}
+\sphinxlineitem{rely=amount \sphinxhyphen{} locate anchor of this widget between 0.0 and 1.0}
+\sphinxAtStartPar
+relative to height of master (1.0 is bottom edge)
+
+\end{description}
+
+\sphinxAtStartPar
+anchor=NSEW (or subset) \sphinxhyphen{} position anchor according to given direction
+width=amount \sphinxhyphen{} width of this widget in pixel
+height=amount \sphinxhyphen{} height of this widget in pixel
+relwidth=amount \sphinxhyphen{} width of this widget between 0.0 and 1.0
+\begin{quote}
+
+\sphinxAtStartPar
+relative to width of master (1.0 is the same width
+as the master)
+\end{quote}
+\begin{description}
+\sphinxlineitem{relheight=amount \sphinxhyphen{} height of this widget between 0.0 and 1.0}
+\sphinxAtStartPar
+relative to height of master (1.0 is the same
+height as the master)
+
+\sphinxlineitem{bordermode=»inside» or «outside» \sphinxhyphen{} whether to take border width of}
+\sphinxAtStartPar
+master widget into account
+
+\end{description}
+
+\end{fulllineitems}
+
+\index{set() (método de probeDesignerUI.AutoScrollbar)@\spxentry{set()}\spxextra{método de probeDesignerUI.AutoScrollbar}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.AutoScrollbar.set}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{set}}}{\sphinxparam{\DUrole{n}{lo}}\sphinxparamcomma \sphinxparam{\DUrole{n}{hi}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Set the fractional values of the slider position (upper and
+lower ends as value between 0 and 1).
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{ControladorApp (clase en probeDesignerUI)@\spxentry{ControladorApp}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ControladorApp}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{ControladorApp}}}{\sphinxparam{\DUrole{n}{root}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{object}}
+\index{mostrar\_pantalla() (método de probeDesignerUI.ControladorApp)@\spxentry{mostrar\_pantalla()}\spxextra{método de probeDesignerUI.ControladorApp}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ControladorApp.mostrar_pantalla}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{mostrar\_pantalla}}}{\sphinxparam{\DUrole{n}{nombre}}\sphinxparamcomma \sphinxparam{\DUrole{n}{seqrecord}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripciones}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dict\_params}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{filepath}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{folderpath}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df1}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df2}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df3}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{genes}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{accnum}\DUrole{o}{=}\DUrole{default_value}{None}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{DataTable (clase en probeDesignerUI)@\spxentry{DataTable}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.DataTable}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{DataTable}}}{\sphinxparam{\DUrole{n}{master}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{Frame}}
+\index{create\_table() (método de probeDesignerUI.DataTable)@\spxentry{create\_table()}\spxextra{método de probeDesignerUI.DataTable}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.DataTable.create_table}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{create\_table}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{mostrar\_gen() (método de probeDesignerUI.DataTable)@\spxentry{mostrar\_gen()}\spxextra{método de probeDesignerUI.DataTable}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.DataTable.mostrar_gen}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{mostrar\_gen}}}{\sphinxparam{\DUrole{n}{gen}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{on\_button\_click\_1() (método de probeDesignerUI.DataTable)@\spxentry{on\_button\_click\_1()}\spxextra{método de probeDesignerUI.DataTable}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.DataTable.on_button_click_1}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{on\_button\_click\_1}}}{\sphinxparam{\DUrole{n}{row}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{on\_button\_click\_2() (método de probeDesignerUI.DataTable)@\spxentry{on\_button\_click\_2()}\spxextra{método de probeDesignerUI.DataTable}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.DataTable.on_button_click_2}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{on\_button\_click\_2}}}{\sphinxparam{\DUrole{n}{row}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{IntegerSelector (clase en probeDesignerUI)@\spxentry{IntegerSelector}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.IntegerSelector}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{IntegerSelector}}}{\sphinxparam{\DUrole{n}{master}}\sphinxparamcomma \sphinxparam{\DUrole{n}{default\_value}\DUrole{o}{=}\DUrole{default_value}{0}}\sphinxparamcomma \sphinxparam{\DUrole{n}{min\_value}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{max\_value}\DUrole{o}{=}\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{increment}\DUrole{o}{=}\DUrole{default_value}{1}}\sphinxparamcomma \sphinxparam{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{CTkFrame}}
+\index{aumentar() (método de probeDesignerUI.IntegerSelector)@\spxentry{aumentar()}\spxextra{método de probeDesignerUI.IntegerSelector}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.IntegerSelector.aumentar}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{aumentar}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{disminuir() (método de probeDesignerUI.IntegerSelector)@\spxentry{disminuir()}\spxextra{método de probeDesignerUI.IntegerSelector}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.IntegerSelector.disminuir}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{disminuir}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{validar() (método de probeDesignerUI.IntegerSelector)@\spxentry{validar()}\spxextra{método de probeDesignerUI.IntegerSelector}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.IntegerSelector.validar}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{validar}}}{\sphinxparam{\DUrole{n}{nuevo\_valor}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaCarga (clase en probeDesignerUI)@\spxentry{PantallaCarga}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaCarga}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaCarga}}}{\sphinxparam{\DUrole{n}{root}}\sphinxparamcomma \sphinxparam{\DUrole{n}{seqrecord}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripciones}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dict\_params}}\sphinxparamcomma \sphinxparam{\DUrole{n}{filepath}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: {\hyperref[\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{PantallaInicial}}}}}
+\index{actualizar\_progreso() (método de probeDesignerUI.PantallaCarga)@\spxentry{actualizar\_progreso()}\spxextra{método de probeDesignerUI.PantallaCarga}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaCarga.actualizar_progreso}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{actualizar\_progreso}}}{\sphinxparam{\DUrole{n}{progreso\_queue}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tarea\_thread}}\sphinxparamcomma \sphinxparam{\DUrole{n}{multiplex}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaCarga)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaCarga}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaCarga.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{ejecutar\_diseno() (método de probeDesignerUI.PantallaCarga)@\spxentry{ejecutar\_diseno()}\spxextra{método de probeDesignerUI.PantallaCarga}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaCarga.ejecutar_diseno}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{ejecutar\_diseno}}}{\sphinxparam{\DUrole{n}{progreso\_queue}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaFinal (clase en probeDesignerUI)@\spxentry{PantallaFinal}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaFinal}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaFinal}}}{\sphinxparam{\DUrole{n}{root}}\sphinxparamcomma \sphinxparam{\DUrole{n}{seqrecord}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripciones}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df}}\sphinxparamcomma \sphinxparam{\DUrole{n}{dict\_params}}\sphinxparamcomma \sphinxparam{\DUrole{n}{filepath}}\sphinxparamcomma \sphinxparam{\DUrole{n}{folderpath}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df1}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df2}}\sphinxparamcomma \sphinxparam{\DUrole{n}{df3}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: {\hyperref[\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{PantallaInicial}}}}}
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaFinal)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaFinal}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaFinal.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{volver\_a\_inicio() (método de probeDesignerUI.PantallaFinal)@\spxentry{volver\_a\_inicio()}\spxextra{método de probeDesignerUI.PantallaFinal}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaFinal.volver_a_inicio}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{volver\_a\_inicio}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaHistorial (clase en probeDesignerUI)@\spxentry{PantallaHistorial}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaHistorial}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaHistorial}}}{\sphinxparam{\DUrole{n}{root}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: {\hyperref[\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{PantallaInicial}}}}}
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaHistorial)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaHistorial}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaHistorial.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{volver\_a\_seleccion() (método de probeDesignerUI.PantallaHistorial)@\spxentry{volver\_a\_seleccion()}\spxextra{método de probeDesignerUI.PantallaHistorial}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaHistorial.volver_a_seleccion}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{volver\_a\_seleccion}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaInicial (clase en probeDesignerUI)@\spxentry{PantallaInicial}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaInicial}}}{\sphinxparam{\DUrole{n}{root}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{object}}
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaInicial)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaInicial}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{seleccionar\_archivo() (método de probeDesignerUI.PantallaInicial)@\spxentry{seleccionar\_archivo()}\spxextra{método de probeDesignerUI.PantallaInicial}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial.seleccionar_archivo}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{seleccionar\_archivo}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{ver\_historial() (método de probeDesignerUI.PantallaInicial)@\spxentry{ver\_historial()}\spxextra{método de probeDesignerUI.PantallaInicial}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial.ver_historial}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{ver\_historial}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaParametros (clase en probeDesignerUI)@\spxentry{PantallaParametros}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaParametros}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaParametros}}}{\sphinxparam{\DUrole{n}{root}}\sphinxparamcomma \sphinxparam{\DUrole{n}{seqrecord}}\sphinxparamcomma \sphinxparam{\DUrole{n}{transcripciones}}\sphinxparamcomma \sphinxparam{\DUrole{n}{filepath}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: {\hyperref[\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{PantallaInicial}}}}}
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaParametros)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaParametros}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaParametros.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{volver\_a\_transcripciones() (método de probeDesignerUI.PantallaParametros)@\spxentry{volver\_a\_transcripciones()}\spxextra{método de probeDesignerUI.PantallaParametros}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaParametros.volver_a_transcripciones}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{volver\_a\_transcripciones}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaRegistro (clase en probeDesignerUI)@\spxentry{PantallaRegistro}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaRegistro}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaRegistro}}}{\sphinxparam{\DUrole{n}{root}}\sphinxparamcomma \sphinxparam{\DUrole{n}{folderpath}}\sphinxparamcomma \sphinxparam{\DUrole{n}{genes}}\sphinxparamcomma \sphinxparam{\DUrole{n}{accnum}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: {\hyperref[\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{PantallaInicial}}}}}
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaRegistro)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaRegistro}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaRegistro.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{volver\_a\_inicio() (método de probeDesignerUI.PantallaRegistro)@\spxentry{volver\_a\_inicio()}\spxextra{método de probeDesignerUI.PantallaRegistro}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaRegistro.volver_a_inicio}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{volver\_a\_inicio}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{PantallaTranscripciones (clase en probeDesignerUI)@\spxentry{PantallaTranscripciones}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{PantallaTranscripciones}}}{\sphinxparam{\DUrole{n}{root}}\sphinxparamcomma \sphinxparam{\DUrole{n}{seqrecord}}\sphinxparamcomma \sphinxparam{\DUrole{n}{filepath}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: {\hyperref[\detokenize{probeDesignerUI:probeDesignerUI.PantallaInicial}]{\sphinxcrossref{\sphinxcode{\sphinxupquote{PantallaInicial}}}}}
+\index{crear\_interfaz() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones.crear_interfaz}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{crear\_interfaz}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{eliminar() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{eliminar()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones.eliminar}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{eliminar}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{eliminar\_todo() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{eliminar\_todo()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones.eliminar_todo}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{eliminar\_todo}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{seleccionar() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{seleccionar()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones.seleccionar}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{seleccionar}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{seleccionar\_todo() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{seleccionar\_todo()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones.seleccionar_todo}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{seleccionar\_todo}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{volver\_a\_seleccion() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{volver\_a\_seleccion()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.PantallaTranscripciones.volver_a_seleccion}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{volver\_a\_seleccion}}}{}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{ScrollableFrame (clase en probeDesignerUI)@\spxentry{ScrollableFrame}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ScrollableFrame}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{ScrollableFrame}}}{\sphinxparam{\DUrole{n}{parent}}\sphinxparamcomma \sphinxparam{\DUrole{o}{*}\DUrole{n}{args}}\sphinxparamcomma \sphinxparam{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{Frame}}
+\index{resize\_canvas() (método de probeDesignerUI.ScrollableFrame)@\spxentry{resize\_canvas()}\spxextra{método de probeDesignerUI.ScrollableFrame}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ScrollableFrame.resize_canvas}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{resize\_canvas}}}{\sphinxparam{\DUrole{n}{event}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{ToolTip (clase en probeDesignerUI)@\spxentry{ToolTip}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ToolTip}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{ToolTip}}}{\sphinxparam{\DUrole{n}{widget}}\sphinxparamcomma \sphinxparam{\DUrole{n}{text}}\sphinxparamcomma \sphinxparam{\DUrole{n}{image\_path}\DUrole{o}{=}\DUrole{default_value}{None}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{object}}
+\index{mostrar\_tooltip() (método de probeDesignerUI.ToolTip)@\spxentry{mostrar\_tooltip()}\spxextra{método de probeDesignerUI.ToolTip}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ToolTip.mostrar_tooltip}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{mostrar\_tooltip}}}{\sphinxparam{\DUrole{n}{event}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+\index{ocultar\_tooltip() (método de probeDesignerUI.ToolTip)@\spxentry{ocultar\_tooltip()}\spxextra{método de probeDesignerUI.ToolTip}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.ToolTip.ocultar_tooltip}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{ocultar\_tooltip}}}{\sphinxparam{\DUrole{n}{event}}}{}
+\pysigstopsignatures
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{Zoom\_Advanced (clase en probeDesignerUI)@\spxentry{Zoom\_Advanced}\spxextra{clase en probeDesignerUI}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }}}\sphinxcode{\sphinxupquote{probeDesignerUI.}}\sphinxbfcode{\sphinxupquote{Zoom\_Advanced}}}{\sphinxparam{\DUrole{n}{mainframe}}\sphinxparamcomma \sphinxparam{\DUrole{n}{path}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Bases: \sphinxcode{\sphinxupquote{Frame}}
+
+\sphinxAtStartPar
+Advanced zoom of the image
+\index{move\_from() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{move\_from()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced.move_from}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{move\_from}}}{\sphinxparam{\DUrole{n}{event}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Remember previous coordinates for scrolling with the mouse
+
+\end{fulllineitems}
+
+\index{move\_to() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{move\_to()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced.move_to}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{move\_to}}}{\sphinxparam{\DUrole{n}{event}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Drag (move) canvas to the new position
+
+\end{fulllineitems}
+
+\index{scroll\_x() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{scroll\_x()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced.scroll_x}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{scroll\_x}}}{\sphinxparam{\DUrole{o}{*}\DUrole{n}{args}}\sphinxparamcomma \sphinxparam{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Scroll canvas horizontally and redraw the image
+
+\end{fulllineitems}
+
+\index{scroll\_y() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{scroll\_y()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced.scroll_y}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{scroll\_y}}}{\sphinxparam{\DUrole{o}{*}\DUrole{n}{args}}\sphinxparamcomma \sphinxparam{\DUrole{o}{**}\DUrole{n}{kwargs}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Scroll canvas vertically and redraw the image
+
+\end{fulllineitems}
+
+\index{show\_image() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{show\_image()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced.show_image}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{show\_image}}}{\sphinxparam{\DUrole{n}{event}\DUrole{o}{=}\DUrole{default_value}{None}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Show image on the Canvas
+
+\end{fulllineitems}
+
+\index{wheel() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{wheel()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{probeDesignerUI:probeDesignerUI.Zoom_Advanced.wheel}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{wheel}}}{\sphinxparam{\DUrole{n}{event}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Zoom with mouse wheel
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
 
 \chapter{Índices y tablas}
 \label{\detokenize{index:indices-y-tablas}}\begin{itemize}
@@ -808,6 +1438,9 @@ True si son compatibles, False en caso contrario.
 \indexspace
 \bigletter{m}
 \item\relax\sphinxstyleindexentry{multiplex}\sphinxstyleindexpageref{multiplex:\detokenize{module-multiplex}}
+\indexspace
+\bigletter{p}
+\item\relax\sphinxstyleindexentry{probeDesignerUI}\sphinxstyleindexpageref{probeDesignerUI:\detokenize{module-probeDesignerUI}}
 \end{sphinxtheindex}
 
 \renewcommand{\indexname}{Índice}

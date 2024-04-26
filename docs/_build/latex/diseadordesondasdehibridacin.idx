@@ -20,3 +20,59 @@
 \indexentry{multiplex@\spxentry{multiplex}!module@\spxentry{module}|hyperpage}{6}
 \indexentry{are\_sequences\_compatible() (en el módulo multiplex)@\spxentry{are\_sequences\_compatible()}\spxextra{en el módulo multiplex}|hyperpage}{6}
 \indexentry{multiplex\_sequences() (en el módulo multiplex)@\spxentry{multiplex\_sequences()}\spxextra{en el módulo multiplex}|hyperpage}{6}
+\indexentry{module@\spxentry{module}!probeDesignerUI@\spxentry{probeDesignerUI}|hyperpage}{7}
+\indexentry{probeDesignerUI@\spxentry{probeDesignerUI}!module@\spxentry{module}|hyperpage}{7}
+\indexentry{AutoScrollbar (clase en probeDesignerUI)@\spxentry{AutoScrollbar}\spxextra{clase en probeDesignerUI}|hyperpage}{7}
+\indexentry{pack() (método de probeDesignerUI.AutoScrollbar)@\spxentry{pack()}\spxextra{método de probeDesignerUI.AutoScrollbar}|hyperpage}{7}
+\indexentry{place() (método de probeDesignerUI.AutoScrollbar)@\spxentry{place()}\spxextra{método de probeDesignerUI.AutoScrollbar}|hyperpage}{7}
+\indexentry{set() (método de probeDesignerUI.AutoScrollbar)@\spxentry{set()}\spxextra{método de probeDesignerUI.AutoScrollbar}|hyperpage}{7}
+\indexentry{ControladorApp (clase en probeDesignerUI)@\spxentry{ControladorApp}\spxextra{clase en probeDesignerUI}|hyperpage}{7}
+\indexentry{mostrar\_pantalla() (método de probeDesignerUI.ControladorApp)@\spxentry{mostrar\_pantalla()}\spxextra{método de probeDesignerUI.ControladorApp}|hyperpage}{7}
+\indexentry{DataTable (clase en probeDesignerUI)@\spxentry{DataTable}\spxextra{clase en probeDesignerUI}|hyperpage}{7}
+\indexentry{create\_table() (método de probeDesignerUI.DataTable)@\spxentry{create\_table()}\spxextra{método de probeDesignerUI.DataTable}|hyperpage}{7}
+\indexentry{mostrar\_gen() (método de probeDesignerUI.DataTable)@\spxentry{mostrar\_gen()}\spxextra{método de probeDesignerUI.DataTable}|hyperpage}{8}
+\indexentry{on\_button\_click\_1() (método de probeDesignerUI.DataTable)@\spxentry{on\_button\_click\_1()}\spxextra{método de probeDesignerUI.DataTable}|hyperpage}{8}
+\indexentry{on\_button\_click\_2() (método de probeDesignerUI.DataTable)@\spxentry{on\_button\_click\_2()}\spxextra{método de probeDesignerUI.DataTable}|hyperpage}{8}
+\indexentry{IntegerSelector (clase en probeDesignerUI)@\spxentry{IntegerSelector}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{aumentar() (método de probeDesignerUI.IntegerSelector)@\spxentry{aumentar()}\spxextra{método de probeDesignerUI.IntegerSelector}|hyperpage}{8}
+\indexentry{disminuir() (método de probeDesignerUI.IntegerSelector)@\spxentry{disminuir()}\spxextra{método de probeDesignerUI.IntegerSelector}|hyperpage}{8}
+\indexentry{validar() (método de probeDesignerUI.IntegerSelector)@\spxentry{validar()}\spxextra{método de probeDesignerUI.IntegerSelector}|hyperpage}{8}
+\indexentry{PantallaCarga (clase en probeDesignerUI)@\spxentry{PantallaCarga}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{actualizar\_progreso() (método de probeDesignerUI.PantallaCarga)@\spxentry{actualizar\_progreso()}\spxextra{método de probeDesignerUI.PantallaCarga}|hyperpage}{8}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaCarga)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaCarga}|hyperpage}{8}
+\indexentry{ejecutar\_diseno() (método de probeDesignerUI.PantallaCarga)@\spxentry{ejecutar\_diseno()}\spxextra{método de probeDesignerUI.PantallaCarga}|hyperpage}{8}
+\indexentry{PantallaFinal (clase en probeDesignerUI)@\spxentry{PantallaFinal}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaFinal)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaFinal}|hyperpage}{8}
+\indexentry{volver\_a\_inicio() (método de probeDesignerUI.PantallaFinal)@\spxentry{volver\_a\_inicio()}\spxextra{método de probeDesignerUI.PantallaFinal}|hyperpage}{8}
+\indexentry{PantallaHistorial (clase en probeDesignerUI)@\spxentry{PantallaHistorial}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaHistorial)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaHistorial}|hyperpage}{8}
+\indexentry{volver\_a\_seleccion() (método de probeDesignerUI.PantallaHistorial)@\spxentry{volver\_a\_seleccion()}\spxextra{método de probeDesignerUI.PantallaHistorial}|hyperpage}{8}
+\indexentry{PantallaInicial (clase en probeDesignerUI)@\spxentry{PantallaInicial}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaInicial)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaInicial}|hyperpage}{8}
+\indexentry{seleccionar\_archivo() (método de probeDesignerUI.PantallaInicial)@\spxentry{seleccionar\_archivo()}\spxextra{método de probeDesignerUI.PantallaInicial}|hyperpage}{8}
+\indexentry{ver\_historial() (método de probeDesignerUI.PantallaInicial)@\spxentry{ver\_historial()}\spxextra{método de probeDesignerUI.PantallaInicial}|hyperpage}{8}
+\indexentry{PantallaParametros (clase en probeDesignerUI)@\spxentry{PantallaParametros}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaParametros)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaParametros}|hyperpage}{8}
+\indexentry{volver\_a\_transcripciones() (método de probeDesignerUI.PantallaParametros)@\spxentry{volver\_a\_transcripciones()}\spxextra{método de probeDesignerUI.PantallaParametros}|hyperpage}{8}
+\indexentry{PantallaRegistro (clase en probeDesignerUI)@\spxentry{PantallaRegistro}\spxextra{clase en probeDesignerUI}|hyperpage}{8}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaRegistro)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaRegistro}|hyperpage}{8}
+\indexentry{volver\_a\_inicio() (método de probeDesignerUI.PantallaRegistro)@\spxentry{volver\_a\_inicio()}\spxextra{método de probeDesignerUI.PantallaRegistro}|hyperpage}{9}
+\indexentry{PantallaTranscripciones (clase en probeDesignerUI)@\spxentry{PantallaTranscripciones}\spxextra{clase en probeDesignerUI}|hyperpage}{9}
+\indexentry{crear\_interfaz() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{crear\_interfaz()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}|hyperpage}{9}
+\indexentry{eliminar() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{eliminar()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}|hyperpage}{9}
+\indexentry{eliminar\_todo() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{eliminar\_todo()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}|hyperpage}{9}
+\indexentry{seleccionar() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{seleccionar()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}|hyperpage}{9}
+\indexentry{seleccionar\_todo() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{seleccionar\_todo()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}|hyperpage}{9}
+\indexentry{volver\_a\_seleccion() (método de probeDesignerUI.PantallaTranscripciones)@\spxentry{volver\_a\_seleccion()}\spxextra{método de probeDesignerUI.PantallaTranscripciones}|hyperpage}{9}
+\indexentry{ScrollableFrame (clase en probeDesignerUI)@\spxentry{ScrollableFrame}\spxextra{clase en probeDesignerUI}|hyperpage}{9}
+\indexentry{resize\_canvas() (método de probeDesignerUI.ScrollableFrame)@\spxentry{resize\_canvas()}\spxextra{método de probeDesignerUI.ScrollableFrame}|hyperpage}{9}
+\indexentry{ToolTip (clase en probeDesignerUI)@\spxentry{ToolTip}\spxextra{clase en probeDesignerUI}|hyperpage}{9}
+\indexentry{mostrar\_tooltip() (método de probeDesignerUI.ToolTip)@\spxentry{mostrar\_tooltip()}\spxextra{método de probeDesignerUI.ToolTip}|hyperpage}{9}
+\indexentry{ocultar\_tooltip() (método de probeDesignerUI.ToolTip)@\spxentry{ocultar\_tooltip()}\spxextra{método de probeDesignerUI.ToolTip}|hyperpage}{9}
+\indexentry{Zoom\_Advanced (clase en probeDesignerUI)@\spxentry{Zoom\_Advanced}\spxextra{clase en probeDesignerUI}|hyperpage}{9}
+\indexentry{move\_from() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{move\_from()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}|hyperpage}{9}
+\indexentry{move\_to() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{move\_to()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}|hyperpage}{9}
+\indexentry{scroll\_x() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{scroll\_x()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}|hyperpage}{9}
+\indexentry{scroll\_y() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{scroll\_y()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}|hyperpage}{9}
+\indexentry{show\_image() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{show\_image()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}|hyperpage}{9}
+\indexentry{wheel() (método de probeDesignerUI.Zoom\_Advanced)@\spxentry{wheel()}\spxextra{método de probeDesignerUI.Zoom\_Advanced}|hyperpage}{9}
