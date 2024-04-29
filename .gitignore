@@ -6,6 +6,7 @@ build/
 databases/
 site-packages/
 _build/
+output/
 probesdb.db
 Pruebas.ipynb
 resultados.xml
@@ -14,3 +15,4 @@ db*
 *.gbk
 *.spec
 *.exe
+*.zip
