@@ -48,8 +48,8 @@ spec3.loader.exec_module(imagen)
 class PantallaInicial:
     def __init__(self, root):
         self.root = root
-        self.root.title("GEMINi - Diseñador de sondas de hibridación para ARN mensajero")
-        self.root.iconbitmap(resource_path(os.path.join("images", "gemini2.ico")))
+        self.root.wm_title("GEMINi - Diseñador de sondas de hibridación para ARN mensajero")
+        self.root.wm_iconbitmap(resource_path(os.path.join("images", "gemini2.ico")))
         #self.frame = tk.Frame(root)
         self.frame = ctk.CTkFrame(master=root)
         self.frame.place(in_=root, relx=0.5, rely=0.5, anchor='c')
@@ -1910,5 +1910,6 @@ if __name__ == "__main__":
     root.state("zoomed")
     app = ControladorApp(root)
     root.iconbitmap(resource_path(os.path.join("images", "gemini2.ico")))
+    root.wm_iconbitmap(resource_path(os.path.join("images", "gemini2.ico")))
     #root.tk.call('wm', 'iconphoto', root._w, tk.PhotoImage(file=os.path.join('images','gemini2.png')))
     root.mainloop()

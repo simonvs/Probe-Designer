@@ -2,8 +2,9 @@ __pycache__/
 .ipynb_checkpoints/
 sondas/
 docs/
-dist/
 build/
+databases/
+site-packages/
 _build/
 probesdb.db
 Pruebas.ipynb
@@ -12,3 +13,4 @@ db*
 *.gb
 *.gbk
 *.spec
+*.exe
